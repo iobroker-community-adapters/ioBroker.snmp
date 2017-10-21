@@ -24,7 +24,7 @@
     "type": "git",
     "url": "git+https://github.com/CTJaeger/ioBroker.snmp-oid.git"
   },
-   "dependencies": {
+  "dependencies": {
     "net-snmp": "^1.2.0"
   },
   "devDependencies": {
@@ -42,5 +42,11 @@
   },
   "bugs": {
     "url": "https://github.com/CTJaeger/ioBroker.snmp/issues"
-  }
+  },
+  "readme": "# snmp-oid\n\n## not working\n",
+  "readmeFilename": "README.md",
+  "_id": "iobroker.snmp-oid@0.0.1",
+  "_shasum": "65fd1cd2f498ba5356e8c8e28ce2f21a6b590204",
+  "_resolved": "https://github.com/CTJaeger/iobroker.snmp-oid/tarball/master",
+  "_from": "https://github.com/CTJaeger/iobroker.snmp-oid/tarball/master"
 }
