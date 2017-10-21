@@ -1,0 +1,110 @@
+<html>
+<link rel="stylesheet" type="text/css" href="../../lib/css/themes/jquery-ui/redmond/jquery-ui.min.css"/>
+<script type="text/javascript" src="../../lib/js/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="../../socket.io/socket.io.js"></script>
+<script type="text/javascript" src="../../lib/js/jquery-ui-1.10.3.full.min.js"></script>
+
+<link rel="stylesheet" type="text/css" href="../../css/adapter.css"/>
+<script type="text/javascript" src="../../js/translate.js"></script>
+<script type="text/javascript" src="../../js/adapter-settings.js"></script>
+
+<script type="text/javascript">
+    systemDictionary = {
+        "SMA Energy Meter Settings": {
+            "en": "SMA Energy Meter settings",
+            "de": "SMA Energy Meter Einstellungen",
+            "ru": "Настройки измерителя энергии SMA"
+        },
+        "Settings": {"en": "Settings", "de": "Einstellungen", "ru": "Настройки"},
+        "Multicast-IP": {"en": "Multicast-IP", "de": "Multicast-IP", "ru": "многоадресный ip"},
+        "Multicast-Port": {"en": "Multicast-Port", "de": "Multicast-Port", "ru": "многоадресный порт"},
+        "Erweiterter Modus" : {"en": "Extended Mode", "de": "Erweiterter Modus", "ru": "Расширенный режим"},
+	"Details-L1" : {"en": "Details-L1", "de": "Details-L1", "ru": "Подробнее-L1"},
+	    "Details-L2" : {"en": "Details-L2", "de": "Details-L2", "ru": "Подробнее-L2"},
+	    "Details-L3" : {"en": "Details-L3", "de": "Details-L3", "ru": "Подробнее-L3"},
+	};
+
+    // the function loadSettings has to exist ...
+    function load(settings, onChange) {
+        // example: select elements with id=key and class=value and insert value
+       if (!settings) return;
+        $('.value').each(function () {
+            var $key = $(this);
+            var id = $key.attr('id');
+            if ($key.attr('type') === 'checkbox') {
+		// do not call onChange direct, because onChange could expect some arguments
+                $key.prop('checked', settings[id]).change(function() {
+                    onChange();
+                });
+            } else {
+		// do not call onChange direct, because onChange could expect some arguments
+                $key.val(settings[id]).change(function() {
+                    onChange();
+                }).keyup(function() {
+                    onChange();
+                });
+            }
+        });
+        onChange(false);
+    }
+
+    // ... and the function save has to exist.
+    // you have to make sure the callback is called with the settings object as first param!
+    function save(callback) {
+        // example: select elements with class=value and build settings object
+        var obj = {};
+        $('.value').each(function () {
+            var $this = $(this);
+			if ($this.attr('type') === 'checkbox') {
+				obj[$this.attr('id')] = $this.prop('checked');
+			} else {
+				obj[$this.attr('id')] = $this.val();
+			}
+        });
+        callback(obj);
+    }
+
+    $(document).ready(function () {
+        $('#tabs').tabs();
+    });
+</script>
+<style>
+    #settings tr { line-height: 2.5em; }
+</style>
+
+<!-- you have to put your config page in a div with id adapter-container -->
+<div id="adapter-container">
+<table>
+<tbody>
+<tr>
+<td><img src="snmp.png" width="64" height="64" /></td>
+<td>
+<h3 class="translate">SNMP OID Adapter</h3>
+</td>
+</tr>
+</tbody>
+</table>
+<div id="settings">
+<table>
+<tbody>
+<div id="values" style="width: 100%; height: calc(100% - 230px)">
+        <button class="table-button-add" style="margin-left: 10px; width: 1.5em; height: 1.5em"></button>
+        <div style="width: 100%; height: calc(100% - 30px); overflow: auto;">
+            <table class="table-values" style="width: 100%;">
+                <thead>
+                <tr>
+                    <th data-name="_index"   style="width: 40px" class="translate"></th>
+                    <th data-name="name"     style="width: 30%" class="translate">Name</th>
+                    <th data-name="ip"       class="translate">IP Address</th>
+					<th data-name="bez"     style="width: 30%" class="translate">Bezeichnung</th>
+			        <th data-buttons="delete" style="width: 40px"></th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</tbody>
+</table>
+</div>
+</div>
+</html>
