@@ -1,7 +1,7 @@
 {
-  "name": "iobroker.snmp-oid",
+  "name": "iobroker.snmp",
   "version": "0.0.1",
-  "description": "ioBroker SNMP-OID Adapter",
+  "description": "ioBroker SNMP Adapter",
   "author": {
     "name": "Marcolotti",
     "email": "info@ct-j.de"
@@ -12,7 +12,7 @@
       "email": "info@ct-j.de"
     }
   ],
-  "homepage": "https://github.com/CTJaeger/ioBroker.snmp-oid",
+  "homepage": "https://github.com/CTJaeger/ioBroker.snmp",
   "license": "MIT",
   "keywords": [
     "ioBroker",
@@ -22,7 +22,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/CTJaeger/ioBroker.snmp-oid.git"
+    "url": "git+https://github.com/CTJaeger/ioBroker.snmp.git"
   },
   "dependencies": {
     "net-snmp": "^1.2.0"
@@ -42,11 +42,5 @@
   },
   "bugs": {
     "url": "https://github.com/CTJaeger/ioBroker.snmp/issues"
-  },
-  "readme": "# snmp-oid\n\n## not working\n",
-  "readmeFilename": "README.md",
-  "_id": "iobroker.snmp-oid@0.0.1",
-  "_shasum": "65fd1cd2f498ba5356e8c8e28ce2f21a6b590204",
-  "_resolved": "https://github.com/CTJaeger/iobroker.snmp-oid/tarball/master",
-  "_from": "https://github.com/CTJaeger/iobroker.snmp-oid/tarball/master"
+  }
 }
