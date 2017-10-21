@@ -32,7 +32,8 @@ function readsnmp(){
 	var session = snmp.createSession (adapter.config.SNMPIP, "public");
     adapter.log.info('Name ' + adapter.config.NAME + ' OID:' + adapter.config.OID);
 
-	var oids = ["1.3.6.1.2.1.43.11.1.1.9.1.1"];
+	var oids = adapter.config.OID;
+	// var oids = ["1.3.6.1.2.1.43.11.1.1.9.1.1"] <- damit geht es
 
 
 
@@ -45,13 +46,12 @@ session.get (oids, function (error, varbinds) {
                 adapter.log.info (snmp.varbindError (varbinds[i]));
             else
                // console.log (varbinds[i].oid + " = " + varbinds[i].value);
-		       
-		   
-			adapter.setState(adapter.config.NAME, varbinds[i].value, true);
+		    		  
+			// adapter.setState(adapter.config.NAME, varbinds[i].value); Legt keine States an
 			adapter.log.info('Name ' + adapter.config.NAME + ': Ergebnis: ' + varbinds[i].value);
     }
 });
-
+	
 session.trap (snmp.TrapType.LinkDown, function (error) {
     if (error)
         console.error (error);
