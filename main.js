@@ -1,6 +1,6 @@
 /**
  *
- * snmp-oid adapter, Copyright CTJaeger 2017, MIT
+ * snmp adapter, Copyright CTJaeger 2017, MIT
  *
  */
 
