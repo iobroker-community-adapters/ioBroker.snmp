@@ -12,7 +12,7 @@
                 "nl": "Eerste release"
             }
         },
-        "title": "SNMP-OID Adapter",
+        "title": "SNMP Adapter",
         "desc": {
             "en": "Allows to poll SNMP OIDs in ioBroker",
             "de": "Ermöglicht das Polling von SNMP Objekten im ioBroker",
