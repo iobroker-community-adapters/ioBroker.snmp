@@ -1,10 +1,12 @@
 // Dictionary (systemDictionary is global variable from adapter-settings.js)
 systemDictionary = {
-	"template adapter settings": {"de": "Beispiel", "ru": "Пример"},
-	"test1":                    {"en": "Test 1", "de": "Test 1", "ru": "Тест 1"},
-	"test2":                    {"en": "Test 2", "de": "Test 2", "ru": "Тест 2"},
-	"on save adapter restarts with new config immediately": {
-		"de": "Beim Speichern von Einstellungen der Adapter wird sofort neu gestartet.",
-		"ru": "При сохранении настроек адаптера он сразу же перезапускается"
-	}
+    "SNMP Settings": {
+        "en": "SNMP Settings",
+        "de": "SNMP Settings",
+        "ru": "SNMP Settings"
+    },
+    "Settings": {"en": "Settings", "de": "Einstellungen", "ru": "Настройки"},
+    "Multicast-IP": {"en": "Multicast-IP", "de": "Multicast-IP", "ru": "многоадресный ip"},
+    "Multicast-Port": {"en": "Multicast-Port", "de": "Multicast-Port", "ru": "многоадресный порт"},
+    "Auto-Reconnect": {"en": "Auto-reconnect", "de": "Wiederverbinden", "ru": "воссоединиться"}
 };

@@ -1,4 +1,5 @@
 <html>
+<head>
 <link rel="stylesheet" type="text/css" href="../../lib/css/themes/jquery-ui/redmond/jquery-ui.min.css"/>
 <script type="text/javascript" src="../../lib/js/jquery-1.11.1.min.js"></script>
 <script type="text/javascript" src="../../socket.io/socket.io.js"></script>
@@ -7,41 +8,32 @@
 <link rel="stylesheet" type="text/css" href="../../css/adapter.css"/>
 <script type="text/javascript" src="../../js/translate.js"></script>
 <script type="text/javascript" src="../../js/adapter-settings.js"></script>
+<script type="text/javascript" src="words.js"></script>
 
 <script type="text/javascript">
-    systemDictionary = {
-        "SNMP-OID Settings": {
-            "en": "SNMP-OID Settings",
-            "de": "SNMP-OID Settings",
-            "ru": "SNMP-OID Settings"
-        },
-        "Settings": {"en": "Settings", "de": "Einstellungen", "ru": "Настройки"},
-        "Multicast-IP": {"en": "Multicast-IP", "de": "Multicast-IP", "ru": "многоадресный ip"},
-        "Multicast-Port": {"en": "Multicast-Port", "de": "Multicast-Port", "ru": "многоадресный порт"},
-        "Auto-Reconnect" : {"en": "Auto-reconnect", "de": "Wiederverbinden", "ru": "воссоединиться"},
-    };
-
+    var oids = [];
     // the function loadSettings has to exist ...
     function load(settings, onChange) {
-        // example: select elements with id=key and class=value and insert value
-       if (!settings) return;
+        if (!settings) return;
         $('.value').each(function () {
             var $key = $(this);
             var id = $key.attr('id');
             if ($key.attr('type') === 'checkbox') {
-		// do not call onChange direct, because onChange could expect some arguments
-                $key.prop('checked', settings[id]).change(function() {
+                // do not call onChange direct, because onChange could expect some arguments
+                $key.prop('checked', settings[id]).change(function () {
                     onChange();
                 });
             } else {
-		// do not call onChange direct, because onChange could expect some arguments
-                $key.val(settings[id]).change(function() {
+                // do not call onChange direct, because onChange could expect some arguments
+                $key.val(settings[id]).change(function () {
                     onChange();
-                }).keyup(function() {
+                }).keyup(function () {
                     onChange();
                 });
             }
         });
+        oids = settings.OIDs || [];
+        values2table('values', oids, onChange);
         onChange(false);
     }
 
@@ -52,54 +44,65 @@
         var obj = {};
         $('.value').each(function () {
             var $this = $(this);
-			if ($this.attr('type') === 'checkbox') {
-				obj[$this.attr('id')] = $this.prop('checked');
-			} else {
-				obj[$this.attr('id')] = $this.val();
-			}
+            if ($this.attr('type') === 'checkbox') {
+                obj[$this.attr('id')] = $this.prop('checked');
+            } else {
+                obj[$this.attr('id')] = $this.val();
+            }
         });
+        obj.OIDs = table2values('values');
         callback(obj);
     }
-
-    $(document).ready(function () {
-        $('#tabs').tabs();
-    });
 </script>
-<style>
-    #settings tr { line-height: 2.5em; }
-</style>
-
+</head>
+<body>
 <!-- you have to put your config page in a div with id adapter-container -->
 <div id="adapter-container">
-<table>
-<tbody>
-<tr>
-<td><img src="snmp.png" width="64" height="64" /></td>
-<td>
-<h3 class="translate">SNMP-OID Settings</h3>
-</td>
-</tr>
-</tbody>
-</table>
-<div id="settings">
-<table>
-<tbody>
-<tr>
-<td class="translate">IP</td>
-<td><input id="SNMPIP" class="value" type="text" value="192.168.178.48" /></td>
-<td>&nbsp;</td>
-</tr>
-<tr>
-<td class="translate">Name</td>
-<td><input id="NAME" class="value" type="text" value="Samsung CLP320" /></td>
-<td>&nbsp;</td>
-</tr>
-<tr>
-<td class="translate">OID</td>
-<td><input id="OID" class="value" type="text" value="1.3.6.1.2.1.43.11.1.1.9.1.1" /></td>
-</tr>
-</tbody>
-</table>
+    <table>
+        <tbody>
+        <tr>
+            <td><img src="snmp.png" width="64" height="64"/></td>
+            <td>
+                <h3 class="translate">SNMP Settings</h3>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <table>
+        <tr>
+            <td><label for="retryTimeout" class="translate">retryTimeout(ms)</label></td>
+            <td><input id="retryTimeout" type="number" min="1000"/></td>
+        </tr>
+        <tr>
+            <td><label for="connectTimeout" class="translate">connectTimeout(ms)</label></td>
+            <td><input id="connectTimeout" type="number" min="1000"/></td>
+        </tr>
+        <tr>
+            <td><label for="pollInterval" class="translate">pollInterval(ms)</label></td>
+            <td><input id="pollInterval" type="number" min="5000"/></td>
+        </tr>
+    </table>
+    <div id="settings">
+        <div id="values" style="width: 100%; height: calc(100% - 160px)">
+            <button class="table-button-add" style="margin-left: 10px; width: 1.5em; height: 1.5em"></button>
+            <div style="width: 100%; height: calc(100% - 30px); overflow: auto;">
+                <table class="table-values" style="width: 100%;">
+                    <thead>
+                    <tr>
+                        <th data-name="_index"    style="width: 40px" class="translate"></th>
+                        <th data-name="enabled"   data-default="true" data-type="checkbox" style="width: 40px" data-tdstyle="text-align: center" class="translate">Enabled</th>
+                        <th data-name="name"      style="width: 20%" class="translate">Name</th>
+                        <th data-name="ip"        style="width: 120px" data-style="width: 120px" class="translate">IP Address</th>
+                        <th data-name="OID"       class="translate">OID</th>
+                        <th data-name="write"     data-type="checkbox" style="width: 40px" data-tdstyle="text-align: center" class="translate">Writable</th>
+                        <th data-name="publicCom" class="translate" style="width: 80px" data-style="width: 80px;">public</th>
+                        <th data-buttons="delete up down" style="width: 40px"></th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
-</div>
+</body>
 </html>
