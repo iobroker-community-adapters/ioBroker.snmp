@@ -10,19 +10,16 @@
 
 <script type="text/javascript">
     systemDictionary = {
-        "SMA Energy Meter Settings": {
-            "en": "SMA Energy Meter settings",
-            "de": "SMA Energy Meter Einstellungen",
-            "ru": "Настройки измерителя энергии SMA"
+        "SNMP-OID Settings": {
+            "en": "SNMP-OID Settings",
+            "de": "SNMP-OID Settings",
+            "ru": "SNMP-OID Settings"
         },
         "Settings": {"en": "Settings", "de": "Einstellungen", "ru": "Настройки"},
         "Multicast-IP": {"en": "Multicast-IP", "de": "Multicast-IP", "ru": "многоадресный ip"},
         "Multicast-Port": {"en": "Multicast-Port", "de": "Multicast-Port", "ru": "многоадресный порт"},
-        "Erweiterter Modus" : {"en": "Extended Mode", "de": "Erweiterter Modus", "ru": "Расширенный режим"},
-	"Details-L1" : {"en": "Details-L1", "de": "Details-L1", "ru": "Подробнее-L1"},
-	    "Details-L2" : {"en": "Details-L2", "de": "Details-L2", "ru": "Подробнее-L2"},
-	    "Details-L3" : {"en": "Details-L3", "de": "Details-L3", "ru": "Подробнее-L3"},
-	};
+        "Auto-Reconnect" : {"en": "Auto-reconnect", "de": "Wiederverbinden", "ru": "воссоединиться"},
+    };
 
     // the function loadSettings has to exist ...
     function load(settings, onChange) {
@@ -79,7 +76,7 @@
 <tr>
 <td><img src="snmp.png" width="64" height="64" /></td>
 <td>
-<h3 class="translate">SNMP OID Adapter</h3>
+<h3 class="translate">SNMP-OID Settings</h3>
 </td>
 </tr>
 </tbody>
@@ -87,22 +84,20 @@
 <div id="settings">
 <table>
 <tbody>
-<div id="values" style="width: 100%; height: calc(100% - 230px)">
-        <button class="table-button-add" style="margin-left: 10px; width: 1.5em; height: 1.5em"></button>
-        <div style="width: 100%; height: calc(100% - 30px); overflow: auto;">
-            <table class="table-values" style="width: 100%;">
-                <thead>
-                <tr>
-                    <th data-name="_index"   style="width: 40px" class="translate"></th>
-                    <th data-name="name"     style="width: 30%" class="translate">Name</th>
-                    <th data-name="ip"       class="translate">IP Address</th>
-					<th data-name="bez"     style="width: 30%" class="translate">Bezeichnung</th>
-			        <th data-buttons="delete" style="width: 40px"></th>
-                </tr>
-                </thead>
-            </table>
-        </div>
-    </div>
+<tr>
+<td class="translate">IP</td>
+<td><input id="SNMPIP" class="value" type="text" value="192.168.178.48" /></td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td class="translate">Name</td>
+<td><input id="NAME" class="value" type="text" value="Samsung CLP320" /></td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td class="translate">OID</td>
+<td><input id="OID" class="value" type="text" value="1.3.6.1.2.1.43.11.1.1.9.1.1" /></td>
+</tr>
 </tbody>
 </table>
 </div>
