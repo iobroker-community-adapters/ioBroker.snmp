@@ -11,6 +11,9 @@
 ### Info
 This adapter polls information from SNMP Device like Printers, Network ...
 
+### 0.0.2
+* (Bluefox)    Fixes
+
 ### 0.0.1
 * (Bluefox)    refactoring
 * (Marcolotti) initial release
