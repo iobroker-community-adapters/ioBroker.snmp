@@ -85,7 +85,7 @@ function main() {
 
         IPs[ip] = IPs[ip] || {oids: [], ids: [], publicCom: adapter.config.OIDs[i].publicCom || 'public'};
 
-        IPs[ip].oids.push(adapter.config.OIDs[i].OID.trim());
+        IPs[ip].oids.push(adapter.config.OIDs[i].OID.trim().replace(/^\./, ''));
         IPs[ip].ids.push(id);
 
         tasks.push({
