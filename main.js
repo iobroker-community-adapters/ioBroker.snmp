@@ -104,24 +104,8 @@ function main() {
     }
     processTasks(tasks, readAll);
 }
-
-function readOneDevice(ip, publicCom, oids, ids) {
-    if (IPs[ip].session) {
-        try {
-            IPs[ip].session.close();
-        } catch (e) {
-            adapter.log.warn('Cannot close session: ' + e);
-        }
-        IPs[ip].session = null;
-    }
-
-    var session = snmp.createSession(ip, publicCom || 'public', {
-        timeout: adapter.config.connectTimeout
-    });
-    adapter.log.debug('[' + ip + '] OIDs: ' + oids.join(', '));
-
-    IPs[ip].interval = setInterval(function () {
-        session.get(oids, function (error, varbinds) {
+function readOids(session, ip, oids, ids) {
+    session.get(oids, function (error, varbinds) {
             if (error) {
                 adapter.log.error('[' + ip + '] Error session.get: ' + error);
             } else {
@@ -136,20 +120,41 @@ function readOneDevice(ip, publicCom, oids, ids) {
                 }
             }
         });
-    }, adapter.config.pollInterval);
+}
 
-    session.trap(snmp.TrapType.LinkDown, function (error) {
+function readOneDevice(ip, publicCom, oids, ids) {
+    if (IPs[ip].session) {
+        try {
+            IPs[ip].session.close();
+        } catch (e) {
+            adapter.log.warn('Cannot close session: ' + e);
+        }
+        IPs[ip].session = null;
+    }
+
+    IPs[ip].session = snmp.createSession(ip, publicCom || 'public', {
+        timeout: adapter.config.connectTimeout
+    });
+    adapter.log.debug('[' + ip + '] OIDs: ' + oids.join(', '));
+
+    IPs[ip].interval = setInterval(readOids, adapter.config.pollInterval, IPs[ip].session, ip, oids, ids);
+
+    IPs[ip].session.trap(snmp.TrapType.LinkDown, function (error) {
         error && adapter.log.error('[' + ip + '] Error: ' + error);
-        session.close();
+        if (IPs[ip] && IPs[ip].session) {
+            IPs[ip].session.close();
+        }
     });
 
-    session.on('close', function () {
+    IPs[ip].session.on('close', function () {
         IPs[ip].session = null;
         clearInterval(IPs[ip].interval);
         IPs[ip].interval = null;
         setTimeout(readOneDevice, adapter.config.retryTimeout, ip, publicCom, oids, ids);
     });
-    IPs[ip].session = session;
+    
+    // read one time immediately
+    readOids(IPs[ip].session, ip, oids, ids);
 }
 
 function readAll() {
