@@ -85,7 +85,7 @@ function main() {
 
         IPs[ip] = IPs[ip] || {oids: [], ids: [], publicCom: adapter.config.OIDs[i].publicCom || 'public'};
 
-        IPs[ip].oids.push(adapter.config.OIDs[i].OID);
+        IPs[ip].oids.push(adapter.config.OIDs[i].OID.trim().replace(/^\./, ''));
         IPs[ip].ids.push(id);
 
         tasks.push({
@@ -115,7 +115,7 @@ function readOids(session, ip, oids, ids) {
                         adapter.setState(ids[i], null, true, 0x84);
                     } else {
                         adapter.log.debug('[' + ip + '] OID ' + oids[i] + ': ' + varbinds[i].value);
-                        adapter.setState(ids[i], varbinds[i].value, true);
+                        adapter.setState(ids[i], varbinds[i].value.toString(), true);
                     }
                 }
             }
@@ -138,13 +138,6 @@ function readOneDevice(ip, publicCom, oids, ids) {
     adapter.log.debug('[' + ip + '] OIDs: ' + oids.join(', '));
 
     IPs[ip].interval = setInterval(readOids, adapter.config.pollInterval, IPs[ip].session, ip, oids, ids);
-
-    IPs[ip].session.trap(snmp.TrapType.LinkDown, function (error) {
-        error && adapter.log.error('[' + ip + '] Error: ' + error);
-        if (IPs[ip] && IPs[ip].session) {
-            IPs[ip].session.close();
-        }
-    });
 
     IPs[ip].session.on('close', function () {
         IPs[ip].session = null;
