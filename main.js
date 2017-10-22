@@ -116,6 +116,7 @@ function readOids(session, ip, oids, ids) {
                     } else {
                         adapter.log.debug('[' + ip + '] OID ' + oids[i] + ': ' + varbinds[i].value);
                         adapter.setState(ids[i], varbinds[i].value.toString(), true);
+                        adapter.setState('info.connection', true, true);
                     }
                 }
             }
@@ -126,6 +127,7 @@ function readOneDevice(ip, publicCom, oids, ids) {
     if (IPs[ip].session) {
         try {
             IPs[ip].session.close();
+            adapter.setState('info.connection', false, true);
         } catch (e) {
             adapter.log.warn('Cannot close session: ' + e);
         }
