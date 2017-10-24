@@ -109,8 +109,8 @@ function main() {
                 name:  adapter.config.OIDs[i].name,
                 write: !!adapter.config.OIDs[i].write,
                 read:  true,
-                type:  'mixed',
-                role: 'state'
+                type:  'state',
+                role: 'value'
             },
             native: {
                 OID: adapter.config.OIDs[i].OID
