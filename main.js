@@ -34,7 +34,7 @@ adapter.on('unload', function (callback) {
 });
 
 function name2id(name) {
-    return 'OIDs.' + (name || '').replace(/[-\s.]+/, '_');
+    return (name || '').replace(/[-\s.]+/, '_');
 }
 function processTasks(tasks, callback) {
     if (!tasks || !tasks.length) {
@@ -88,14 +88,29 @@ function main() {
         IPs[ip].oids.push(adapter.config.OIDs[i].OID.trim().replace(/^\./, ''));
         IPs[ip].ids.push(id);
 
+        var IPString = ip.replace(/\./gi, ":"); 
+
         tasks.push({
-            _id: adapter.namespace + '.' + id,
+            _id: adapter.namespace + '.' + IPString,
+            common: {
+                //name:  adapter.config.OIDs[i].name,
+                //write: !!adapter.config.OIDs[i].write,
+                read:  true,
+                type:  'channel',
+                role: 'value'
+            },
+            native: {
+                OID: adapter.config.OIDs[i].OID
+            }
+        });
+		tasks.push({
+            _id: adapter.namespace + '.' + IPString + '.' + id,
             common: {
                 name:  adapter.config.OIDs[i].name,
                 write: !!adapter.config.OIDs[i].write,
                 read:  true,
                 type:  'mixed',
-                role: 'value'
+                role: 'state'
             },
             native: {
                 OID: adapter.config.OIDs[i].OID
@@ -110,12 +125,12 @@ function readOids(session, ip, oids, ids) {
                 adapter.log.error('[' + ip + '] Error session.get: ' + error);
             } else {
                 for (var i = 0; i < varbinds.length; i++) {
-                    if (snmp.isVarbindError(varbinds[i])) {
+                   if (snmp.isVarbindError(varbinds[i])) {
                         adapter.log.warn(snmp.varbindError(varbinds[i]));
-                        adapter.setState(ids[i], null, true, 0x84);
+                        adapter.setState(ip.replace(/\./gi, ":") + '.' +ids[i], null, true, 0x84);
                     } else {
-                        adapter.log.debug('[' + ip + '] OID ' + oids[i] + ': ' + varbinds[i].value);
-                        adapter.setState(ids[i], varbinds[i].value.toString(), true);
+                        adapter.log.debug(ip.replace(/\./gi, ":") + '.' +ids[i]);
+                        adapter.setState(ip.replace(/\./gi, ":") + '.' +ids[i], varbinds[i].value.toString(), true);
                         adapter.setState('info.connection', true, true);
                     }
                 }
