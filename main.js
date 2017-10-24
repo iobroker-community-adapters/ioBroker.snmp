@@ -88,7 +88,7 @@ function main() {
         IPs[ip].oids.push(adapter.config.OIDs[i].OID.trim().replace(/^\./, ''));
         IPs[ip].ids.push(id);
 
-        var IPString = ip.replace(/\./gi, ":"); 
+        var IPString = ip.replace(/\./gi, "_"); 
 
         tasks.push({
             _id: adapter.namespace + '.' + IPString,
@@ -127,10 +127,10 @@ function readOids(session, ip, oids, ids) {
                 for (var i = 0; i < varbinds.length; i++) {
                    if (snmp.isVarbindError(varbinds[i])) {
                         adapter.log.warn(snmp.varbindError(varbinds[i]));
-                        adapter.setState(ip.replace(/\./gi, ":") + '.' +ids[i], null, true, 0x84);
+                        adapter.setState(ip.replace(/\./gi, "_") + '.' +ids[i], null, true, 0x84);
                     } else {
-                        adapter.log.debug(ip.replace(/\./gi, ":") + '.' +ids[i]);
-                        adapter.setState(ip.replace(/\./gi, ":") + '.' +ids[i], varbinds[i].value.toString(), true);
+                        adapter.log.debug(ip.replace(/\./gi, "_") + '.' +ids[i]);
+                        adapter.setState(ip.replace(/\./gi, "_") + '.' +ids[i], varbinds[i].value.toString(), true);
                         adapter.setState('info.connection', true, true);
                     }
                 }
