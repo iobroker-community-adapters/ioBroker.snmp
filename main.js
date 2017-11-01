@@ -88,15 +88,15 @@ function main() {
         IPs[ip].oids.push(adapter.config.OIDs[i].OID.trim().replace(/^\./, ''));
         IPs[ip].ids.push(id);
 
-        var IPString = ip.replace(/\./gi, "_"); 
+        var IPString = ip.replace(/\./gi, "_");
 
         tasks.push({
             _id: adapter.namespace + '.' + IPString,
+            type: 'channel',
             common: {
                 //name:  adapter.config.OIDs[i].name,
                 //write: !!adapter.config.OIDs[i].write,
                 read:  true,
-                type:  'channel',
                 role: 'value'
             },
             native: {
@@ -105,11 +105,12 @@ function main() {
         });
 		tasks.push({
             _id: adapter.namespace + '.' + IPString + '.' + id,
+            type: 'state',
             common: {
                 name:  adapter.config.OIDs[i].name,
                 write: !!adapter.config.OIDs[i].write,
                 read:  true,
-                type:  'state',
+                type: 'string',
                 role: 'value'
             },
             native: {
@@ -162,7 +163,7 @@ function readOneDevice(ip, publicCom, oids, ids) {
         IPs[ip].interval = null;
         setTimeout(readOneDevice, adapter.config.retryTimeout, ip, publicCom, oids, ids);
     });
-    
+
     // read one time immediately
     readOids(IPs[ip].session, ip, oids, ids);
 }
