@@ -10,6 +10,8 @@
 
 ### Info
 This adapter polls information from SNMP Device like Printers, Network ...
+### 0.0.3
+* (Apollon77)  Fix Object Type
 
 ### 0.0.2
 * (Bluefox)    Fixes
