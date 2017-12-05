@@ -7,7 +7,7 @@ The SNMP protocol (Simple Network Management Protocol) was developed to centrall
 The SNMP adapter uses the so-called OID's (Object Identifier) ​​to read these values ​​from the respective device.
 
 ## Administration / Admin page
-! [Adapter_admin_konfiguration] (img/adminpage.png)
+![Adapter_admin_konfiguration](img/adminpage.png)
 
 1. RetryTimeout - retry time in ms
 2. connectTimeout - Connection attempt in ms
@@ -19,6 +19,7 @@ For most printers, there is a standard. (PRINTER MIB)
 http://www.oidview.com/mibs/0/Printer-MIB.html
 
 For the Samsung CLP320 color laser, e.g. the following OIDs are valid.
+
 Number of printed pages: 1.3.6.1.2.1.43.10.2.1.4.1.1
 
 Black toner: 1.3.6.1.2.1.43.11.1.1.9.1.1
