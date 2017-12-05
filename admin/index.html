@@ -11,6 +11,21 @@
 <script type="text/javascript" src="words.js"></script>
 
 <script type="text/javascript">
+    systemDictionary = {
+        "SNMP Settings": {
+            "en": "SNMP Settings",
+            "de": "SNMP Einstellungen",
+            "ru": "Настройки snmp"
+        },
+        "retryTimeout(ms)": {"en": "retryTimeout(ms)", "de": "Wiederholungs TimeOut in ms", "ru": "повторный тайм-аут"},
+        "connectTimeout(ms)": {"en": "connectTimeout(ms)", "de": "Verbindungs TimeOut in ms", "ru": "соединять тайм-аут"},
+        "pollInterval(ms)": {"en": "pollInterval(ms)", "de": "Abfrageinterval in ms", "ru": "интервал запроса"},
+        "Enabled" : {"en": "Enabled", "de": "Aktiviert", "ru": "Включено"},
+	    "Name" : {"en": "Name", "de": "Name", "ru": "имя"},
+	    "IP Address" : {"en": "IP Address", "de": "IP Addresse", "ru": "IP-адрес"},
+	    "Writable" : {"en": "Writable", "de": "Beschreibbar", "ru": "записываемый"},
+        "community" : {"en": "community", "de": "Community", "ru": "сообщество"},
+	};
     var oids = [];
     // the function loadSettings has to exist ...
     function load(settings, onChange) {
