@@ -19,13 +19,13 @@ Für die meisten Drucker gibt es einen Standard. (PRINTER MIB)
 http://www.oidview.com/mibs/0/Printer-MIB.html
 
 Für den Farblaser Samsung CLP320 sind z.B. folgende OID´s gültig.
-Anzahl gedruckter Seiten: 	1.3.6.1.2.1.43.10.2.1.4.1.1
-Toner schwarz: 				1.3.6.1.2.1.43.11.1.1.9.1.1
-Toner cyan:					1.3.6.1.2.1.43.11.1.1.9.1.2
-Toner magenta:				1.3.6.1.2.1.43.11.1.1.9.1.3
-Toner yellow:				1.3.6.1.2.1.43.11.1.1.9.1.4
-Lebensdauer_Bandeinheit:	1.3.6.1.2.1.43.11.1.1.9.1.6
-Lebensdauer_Trommeleinheit: 1.3.6.1.2.1.43.11.1.1.9.1.7
+# Anzahl gedruckter Seiten: 	1.3.6.1.2.1.43.10.2.1.4.1.1
+# Toner schwarz: 				      1.3.6.1.2.1.43.11.1.1.9.1.1
+# Toner cyan:				        	1.3.6.1.2.1.43.11.1.1.9.1.2
+# Toner magenta:				      1.3.6.1.2.1.43.11.1.1.9.1.3
+# Toner yellow:				        1.3.6.1.2.1.43.11.1.1.9.1.4
+# Lebensdauer_Bandeinheit:	  1.3.6.1.2.1.43.11.1.1.9.1.6
+# Lebensdauer_Trommeleinheit: 1.3.6.1.2.1.43.11.1.1.9.1.7
 
 ## NAS Systeme - Beispiel
 
