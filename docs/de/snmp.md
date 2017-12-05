@@ -7,7 +7,7 @@ Das SNMP Protocol (Simple Network Management Protocol) wurde entwickelt um zentr
 Der SNMP Adapter ist mit Hilfe der sogenannten OID´s (Object Identifier) diese Werte aus dem jeweiligen Gerät auszulesen.
 
 ## Administration / Admin-Seite
-[adapter_admin_konfiguration](img/adminpage.png)
+![adapter_admin_konfiguration](img/adminpage.png)
 
 1. RetryTimeout - Wiederholungszeit in ms
 2. connectTimeout - Verbindungsversuch in ms
