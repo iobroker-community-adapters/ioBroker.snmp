@@ -10,6 +10,10 @@
 
 ### Info
 This adapter polls information from SNMP Device like Printers, Network ...
+### 0.5.0
+* (Marcolotti) Add documentation (de,en,ru)
+* (Marcolotti) Add languages (de,en,ru)
+
 ### 0.0.3
 * (Apollon77)  Fix Object Type
 
