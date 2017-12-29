@@ -83,7 +83,7 @@ function main() {
         var ip = adapter.config.OIDs[i].ip.trim();
         var id = name2id(adapter.config.OIDs[i].name);
 
-        IPs[ip] = IPs[ip] || {oids: [], ids: [], publicCom: adapter.config.OIDs[i].publicCom || 'public'};
+        IPs[ip] = IPs[ip] || {oids: [], ids: [], publicCom: adapter.config.OIDs[i].publicCom};
 
         IPs[ip].oids.push(adapter.config.OIDs[i].OID.trim().replace(/^\./, ''));
         IPs[ip].ids.push(id);
