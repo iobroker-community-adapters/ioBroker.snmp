@@ -2,7 +2,7 @@
 # ioBroker.snmp
 =================
 
-[![NPM version](http://img.shields.io/npm/v/iobroker.snmp.svg)](https://www.npmjs.com/package/iobroker.snmp)
+![Number of Installations](http://iobroker.live/badges/snmp-installed.svg) ![Number of Installations](http://iobroker.live/badges/snmp-stable.svg) [![NPM version](http://img.shields.io/npm/v/iobroker.snmp.svg)](https://www.npmjs.com/package/iobroker.snmp)
 [![Downloads](https://img.shields.io/npm/dm/iobroker.snmp.svg)](https://www.npmjs.com/package/iobroker.snmp)
 [![Tests](https://travis-ci.org/CTJaeger/ioBroker.snmp.svg?branch=master)](https://travis-ci.org/CTJaeger/ioBroker.snmp)
 
