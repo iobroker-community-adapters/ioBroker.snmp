@@ -12,7 +12,7 @@
       "email": "info@ct-j.de"
     }
   ],
-  "homepage": "https://github.com/CTJaeger/ioBroker.snmp",
+  "homepage": "https://github.com/iobroker-community-adapters/ioBroker.snmp",
   "license": "MIT",
   "keywords": [
     "ioBroker",
@@ -22,7 +22,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/CTJaeger/ioBroker.snmp.git"
+    "url": "git+https://github.com/iobroker-community-adapters/ioBroker.snmp.git"
   },
   "dependencies": {
     "net-snmp": "^1.2.0",
@@ -42,6 +42,6 @@
     "test": "node node_modules/mocha/bin/mocha --exit"
   },
   "bugs": {
-    "url": "https://github.com/CTJaeger/ioBroker.snmp/issues"
+    "url": "https://github.com/iobroker-community-adapters/ioBroker.snmp/issues"
   }
 }
