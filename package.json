@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "net-snmp": "^1.2.0",
-    "@iobroker/adapter-core": "^1.0.3"
+    "@iobroker/adapter-core": "^2.6.0"
   },
   "devDependencies": {
     "grunt": "^1.0.1",
