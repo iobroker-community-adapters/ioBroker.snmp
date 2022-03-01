@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "snmp",
-        "version": "0.5.0",
+        "version": "0.6.0-beta",
         "news": {
             "0.0.1": {
                 "en": "initial adapter",
