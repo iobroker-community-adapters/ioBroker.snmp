@@ -4,10 +4,11 @@
  *
  * changelog:
  *
- * 2022-02-18 	mcm1957		add info.connection state per ip 
- *							avoid excessive errors if target is unreachable
- *							improve setting of state info.connection
- *							output warning if OIDs specify different commmunities for one device
+ * 2022-02-18 	mcm1957	
+ *		add info.connection state per ip 
+ *		avoid excessive errors if target is unreachable
+ *		improve setting of state info.connection
+ *		output warning if OIDs specify different commmunities for one device
  *
  */
 
