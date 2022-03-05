@@ -45,6 +45,7 @@ adapter.on('unload', function (callback) {
             }
             IPs[ip].session = null;
         }
+		adapter.setState(ip.replace(/\./gi, "_") + '.info.connection', false, true);
     }
 	
 	if (myData.interval) {
@@ -55,6 +56,8 @@ adapter.on('unload', function (callback) {
 		}
 		myData.interval = null;
 	}
+
+	adapter.setState('info.connection', false, true);
 	
     callback && callback();
 });
@@ -115,7 +118,8 @@ function main() {
 
         IPs[ip].oids.push(adapter.config.OIDs[i].OID.trim().replace(/^\./, ''));
         IPs[ip].ids.push(id);
-		IPs[ip].inactive = true;
+		IPs[ip].initialized = false;
+		IPs[ip].inactive = false;
 
 		// verify that all OIDs specifiy identical community for same device (same ip)
 		if ( IPs[ip].publicCom != adapter.config.OIDs[i].publicCom ) {
@@ -199,6 +203,7 @@ function handleConnectionInfo() {
 			connected = true;
 		}
 	}
+	adapter.log.debug('info.connection set to '+connected);
 	adapter.setState('info.connection', connected, true);
 	if ( connected ) {
 		if ( ! myData.connected ) {
@@ -239,7 +244,7 @@ function readOids(session, ip, oids, ids) {
 					IPs[ip].inactive = false;
 					setImmediate(handleConnectionInfo);
 				};
-				
+
 				adapter.setState(ip.replace(/\./gi, "_") + '.info.connection', true, true);
                 
 				for (var i = 0; i < varbinds.length; i++) {
@@ -252,7 +257,12 @@ function readOids(session, ip, oids, ids) {
                         // adapter.setState('info.connection', true, true); 
                     }
                 }
-            }
+            };
+
+			if ( ! IPs[ip].initialized ) {
+				IPs[ip].initialized = true;
+				setImmediate(handleConnectionInfo);
+			};
         });
 }
 
@@ -268,6 +278,10 @@ function readOneDevice(ip, publicCom, oids, ids) {
         IPs[ip].session = null;
     }
 
+	// initialize connection status
+	adapter.setState(ip.replace(/\./gi, "_") + '.info.connection', false, true);
+
+	// create snmp session for device
     IPs[ip].session = snmp.createSession(ip, publicCom || 'public', {
         timeout: adapter.config.connectTimeout
     });
@@ -284,6 +298,7 @@ function readOneDevice(ip, publicCom, oids, ids) {
 
     // read one time immediately
     readOids(IPs[ip].session, ip, oids, ids);
+
 }
 
 function readAll() {
