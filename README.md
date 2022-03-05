@@ -11,11 +11,14 @@
 This adapter polls information from SNMP Device like Printers, Network ...
 
 ## Changelog
-### 0.6.0
-* (mcm1957) avoid excessive error logs if target is unreachable
-* (mcm1957) add additional info.connection at ip base to indicate target is reachable
-* (mcm1957) output warning if OIDs specify different commmunities for one device
+### 0.6.1
+* (McM1957) reduce severity of timout message to informational
+* (McM1957) reduce letency for update of info.connection 
 
+### 0.6.0
+* (McM1957) avoid excessive error logs if target is unreachable
+* (McM1957) add additional info.connection at ip base to indicate target is reachable
+* (McM1957) output warning if OIDs specify different commmunities for one device
 
 ### 0.5.0
 * (Marcolotti) Add documentation (de,en,ru)

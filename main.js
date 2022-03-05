@@ -4,11 +4,15 @@
  *
  * changelog:
  *
- * 2022-02-18 	mcm1957	
+ * 2022-02-18 	McM1957	 0.6.0
  *		add info.connection state per ip 
  *		avoid excessive errors if target is unreachable
  *		improve setting of state info.connection
  *		output warning if OIDs specify different commmunities for one device
+ *
+ * 2022-03-05 	McM1957	 0.6.1
+ *		reduce timout warning to info level
+ *		reduce latency for update of info.connection
  *
  */
 
@@ -111,7 +115,7 @@ function main() {
 
         IPs[ip].oids.push(adapter.config.OIDs[i].OID.trim().replace(/^\./, ''));
         IPs[ip].ids.push(id);
-		IPs[ip].inactive = false;
+		IPs[ip].inactive = true;
 
 		// verify that all OIDs specifiy identical community for same device (same ip)
 		if ( IPs[ip].publicCom != adapter.config.OIDs[i].publicCom ) {
@@ -182,7 +186,7 @@ function main() {
     }
     processTasks(tasks, readAll);
 	
-    myData.interval = setInterval(handleConnectionInfo, adapter.config.pollInterval);
+    myData.interval = setInterval(handleConnectionInfo, 15000);
 }
 
 function handleConnectionInfo() {
@@ -217,13 +221,15 @@ function readOids(session, ip, oids, ids) {
 				adapter.log.debug('[' + ip + '] session.get: ' + error);
 				if (error == 'RequestTimedOutError: Request timed out') {
 					if ( ! IPs[ip].inactive ) {
-						adapter.log.warn('[' + ip + '] device disconnected - request timout');
+						adapter.log.info('[' + ip + '] device disconnected - request timout');
 						IPs[ip].inactive = true;
+						setImmediate(handleConnectionInfo);
 					};
 				} else {
 					if ( ! IPs[ip].inactive ) {
 						adapter.log.error('[' + ip + '] session.get: ' +error);
-						IPs[ip].inactive = true;0
+						IPs[ip].inactive = true;
+						setImmediate(handleConnectionInfo);
 					};
 					adapter.setState(ip.replace(/\./gi, "_") + '.info.connection', false, true);
 				}
@@ -231,6 +237,7 @@ function readOids(session, ip, oids, ids) {
 				if ( IPs[ip].inactive ) {
 					adapter.log.info('[' + ip + '] device (re)connected');
 					IPs[ip].inactive = false;
+					setImmediate(handleConnectionInfo);
 				};
 				
 				adapter.setState(ip.replace(/\./gi, "_") + '.info.connection', true, true);
