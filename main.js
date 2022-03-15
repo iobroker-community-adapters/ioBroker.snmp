@@ -147,20 +147,6 @@ function main() {
             }
         });
 		
-        tasks.push({
-            _id: adapter.namespace + '.' + IPString + '.info',
-            type: 'channel',
-            common: {
-                name:  'device information',
-                //write: !!adapter.config.OIDs[i].write,
-                read:  true,
-                role: 'value'
-            },
-            native: {
-                OID: adapter.config.OIDs[i].OID
-            }
-        });
-		
 		tasks.push({
             _id: adapter.namespace + '.' + IPString + '.online',
             type: 'state',
