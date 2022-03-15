@@ -11,6 +11,9 @@
 This adapter polls information from SNMP Device like Printers, Network ...
 
 ## Changelog
+### 0.6.2
+* (McM1957) rename state IP.info.connected to IP.online
+
 ### 0.6.1
 * (McM1957) reduce severity of timout message to informational
 * (McM1957) reduce latency for update of info.connection 

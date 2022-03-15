@@ -14,6 +14,9 @@
  *		reduce timout warning to info level
  *		reduce latency for update of info.connection
  *
+ * 2022-03-15 	McM1957	 0.6.2
+ *		rename IP.info.connection state to IP.online 
+ *
  */
 
 /* jshint -W097 */
@@ -45,7 +48,7 @@ adapter.on('unload', function (callback) {
             }
             IPs[ip].session = null;
         }
-		adapter.setState(ip.replace(/\./gi, "_") + '.info.connection', false, true);
+		adapter.setState(ip.replace(/\./gi, "_") + '.online', false, true);
     }
 	
 	if (myData.interval) {
@@ -159,10 +162,10 @@ function main() {
         });
 		
 		tasks.push({
-            _id: adapter.namespace + '.' + IPString + '.info.connection',
+            _id: adapter.namespace + '.' + IPString + '.online',
             type: 'state',
             common: {
-                name:  'If device is connected',
+                name:  'device online',
                 //write: !!adapter.config.OIDs[i].write,
                 read:  true,
                 type: 'boolean',
@@ -236,7 +239,7 @@ function readOids(session, ip, oids, ids) {
 						IPs[ip].inactive = true;
 						setImmediate(handleConnectionInfo);
 					};
-					adapter.setState(ip.replace(/\./gi, "_") + '.info.connection', false, true);
+					adapter.setState(ip.replace(/\./gi, "_") + '.online', false, true);
 				}
             } else {
 				if ( IPs[ip].inactive ) {
@@ -245,7 +248,7 @@ function readOids(session, ip, oids, ids) {
 					setImmediate(handleConnectionInfo);
 				};
 
-				adapter.setState(ip.replace(/\./gi, "_") + '.info.connection', true, true);
+				adapter.setState(ip.replace(/\./gi, "_") + '.online', true, true);
                 
 				for (var i = 0; i < varbinds.length; i++) {
 					if (snmp.isVarbindError(varbinds[i])) {
@@ -279,7 +282,7 @@ function readOneDevice(ip, publicCom, oids, ids) {
     }
 
 	// initialize connection status
-	adapter.setState(ip.replace(/\./gi, "_") + '.info.connection', false, true);
+	adapter.setState(ip.replace(/\./gi, "_") + '.online', false, true);
 
 	// create snmp session for device
     IPs[ip].session = snmp.createSession(ip, publicCom || 'public', {

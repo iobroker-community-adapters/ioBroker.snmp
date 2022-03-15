@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "snmp",
-        "version": "0.6.1",
+        "version": "0.6.2",
         "news": {
             "0.0.1": {
                 "en": "initial adapter",
@@ -22,7 +22,19 @@
 				"es": "manejo mejorado de dispositivos fuera de línea",
 				"pl": "ulepszona obsługa urządzeń offline",
 				"zh-cn": "改进了对离线设备的处理"
-            }
+            },
+            "0.6.2": {
+				"en": "renamed IP.info.connected to IP.online",
+				"de": "umbenannt in IP.info.connected in IP.online",
+				"ru": "переименован в IP.info.подключен к IP.online",
+				"pt": "renomeado IP.info.connected para IP.online",
+				"nl": "hernoemd IP.info.verbonden met IP.online",
+				"fr": "renommé IP.info.connected en IP.online",
+				"it": "rinominato IP.info.connected a IP.online",
+				"es": "renombrado IP.info.conectado a IP.online",
+				"pl": "zmieniono nazwę IP.info.połączone z IP.online",
+				"zh-cn": "将 IP.info.connected 重命名为 IP.online"
+ 			}
         },
         "title": "SNMP Adapter",
         "desc": {
