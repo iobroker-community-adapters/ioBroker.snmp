@@ -1,12 +1,10 @@
-// Dictionary (systemDictionary is global variable from adapter-settings.js)
+/*global systemDictionary:true */
+'use strict';
+
 systemDictionary = {
-    "SNMP Settings": {
-        "en": "SNMP Settings",
-        "de": "SNMP Settings",
-        "ru": "SNMP Settings"
-    },
-    "Settings": {"en": "Settings", "de": "Einstellungen", "ru": "Настройки"},
-    "Multicast-IP": {"en": "Multicast-IP", "de": "Multicast-IP", "ru": "многоадресный ip"},
-    "Multicast-Port": {"en": "Multicast-Port", "de": "Multicast-Port", "ru": "многоадресный порт"},
-    "Auto-Reconnect": {"en": "Auto-reconnect", "de": "Wiederverbinden", "ru": "воссоединиться"}
+    "Auto-Reconnect": {                              "en": "Auto-reconnect",                                  "de": "Wiederverbinden",                                 "ru": "воссоединиться",                                  "pt": "Reconexão automática",                            "nl": "Automatisch herverbinden",                        "fr": "Reconnexion automatique",                         "it": "Riconnessione automatica",                        "es": "Reconexión automática",                           "pl": "Automatycznie wznów połączenie",                  "zh-cn": "自动重新连接"},
+    "Multicast-IP": {                                "en": "Multicast-IP",                                    "de": "Multicast-IP",                                    "ru": "многоадресный ip",                                "pt": "Multicast-IP",                                    "nl": "Multicast-IP",                                    "fr": "Multicast-IP",                                    "it": "IP multicast",                                    "es": "IP de multidifusión",                             "pl": "Multicast-IP",                                    "zh-cn": "组播IP"},
+    "Multicast-Port": {                              "en": "Multicast-Port",                                  "de": "Multicast-Port",                                  "ru": "многоадресный порт",                              "pt": "Porta multicast",                                 "nl": "Multicast-poort",                                 "fr": "Port multicast",                                  "it": "Porta multicast",                                 "es": "Puerto de multidifusión",                         "pl": "Multicast-Port",                                  "zh-cn": "组播端口"},
+    "SNMP Settings": {                               "en": "SNMP Settings",                                   "de": "SNMP Settings",                                   "ru": "SNMP Settings",                                   "pt": "Configurações de SNMP",                           "nl": "SNMP-instellingen",                               "fr": "Paramètres SNMP",                                 "it": "Impostazioni SNMP",                               "es": "Configuración de SNMP",                           "pl": "Ustawienia SNMP",                                 "zh-cn": "SNMP 设置"},
+    "Settings": {                                    "en": "Settings",                                        "de": "Einstellungen",                                   "ru": "Настройки",                                       "pt": "Configurações",                                   "nl": "Instellingen",                                    "fr": "Réglages",                                        "it": "Impostazioni",                                    "es": "Ajustes",                                         "pl": "Ustawienia",                                      "zh-cn": "设置"},
 };

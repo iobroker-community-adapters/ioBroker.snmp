@@ -3,68 +3,68 @@
         "name": "snmp",
         "version": "0.6.2",
         "news": {
-            "0.0.1": {
-                "en": "initial adapter",
-                "de": "Initiale Version",
-                "ru": "Первоначальный адаптер",
-                "pt": "Versão inicial",
-                "fr": "Version initiale",
-                "nl": "Eerste release"
-            },
-            "0.6.1": {
-				"en": "improved handling of offline devices",
-				"de": "verbesserte Handhabung von Offline-Geräten",
-				"ru": "улучшенная обработка автономных устройств",
-				"pt": "melhor manuseio de dispositivos offline",
-				"nl": "verbeterde verwerking van offline apparaten",
-				"fr": "gestion améliorée des appareils hors ligne",
-				"it": "migliore gestione dei dispositivi offline",
-				"es": "manejo mejorado de dispositivos fuera de línea",
-				"pl": "ulepszona obsługa urządzeń offline",
-				"zh-cn": "改进了对离线设备的处理"
-            },
-            "0.6.2": {
-				"en": "renamed IP.info.connected to IP.online",
-				"de": "umbenannt in IP.info.connected in IP.online",
-				"ru": "переименован в IP.info.подключен к IP.online",
-				"pt": "renomeado IP.info.connected para IP.online",
-				"nl": "hernoemd IP.info.verbonden met IP.online",
-				"fr": "renommé IP.info.connected en IP.online",
-				"it": "rinominato IP.info.connected a IP.online",
-				"es": "renombrado IP.info.conectado a IP.online",
-				"pl": "zmieniono nazwę IP.info.połączone z IP.online",
-				"zh-cn": "将 IP.info.connected 重命名为 IP.online"
- 			}
+            "0.5.0": {
+                "en": "Initial Release",
+                "de": "Erstveröffentlichung",
+                "ru": "Первый выпуск",
+                "pt": "Lançamento inicial",
+                "nl": "Eerste uitgave",
+                "fr": "Première version",
+                "it": "Versione iniziale",
+                "es": "Versión inicial",
+                "pl": "Pierwsze wydanie",
+                "zh-cn": "初始发行"
+            }
         },
-        "title": "SNMP Adapter",
+        "title": "SNMP",
+        "titleLang": {
+            "en": "SNMP",
+            "de": "SNMP",
+            "ru": "SNMP",
+            "pt": "SNMP",
+            "nl": "SNMP",
+            "fr": "SNMP",
+            "it": "SNMP",
+            "es": "SNMP",
+            "pl": "SNMP",
+            "zh-cn": "SNMP"
+        },
         "desc": {
             "en": "Allows to poll SNMP OIDs in ioBroker",
             "de": "Ermöglicht das Polling von SNMP Objekten im ioBroker",
             "ru": "Позволяет считывать SNPM объекты по OID в ioBroker",
             "pt": "ioBroker SNMP-OID Adapter",
             "fr": "ioBroker SNMP-OID Adapter",
-            "nl": "ioBroker SNMP-OID Adapter"
+            "nl": "ioBroker SNMP-OID Adapter",
+            "it": "Consente di eseguire il polling degli OID SNMP in ioBroker",
+            "es": "Permite sondear los OID de SNMP en ioBroker",
+            "pl": "Umożliwia odpytywanie identyfikatorów SNMP OID w ioBroker",
+            "zh-cn": "允许在 ioBroker 中轮询 SNMP OID"
         },
         "license": "MIT",
         "platform": "Javascript/Node.js",
         "icon": "snmp.png",
         "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.snmp/master/admin/snmp.png",
-	    "keywords": [
+        "keywords": [
             "SNMP-OID"
         ],
         "readme": "https://github.com/iobroker-community-adapters/ioBroker.snmp/blob/master/README.md",
         "loglevel": "info",
         "mode": "daemon",
         "type": "infrastructure",
-		"connectionType": "local",
-		"dataSource": "poll",
-        "restartAdapters": [],
+        "connectionType": "local",
+        "dataSource": "poll",
         "authors": [
             {
                 "name": "Marcolotti",
                 "email": "info@ct-j.de"
             }
-        ]
+        ],
+        "plugins": {
+            "sentry": {
+                "dsn": "https://621ac710b70445f8b170cbb783045988@sentry.iobroker.net/181"
+            }
+        }
     },
     "native": {
         "retryTimeout": 5000,
@@ -101,6 +101,5 @@
             },
             "native": {}
         }
-        
     ]
 }

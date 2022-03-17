@@ -1,28 +1,27 @@
 ![Logo](admin/snmp.png)
 # ioBroker.snmp
 
-![Number of Installations](http://iobroker.live/badges/snmp-installed.svg) ![Number of Installations](http://iobroker.live/badges/snmp-stable.svg) [![NPM version](http://img.shields.io/npm/v/iobroker.snmp.svg)](https://www.npmjs.com/package/iobroker.snmp)
-[![Downloads](https://img.shields.io/npm/dm/iobroker.snmp.svg)](https://www.npmjs.com/package/iobroker.snmp)
-[![Tests](https://travis-ci.org/CTJaeger/ioBroker.snmp.svg?branch=master)](https://travis-ci.org/CTJaeger/ioBroker.snmp)
+![Number of Installations](http://iobroker.live/badges/snmp-installed.svg)
+![Number of Installations](http://iobroker.live/badges/snmp-stable.svg)
+[![NPM version](http://img.shields.io/npm/v/iobroker.snmp.svg)](https://www.npmjs.com/package/iobroker.snmp)
 
-[![NPM](https://nodei.co/npm/iobroker.snmp.png?downloads=true)](https://nodei.co/npm/iobroker.snmp/)
+![Test and Release](https://github.com/iobroker-community-adapters/iobroker.snmp/workflows/Test%20and%20Release/badge.svg)
+[![Translation status](https://weblate.iobroker.net/widgets/adapters/-/snmp/svg-badge.svg)](https://weblate.iobroker.net/engage/adapters/?utm_source=widget)
+[![Downloads](https://img.shields.io/npm/dm/iobroker.snmp.svg)](https://www.npmjs.com/package/iobroker.snmp)
+
+**This adapter uses Sentry libraries to automatically report exceptions and code errors to the developers.**
+For more details and for information how to disable the error reporting see [Sentry-Plugin Documentation](https://github.com/ioBroker/plugin-sentry#plugin-sentry)! Sentry reporting is used starting with js-controller 3.0.
 
 ## Info
 This adapter polls information from SNMP Device like Printers, Network ...
 
 ## Changelog
-### 0.6.2
-* (McM1957) rename state IP.info.connected to IP.online
-
-### 0.6.1
-* (McM1957) reduce severity of timout message to informational
+### __WORK IN PROGRESS__
 * (McM1957) reduce latency for update of info.connection 
-* (McM1957) update dependencies as suggested by dependabot
-
-### 0.6.0
-* (McM1957) avoid excessive error logs if target is unreachable
-* (McM1957) add additional info.connection at ip base to indicate target is reachable
+* (McM1957) avoid excessive error logs if target is unreachable, optimize logging
+* (McM1957) add additional online at ip base to indicate target is reachable
 * (McM1957) output warning if OIDs specify different commmunities for one device
+* (McM1957) update dependencies
 
 ### 0.5.0
 * (Marcolotti) Add documentation (de,en,ru)
@@ -41,7 +40,7 @@ This adapter polls information from SNMP Device like Printers, Network ...
 ## License
 The MIT License (MIT)
 
-Copyright (c) 2017 Marcolotti <info@ct-j.de>
+Copyright (c) 2017-2022 Marcolotti <info@ct-j.de>, ioBroker Community Developers 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
