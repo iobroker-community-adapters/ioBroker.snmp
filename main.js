@@ -2,6 +2,21 @@
  *
  * snmp adapter, Copyright CTJaeger 2017, MIT
  *
+ * changelog:
+ *
+ * 2022-02-18 	McM1957	 0.6.0
+ *		add info.connection state per ip 
+ *		avoid excessive errors if target is unreachable
+ *		improve setting of state info.connection
+ *		output warning if OIDs specify different commmunities for one device
+ *
+ * 2022-03-05 	McM1957	 0.6.1
+ *		reduce timout warning to info level
+ *		reduce latency for update of info.connection
+ *
+ * 2022-03-15 	McM1957	 0.6.2
+ *		rename IP.info.connection state to IP.online 
+ *
  */
 
 /* jshint -W097 */
@@ -15,10 +30,14 @@ var snmp    = require('net-snmp');
 
 var adapter = new utils.Adapter('snmp');
 var IPs = {};
+var myData = {};
 
+myData.connected = false;
+
+// startup 
 adapter.on('ready', main);
 
-// close all opened sockets
+// shutdown - close all opened sockets
 adapter.on('unload', function (callback) {
     for (var ip in IPs) {
         if (IPs.hasOwnProperty(ip) && IPs[ip].session) {
@@ -29,7 +48,20 @@ adapter.on('unload', function (callback) {
             }
             IPs[ip].session = null;
         }
+		adapter.setState(ip.replace(/\./gi, "_") + '.online', false, true);
     }
+	
+	if (myData.interval) {
+		try {
+			clearInterval(myData.interval);
+		} catch (e) {
+
+		}
+		myData.interval = null;
+	}
+
+	adapter.setState('info.connection', false, true);
+	
     callback && callback();
 });
 
@@ -74,6 +106,8 @@ function main() {
         adapter.config.pollInterval = 5000;
     }
 
+	adapter.setState('info.connection', false, true);
+
     var tasks = [];
     for (var i = 0; i < adapter.config.OIDs.length; i++) {
         if (!adapter.config.OIDs[i].ip || !adapter.config.OIDs[i].enabled) {
@@ -87,6 +121,15 @@ function main() {
 
         IPs[ip].oids.push(adapter.config.OIDs[i].OID.trim().replace(/^\./, ''));
         IPs[ip].ids.push(id);
+		IPs[ip].initialized = false;
+		IPs[ip].inactive = false;
+
+		// verify that all OIDs specifiy identical community for same device (same ip)
+		if ( IPs[ip].publicCom != adapter.config.OIDs[i].publicCom ) {
+			adapter.log.warn('[' + ip + '] OID ' + adapter.config.OIDs[i].OID.trim().replace(/^\./, '') + 
+				' specifies different community "' + adapter.config.OIDs[i].publicCom + '"');
+			adapter.log.warn('[' + ip + '] value will be ignored, keeping current value "' + IPs[ip].publicCom + '"');
+		}
 
         var IPString = ip.replace(/\./gi, "_");
 
@@ -103,6 +146,22 @@ function main() {
                 OID: adapter.config.OIDs[i].OID
             }
         });
+		
+		tasks.push({
+            _id: adapter.namespace + '.' + IPString + '.online',
+            type: 'state',
+            common: {
+                name:  'device online',
+                //write: !!adapter.config.OIDs[i].write,
+                read:  true,
+                type: 'boolean',
+                role: 'value'
+            },
+            native: {
+                OID: adapter.config.OIDs[i].OID
+            }
+        });
+
 		tasks.push({
             _id: adapter.namespace + '.' + IPString + '.' + id,
             type: 'state',
@@ -119,37 +178,99 @@ function main() {
         });
     }
     processTasks(tasks, readAll);
+	
+    myData.interval = setInterval(handleConnectionInfo, 15000);
 }
+
+function handleConnectionInfo() {
+	var connected = false;
+
+	adapter.log.debug('executing handleConnectionInfo');
+	
+    for (var ip in IPs) {
+		if (! IPs[ip].inactive)  {
+			connected = true;
+		}
+	}
+	adapter.log.debug('info.connection set to '+connected);
+	adapter.setState('info.connection', connected, true);
+	if ( connected ) {
+		if ( ! myData.connected ) {
+			adapter.log.info('instance connected to at least one device');
+			myData.connected = true;
+		}
+	} else  {
+		if ( myData.connected ) {
+			adapter.log.info('instance disconnected from all devices');
+			myData.connected = false;
+		}
+	}
+}
+
 function readOids(session, ip, oids, ids) {
+	adapter.log.debug('[' + ip + '] executing readOids');
+
     session.get(oids, function (error, varbinds) {
             if (error) {
-                adapter.log.error('[' + ip + '] Error session.get: ' + error);
+				adapter.log.debug('[' + ip + '] session.get: ' + error);
+				if (error == 'RequestTimedOutError: Request timed out') {
+					if ( ! IPs[ip].inactive ) {
+						adapter.log.info('[' + ip + '] device disconnected - request timout');
+						IPs[ip].inactive = true;
+						setImmediate(handleConnectionInfo);
+					};
+				} else {
+					if ( ! IPs[ip].inactive ) {
+						adapter.log.error('[' + ip + '] session.get: ' +error);
+						IPs[ip].inactive = true;
+						setImmediate(handleConnectionInfo);
+					};
+					adapter.setState(ip.replace(/\./gi, "_") + '.online', false, true);
+				}
             } else {
-                for (var i = 0; i < varbinds.length; i++) {
-                   if (snmp.isVarbindError(varbinds[i])) {
+				if ( IPs[ip].inactive ) {
+					adapter.log.info('[' + ip + '] device (re)connected');
+					IPs[ip].inactive = false;
+					setImmediate(handleConnectionInfo);
+				};
+
+				adapter.setState(ip.replace(/\./gi, "_") + '.online', true, true);
+                
+				for (var i = 0; i < varbinds.length; i++) {
+					if (snmp.isVarbindError(varbinds[i])) {
                         adapter.log.warn(snmp.varbindError(varbinds[i]));
                         adapter.setState(ip.replace(/\./gi, "_") + '.' +ids[i], null, true, 0x84);
                     } else {
-                        adapter.log.debug(ip.replace(/\./gi, "_") + '.' +ids[i]);
+						adapter.log.debug('[' + ip + '] update ' + ip.replace(/\./gi, "_") + '.' +ids[i]);
                         adapter.setState(ip.replace(/\./gi, "_") + '.' +ids[i], varbinds[i].value.toString(), true);
-                        adapter.setState('info.connection', true, true);
+                        // adapter.setState('info.connection', true, true); 
                     }
                 }
-            }
+            };
+
+			if ( ! IPs[ip].initialized ) {
+				IPs[ip].initialized = true;
+				setImmediate(handleConnectionInfo);
+			};
         });
 }
 
 function readOneDevice(ip, publicCom, oids, ids) {
+	adapter.log.debug('executing readOneDevice (' + ip + ', ...)');
     if (IPs[ip].session) {
         try {
             IPs[ip].session.close();
-            adapter.setState('info.connection', false, true);
+//            adapter.setState('info.connection', false, true);
         } catch (e) {
             adapter.log.warn('Cannot close session: ' + e);
         }
         IPs[ip].session = null;
     }
 
+	// initialize connection status
+	adapter.setState(ip.replace(/\./gi, "_") + '.online', false, true);
+
+	// create snmp session for device
     IPs[ip].session = snmp.createSession(ip, publicCom || 'public', {
         timeout: adapter.config.connectTimeout
     });
@@ -166,9 +287,11 @@ function readOneDevice(ip, publicCom, oids, ids) {
 
     // read one time immediately
     readOids(IPs[ip].session, ip, oids, ids);
+
 }
 
 function readAll() {
+	adapter.log.debug('executing readAll');
     for (var ip in IPs) {
         if (IPs.hasOwnProperty(ip))  {
             readOneDevice(ip, IPs[ip].publicCom, IPs[ip].oids, IPs[ip].ids);
