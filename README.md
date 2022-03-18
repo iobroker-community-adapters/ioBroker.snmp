@@ -17,6 +17,7 @@ This adapter polls information from SNMP Device like Printers, Network ...
 
 ## Changelog
 ### __WORK IN PROGRESS__
+* IMPORTANT: This release will change the object structures!!
 * (McM1957) reduce latency for update of info.connection 
 * (McM1957) avoid excessive error logs if target is unreachable, optimize logging
 * (McM1957) add additional online at ip base to indicate target is reachable

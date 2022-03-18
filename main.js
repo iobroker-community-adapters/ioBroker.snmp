@@ -53,7 +53,7 @@ adapter.on('unload', (callback) => {
 });
 
 function name2id(name) {
-    return (name || '').replace(/[-\s.]+/g, '_');
+    return (name || '').replace(adapter.FORBIDDEN_CHARS, '_');
 }
 
 function processTasks(tasks, callback) {
@@ -107,14 +107,14 @@ function main() {
 
         IPs[ip] = IPs[ip] || {oids: [], ids: [], publicCom: adapter.config.OIDs[i].publicCom};
 
-        IPs[ip].oids.push(adapter.config.OIDs[i].OID.trim().replace(/^\./g, ''));
+        IPs[ip].oids.push(adapter.config.OIDs[i].OID.trim().replace(/^\./, ''));
         IPs[ip].ids.push(id);
 		IPs[ip].initialized = false;
 		IPs[ip].inactive = false;
 
 		// verify that all OIDs specify identical community for same device (same ip)
 		if ( IPs[ip].publicCom !== adapter.config.OIDs[i].publicCom ) {
-			adapter.log.warn('[' + ip + '] OID ' + adapter.config.OIDs[i].OID.trim().replace(/^\./g, '') +
+			adapter.log.warn('[' + ip + '] OID ' + adapter.config.OIDs[i].OID.trim().replace(/^\./, '') +
 				' specifies different community "' + adapter.config.OIDs[i].publicCom + '"');
 			adapter.log.warn('[' + ip + '] value will be ignored, keeping current value "' + IPs[ip].publicCom + '"');
 		}
@@ -123,7 +123,7 @@ function main() {
 
         tasks.push({
             _id: IPString,
-            type: 'channel',
+            type: 'device',
             common: {
                 name: IPString
             },
@@ -145,6 +145,21 @@ function main() {
             native: {
                 OID: adapter.config.OIDs[i].OID
             }
+        });
+
+        const idArr = id.split('.');
+        idArr.pop();
+        let partlyId = IPString;
+        idArr.forEach( el => {
+            partlyId += '.' + el;
+            tasks.push({
+                _id: partlyId,
+                type: 'folder',
+                common: {
+                },
+                native: {
+                }
+            });
         });
 
 		tasks.push({
