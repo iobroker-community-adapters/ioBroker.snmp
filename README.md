@@ -21,7 +21,7 @@ This adapter polls information from SNMP Device like Printers, Network ...
 * (McM1957) avoid excessive error logs if target is unreachable, optimize logging
 * (McM1957) add additional online at ip base to indicate target is reachable
 * (McM1957) output warning if OIDs specify different commmunities for one device
-* (McM1957) update dependencies
+* (Apollon77) Add Sentry for crash reporting
 
 ### 0.5.0
 * (Marcolotti) Add documentation (de,en,ru)
