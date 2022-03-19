@@ -125,7 +125,7 @@ function main() {
             _id: IPString,
             type: 'device',
             common: {
-                name: IPString
+                name: ip
             },
             native: {
                 OID: adapter.config.OIDs[i].OID
@@ -136,7 +136,7 @@ function main() {
             _id: IPString + '.online',
             type: 'state',
             common: {
-                name: 'device online',
+                name: ip + ' online',
                 write: false,
                 read:  true,
                 type: 'boolean',
@@ -156,6 +156,7 @@ function main() {
                 _id: partlyId,
                 type: 'folder',
                 common: {
+                    name: ''
                 },
                 native: {
                 }
