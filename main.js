@@ -222,12 +222,12 @@ function readOids(session, ip, oids, ids) {
                 }
             } else {
                 if ( ! IPs[ip].inactive ) {
-                    adapter.log.error('[' + ip + '] session.get: ' +error);
+                    adapter.log.error('[' + ip + '] session.get: ' + error);
                     IPs[ip].inactive = true;
                     setImmediate(handleConnectionInfo);
                 }
-                adapter.setState(ip.replace(/\./g, "_") + '.online', false, true);
             }
+            adapter.setState(ip.replace(/\./g, "_") + '.online', false, true);
         } else {
             if ( IPs[ip].inactive ) {
                 adapter.log.info('[' + ip + '] device (re)connected');
