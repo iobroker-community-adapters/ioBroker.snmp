@@ -213,8 +213,8 @@ function readOids(session, ip, oids, ids) {
 
     session.get(oids, (error, varbinds) => {
         if (error) {
-            adapter.log.debug('[' + ip + '] session.get: ' + error);
-            if (error === 'RequestTimedOutError: Request timed out') {
+            adapter.log.debug('[' + ip + '] session.get: ' + error.toString());
+            if (error.toString() === 'RequestTimedOutError: Request timed out') {
                 if ( ! IPs[ip].inactive ) {
                     adapter.log.info('[' + ip + '] device disconnected - request timout');
                     IPs[ip].inactive = true;
