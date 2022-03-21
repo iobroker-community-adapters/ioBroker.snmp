@@ -64,7 +64,70 @@
             "sentry": {
                 "dsn": "https://621ac710b70445f8b170cbb783045988@sentry.iobroker.net/181"
             }
-        }
+        },
+        "globalDependencies": [
+            {
+                "admin": ">=5.1.28"
+            }
+        ],
+        "dependencies": [
+            {
+                "js-controller": ">=2.0.0"
+            }
+        ],
+        "messages": [
+            {
+                "condition": {
+                    "operand": "and",
+                    "rules": [
+                        "oldVersion<1.0.0",
+                        "newVersion>=1.0.0"
+                    ]
+                },
+                "title": {
+                    "en": "Important notice!",
+                    "de": "Wichtiger Hinweis!",
+                    "ru": "Важное замечание!",
+                    "pt": "Notícia importante!",
+                    "nl": "Belangrijke mededeling!",
+                    "fr": "Avis important!",
+                    "it": "Avviso IMPORTANTE!",
+                    "es": "Noticia importante!",
+                    "pl": "Ważna uwaga!",
+                    "zh-cn": "重要通知!"
+                },
+                "text": {
+                    "en": "Version 1.0 will potentially change the Names of Objects when special characters like \".\", \"-\" or spaces were used in the names! Please delete the old objects manually if needed.",
+                    "de": "Version 1.0 wird möglicherweise die Namen von Objekten ändern, wenn Sonderzeichen wie \".\", \"-\" oder Leerzeichen in den Namen verwendet wurden! Bitte löschen Sie die alten Objekte bei Bedarf manuell.",
+                    "ru": "Версия 1.0 потенциально изменит имена объектов, когда в именах используются специальные символы, такие как «.», «-» или пробелы! При необходимости удалите старые объекты вручную.",
+                    "pt": "A versão 1.0 alterará potencialmente os nomes dos objetos quando caracteres especiais como \".\", \"-\" ou espaços forem usados nos nomes! Por favor, exclua os objetos antigos manualmente, se necessário.",
+                    "nl": "Versie 1.0 zal mogelijk de namen van objecten wijzigen wanneer speciale tekens zoals \".\", \"-\" of spaties in de namen werden gebruikt! Verwijder indien nodig de oude objecten handmatig.",
+                    "fr": "La version 1.0 changera potentiellement les noms des objets lorsque des caractères spéciaux comme \".\", \"-\" ou des espaces ont été utilisés dans les noms ! Veuillez supprimer les anciens objets manuellement si nécessaire.",
+                    "it": "La versione 1.0 cambierà potenzialmente i nomi degli oggetti quando nei nomi sono stati utilizzati caratteri speciali come \".\", \"-\" o spazi! Si prega di eliminare i vecchi oggetti manualmente, se necessario.",
+                    "es": "¡La versión 1.0 cambiará potencialmente los nombres de los objetos cuando se usen caracteres especiales como \".\", \"-\" o espacios en los nombres! Elimine los objetos antiguos manualmente si es necesario.",
+                    "pl": "Wersja 1.0 potencjalnie zmieni nazwy obiektów, gdy w nazwach zostaną użyte znaki specjalne, takie jak \".\", \"-\" lub spacje! W razie potrzeby usuń stare obiekty ręcznie.",
+                    "zh-cn": "当名称中使用“.”、“-”或空格等特殊字符时，1.0 版可能会更改对象的名称！如果需要，请手动删除旧对象。"
+                },
+                "link": "https://github.com/iobroker-community-adapters/ioBroker.snmp#changelog",
+                "level": "warn",
+                "linkText": {
+                    "en": "Changelog",
+                    "de": "Änderungsprotokoll",
+                    "ru": "Список изменений",
+                    "pt": "Registro de alterações",
+                    "nl": "Wijzigingslog",
+                    "fr": "Journal des modifications",
+                    "it": "Registro delle modifiche",
+                    "es": "registro de cambios",
+                    "pl": "Dziennik zmian",
+                    "zh-cn": "变更日志"
+                },
+                "buttons": [
+                    "agree",
+                    "cancel"
+                ]
+            }
+        ]
     },
     "native": {
         "retryTimeout": 5000,
