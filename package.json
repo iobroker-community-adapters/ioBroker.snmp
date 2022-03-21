@@ -1,6 +1,6 @@
 {
   "name": "iobroker.snmp",
-  "version": "0.6.2",
+  "version": "1.0.0",
   "description": "ioBroker SNMP Adapter",
   "author": {
     "name": "Marcolotti",
@@ -11,11 +11,10 @@
       "name": "Marcolotti",
       "email": "info@ct-j.de"
     },
-	{
+    {
       "name": "McM1957",
       "email": "mcm57@gmx.at"
     }
-
   ],
   "homepage": "https://github.com/iobroker-community-adapters/ioBroker.snmp",
   "license": "MIT",
