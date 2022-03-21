@@ -53,7 +53,7 @@ adapter.on('unload', (callback) => {
 });
 
 function name2id(name) {
-    return (name || '').replace(adapter.FORBIDDEN_CHARS, '_').replace(/-\s/g, '_');
+    return (name || '').replace(adapter.FORBIDDEN_CHARS, '_').replace(/[-\s]/g, '_');
 }
 
 function processTasks(tasks, callback) {
