@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "snmp",
-    "version": "1.0.0",
+    "version": "1.1.0-beta",
     "news": {
       "1.0.0": {
         "en": "IMPORTANT: This release will change the object structures!!\nreduce latency for update of info.connection \navoid excessive error logs if target is unreachable, optimize logging\nadd additional online at ip base to indicate target is reachable\noutput warning if OIDs specify different communities for one device\nAdd Sentry for crash reporting",
@@ -70,7 +70,12 @@
       {
         "name": "Marcolotti",
         "email": "info@ct-j.de"
+      },
+	  {
+        "name": "mcm1957",
+        "email": "mcm57@gmx.at"
       }
+
     ],
     "plugins": {
       "sentry": {
