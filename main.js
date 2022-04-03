@@ -297,9 +297,6 @@ async function onSessionClose(IP) {
 	console.log('onSessionClose (' + IP.ip + ')');
 	adapter.log.debug('['+IP.ip+'] session closed');
 	
-	IP.session.on('error', null ); // avoid nesting callbacks
-	IP.session.on('close', null ); // avoid nesting callbacks
-	
 	clearInterval(IP.interval);
 	IP.interval = null;
 
