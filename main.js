@@ -295,7 +295,8 @@ async function initOidObjects(OID) {
  */
 async function onSessionClose(IP) {
 	console.log('onSessionClose (' + IP.ip + ')');
-
+	adapter.log.debug('['+IP.ip+'] session closed');
+	
 	IP.session.on('error', null ); // avoid nesting callbacks
 	IP.session.on('close', null ); // avoid nesting callbacks
 	
@@ -321,7 +322,8 @@ async function onSessionClose(IP) {
  */
 async function onSessionError(IP, err) {
 	console.log('onSessionError (' + IP.ip + ')');
-
+	adapter.log.debug('['+IP.ip+'] session signalled error: ' + err.toString);
+	
 	console.log('onSessionError (' + IP.ip + ') - error:' + err.toString);
 // ### to be implemented ###
 }
@@ -336,7 +338,8 @@ async function onSessionError(IP, err) {
  */
 async function createSession(IP) {
 	console.log('createSession (' + IP.ip + ')');
-
+	adapter.log.debug('['+IP.ip+'] creating session');
+	
 	// (re)set device online status
 	adapter.setState(IP.ipStr + '.online', false, true);
 
