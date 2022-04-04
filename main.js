@@ -303,11 +303,10 @@ async function onSessionClose(IP) {
 
 	IP.session = null;
 
-	IP.retryTimeout = setTimeout((ip, publicCom, oids, ids) => {
+	IP.retryTimeout = setTimeout((IP) => {
 		IP.retryTimeout = null;
-		startOneDevice(ip, publicCom, oids, ids);
-		}, adapter.config.retryTimeout, ip, publicCom, oids, ids);
-// ### to check parameters ###
+		createSession(IP);
+		}, adapter.config.retryTimeout, IP);
 }
 
 /**
