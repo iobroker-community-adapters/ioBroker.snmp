@@ -195,7 +195,7 @@ async function initIpObjects(IP) {
 
 	try{ 
 		// create <ip> device object
-		initObject({
+		await initObject({
 					_id: ipStr,
 					type: 'device',
 					common: {
@@ -207,7 +207,7 @@ async function initIpObjects(IP) {
 			);
 
 		// create <ip>.online state object
-		initObject({
+		await initObject({
 					_id: ipStr + '.online',
 					type: 'state',
 					common: {
@@ -247,9 +247,10 @@ async function initOidObjects(OID) {
         const idArr = id.split('.');
         idArr.pop();
         let partlyId = ipStr;
-        idArr.forEach( el => {
+		for (let i = 0; i < idArr.length; i++) {
+			let el = idArr[i];
             partlyId += '.' + el;
-				initObject({
+			await initObject({
 						_id: partlyId,
 						type: 'folder',
 						common: {
@@ -258,23 +259,23 @@ async function initOidObjects(OID) {
 						native: {
 						}
 					});
-		});
+		};
 
 		// create OID state object
-		initObject({
-            _id: ipStr + '.' + id,
-            type: 'state',
-            common: {
-                name:  OID.name,
-                write: !!OID.write,
-                read:  true,
-                type: 'string',
-                role: 'value'
-            },
-            native: {
-                OID: OID.OID
-            }
-        });
+		await initObject({
+				_id: ipStr + '.' + id,
+				type: 'state',
+				common: {
+					name:  OID.name,
+					write: !!OID.write,
+					read:  true,
+					type: 'string',
+					role: 'value'
+				},
+				native: {
+					OID: OID.OID
+				}
+			});
 
 	} catch(e) {
 		adapter.log.error ('error processing oid "'+OID.OID+'" '+e.message);
@@ -538,13 +539,14 @@ async function main() {
 		const IP = IPs[ip];
 	
 		// create IP objects
-		initIpObjects(IP);
-
+		await initIpObjects(IP);
+	
 		// create OID objects
-		IP.OIDs.forEach( OID => {
-			adapter.log.debug('handling oid '+ OID.OID +' for ip ' + ip);
-			initOidObjects(OID);
-		});		
+		for (let i = 0; i < IP.OIDs.length; i++) {
+			const OID = IP.OIDs[i];
+			adapter.log.debug('handling oid ' + OID.id + ' (' + OID.oid +') for ip ' + ip);
+			await initOidObjects(OID);
+		};		
 	}
 
 	console.log('initialization completed');
