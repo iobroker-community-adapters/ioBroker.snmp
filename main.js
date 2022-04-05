@@ -319,9 +319,9 @@ async function onSessionClose(IP) {
  */
 async function onSessionError(IP, err) {
 	console.log('onSessionError (' + IP.ip + ')');
-	adapter.log.debug('['+IP.ip+'] session signalled error: ' + err.toString);
+	adapter.log.debug('['+IP.ip+'] session signalled error: ' + err.toString());
 	
-	console.log('onSessionError (' + IP.ip + ') - error:' + err.toString);
+	console.log('onSessionError (' + IP.ip + ') - error:' + err.toString());
 // ### to be implemented ###
 }
 
@@ -400,7 +400,7 @@ function readOids(IP) {
             } else {
 				// other error
 				if (!IP.inactive) {
-					adapter.log.error('[' + ip + '] session.get: ' + err.toString);
+					adapter.log.error('[' + ip + '] session.get: ' + err.toString());
 					IPs[ip].inactive = true;
 					setImmediate(handleConnectionInfo);
 					}
