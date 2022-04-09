@@ -1,0 +1,189 @@
+{
+    "i18n": true,
+    "type": "tabs",
+    "items": {
+        "general": {
+            "type": "panel",
+            "label": "General Setup",
+            "items": {
+				"optUseName": 	{
+						"type": "checkbox",
+						"label": "use device name for id",
+						"filter": false,
+						"sort": false,
+						"default": false,
+						"validator": "data.optUseName"
+					},			
+				"optTest": {
+						"type": "checkbox",
+						"label": "test only",
+						"filter": false,
+						"sort": false,
+						"default": false,
+						"validator": "data.oids[1].oid"
+					}
+				}					
+			},       
+        "oid_groups": {
+            "type": "panel",
+            "label": "OID Configuration",
+            "items": {
+				"desc":{
+					"type": "staticText",
+					"text": "Add OIDs grouped by OID Group names here. Those groups can be assigned to devices at panel Devices"
+				},
+				"divider":{
+					"type": "divider"
+				},
+                "oids": {
+                    "type": "table",
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "label": "OID Groups",
+                    "items": [
+                        {
+                            "type": "text",
+                            "attr": "oid_group",
+                            "width": "25% ",
+                            "title": "OID Group",
+                            "filter": false,
+                            "sort": true,
+                            "default": "",
+							"validator": "data.optUseName"
+                        },
+                        {
+                            "type": "text",
+                            "attr": "oid",
+                            "width": "25% ",
+                            "title": "OID",
+                            "filter": false,
+                            "sort": true,
+                            "default": ""
+                        },
+                        {
+                            "type": "checkbox",
+                            "attr": "writeable",
+                            "width": "10% ",
+                            "title": "write",
+                            "filter": false,
+                            "sort": false,
+                            "default": false
+                        },
+                        {
+                            "type": "checkbox",
+                            "attr": "optional",
+                            "width": "10% ",
+                            "title": "optional",
+                            "filter": false,
+                            "sort": false,
+                            "default": false
+                        }						
+					]
+				}
+			}
+		},
+        "devices": {
+            "type": "panel",
+            "label": "Devices",
+            "items": {
+                "ips": {
+                    "type": "table",
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "label": "Devices",
+                    "items": [
+                        {
+                            "type": "checkbox",
+                            "attr": "enable",
+                            "width": "10% ",
+                            "title": "",
+                            "filter": false,
+                            "sort": false,
+                            "default": true
+                        },
+                        {
+                            "type": "text",
+                            "attr": "name",
+                            "width": "10% ",
+                            "title": "Name",
+                            "filter": false,
+                            "sort": true,
+                            "default": ""
+                        },
+                        {
+                            "type": "text",
+                            "attr": "ip",
+                            "width": "25% ",
+                            "title": "IP Address",
+                            "filter": false,
+                            "sort": true,
+                            "default": "0.0.0.0"
+                        },
+                        {
+                            "type": "text",
+                            "attr": "iod_group",
+                            "width": "10% ",
+                            "title": "OID group",
+                            "filter": false,
+                            "sort": true,
+                            "default": ""
+                        },
+                        {
+                            "type": "select",
+                            "attr": "snmpversion",
+                            "width": "10% ",
+                            "title": "SNMP\nversion",
+                            "options": [
+                                { "label": "snmp v1", "value": 1}, 
+                                { "label": "snmp v2c", "value": 2},
+                                { "label": "snmp v3", "value": 3}
+                            ],
+                            "filter": false,
+                            "sort": true,
+                            "default": "1"
+                        },
+                        {
+                            "type": "text",
+                            "attr": "comm_user",
+                            "width": "25% ",
+                            "title": "community (v1, v2c)\nUsername (v3)",
+                            "filter": false,
+                            "sort": true,
+                            "default": "public",
+							"hidden": true
+                        },
+                        {
+                            "type": "text",
+                            "attr": "timeout",
+                            "width": "10% ",
+                            "title": "timeout\nintervall (s)",
+                            "filter": false,
+                            "sort": true,
+                            "default": "5"
+                        },
+                        {
+                            "type": "text",
+                            "attr": "retry",
+                            "width": "10% ",
+                            "title": "retry\nintervall (s)",
+                            "filter": false,
+                            "sort": true,
+                            "default": "5"
+                        },
+                        {
+                            "type": "text",
+                            "attr": "poll",
+                            "width": "10% ",
+                            "title": "poll\nintervall (s)",
+                            "filter": false,
+                            "sort": true,
+                            "default": "30"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

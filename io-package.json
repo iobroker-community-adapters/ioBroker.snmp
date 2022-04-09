@@ -75,8 +75,10 @@
         "name": "mcm1957",
         "email": "mcm57@gmx.at"
       }
-
     ],
+    "adminUI": {
+        "config": "json"
+    },
     "plugins": {
       "sentry": {
         "dsn": "https://621ac710b70445f8b170cbb783045988@sentry.iobroker.net/181"
