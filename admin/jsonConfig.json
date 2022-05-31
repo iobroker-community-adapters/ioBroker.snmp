@@ -2,35 +2,52 @@
     "i18n": true,
     "type": "tabs",
     "items": {
-        "general": {
+        "oidSets": {
             "type": "panel",
-            "label": "General Setup",
+            "label": "lblOidSets",
             "items": {
-				"optUseName": 	{
-						"type": "checkbox",
-						"label": "use device name for id",
-						"filter": false,
-						"sort": false,
-						"default": false,
-						"validator": "data.optUseName"
-					},			
-				"optTest": {
-						"type": "checkbox",
-						"label": "test only",
-						"filter": false,
-						"sort": false,
-						"default": false,
-						"validator": "data.oids[1].oid"
-					}
-				}					
-			},       
-        "oid_groups": {
-            "type": "panel",
-            "label": "OID Configuration",
-            "items": {
-				"desc":{
+				"_oidsInfo_1":{
 					"type": "staticText",
-					"text": "Add OIDs grouped by OID Group names here. Those groups can be assigned to devices at panel Devices"
+					"text": "infoOidSets",
+					"style": {
+						"fontSize": 16
+					}
+				},
+				"_oidsErr_1":{
+					"type": "staticText",
+					"text": "errOidGrpMissing",
+					"newLine": true,
+					"hidden": "data.oids&&data.oids.length",
+					"validator":"data.oids&&data.oids.length",
+					"validatorNoSaveOnError": true,
+					"style": {
+						"fontSize": 16,
+						"color": "red"
+					}
+				},
+				"_oidsErr_2":{
+					"type": "staticText",
+					"text": "errOidGrpEmpty",
+					"newLine": true,
+					"hidden": "for(let ii=0; ii<data.oids.length; ii++) {if (data.oids[ii].oidGroup != ''){return 1;}}; return 0;",
+					"validator": "for(let ii=0; ii<data.oids.length; ii++) {if (data.oids[ii].oidGroup != ''){return 1;}}; return 0;",
+					"validatorNoSaveOnError": true,
+					"style": {
+						"fontSize": 16,
+						"color": "red"
+					}
+				},
+				"_oidsErr_3":{
+					"type": "staticText",
+					"text": "errOidEmpty",
+					"newLine": true,
+					"hidden": "for(let ii=0; ii<data.oids.length; ii++) {if (data.oids[ii].oid != ''){return 1;}}; return 0;",
+					"validator": "for(let ii=0; ii<data.oids.length; ii++) {if (data.oids[ii].oid != ''){return 1;}}; return 0;",
+					"validatorNoSaveOnError": true,
+					"style": {
+						"fontSize": 16,
+						"color": "red"
+					}
 				},
 				"divider":{
 					"type": "divider"
@@ -40,41 +57,67 @@
                     "sm": 12,
                     "md": 12,
                     "lg": 12,
-                    "label": "OID Groups",
+                    "label": "lblOidGroups",
                     "items": [
                         {
-                            "type": "text",
-                            "attr": "oid_group",
-                            "width": "25% ",
-                            "title": "OID Group",
+                            "type": "checkbox",
+                            "attr": "oidAct",
+                            "width": "10% ",
+                            "title": "lblOidAct",
                             "filter": false,
-                            "sort": true,
-                            "default": "",
-							"validator": "data.optUseName"
+                            "sort": false,
+                            "default": true
                         },
                         {
                             "type": "text",
-                            "attr": "oid",
-                            "width": "25% ",
-                            "title": "OID",
+                            "attr": "oidGroup",
+                            "width": "15% ",
+                            "title": "lblOidGroup",
                             "filter": false,
                             "sort": true,
+							"validator": "data.oidGroup&&data.oidGroup!=''",
+							"validatorErrorText": "errOidGrpEmpty",
+							"validatorNoSaveOnError": true,
+                            "default": ""
+                        },
+                        {
+                            "type": "text",
+                            "attr": "oidName",
+                            "width": "20% ",
+                            "title": "lblOidName",
+                            "filter": false,
+                            "sort": true,
+							"validator": "data.oidName&&data.oidName!=''",
+							"validatorErrorText": "errOidNameEmpty",
+							"validatorNoSaveOnError": true,
+                            "default": ""
+                        },
+                        {
+                            "type": "text",
+                            "attr": "oidOid",
+                            "width": "30% ",
+                            "title": "lblOidOid",
+                            "filter": false,
+                            "sort": true,
+							"validator": "data.oidOid&&data.oidOid!=''",
+							"validatorErrorText": "errOidEmpty",
+							"validatorNoSaveOnError": true,
                             "default": ""
                         },
                         {
                             "type": "checkbox",
-                            "attr": "writeable",
+                            "attr": "OidWriteable",
                             "width": "10% ",
-                            "title": "write",
+                            "title": "lblOidWriteable",
                             "filter": false,
                             "sort": false,
                             "default": false
                         },
                         {
                             "type": "checkbox",
-                            "attr": "optional",
+                            "attr": "oidOptional",
                             "width": "10% ",
-                            "title": "optional",
+                            "title": "lblOidOptional",
                             "filter": false,
                             "sort": false,
                             "default": false
@@ -83,107 +126,252 @@
 				}
 			}
 		},
+        
         "devices": {
             "type": "panel",
-            "label": "Devices",
+            "label": "lblDevs",
             "items": {
-                "ips": {
+				"_errDevices_1": {
+					"type": "staticText",
+					"text": "lblDevsInfo",
+					"newLine": true,
+					"hidden": "data.oids&&data.oids.length",
+					"validator":"data.oids&&data.oids.length",
+					"validatorNoSaveOnError": true,
+					"style": {
+						"fontSize": 16,
+						"textAlign": "center"
+					}
+				},
+				"divider":{
+					"type": "divider"
+				},
+                "devs": {
                     "type": "table",
+					"newLine": true,
                     "sm": 12,
                     "md": 12,
                     "lg": 12,
-                    "label": "Devices",
+					"hidden": "!(data.oids&&data.oids.length)",
+                    "label": "lblDevsDevices",
                     "items": [
                         {
                             "type": "checkbox",
-                            "attr": "enable",
+                            "attr": "devAct",
                             "width": "10% ",
-                            "title": "",
+                            "title": "lblDevAct",
                             "filter": false,
                             "sort": false,
                             "default": true
                         },
                         {
                             "type": "text",
-                            "attr": "name",
-                            "width": "10% ",
-                            "title": "Name",
+                            "attr": "devName",
+                            "width": "15% ",
+                            "title": "lblDevName",
                             "filter": false,
-                            "sort": true,
+                            "sort": false,
                             "default": ""
                         },
                         {
                             "type": "text",
-                            "attr": "ip",
-                            "width": "25% ",
-                            "title": "IP Address",
+                            "attr": "devIpAddr",
+                            "width": "30% ",
+                            "title": "lblDevIpAddr",
                             "filter": false,
-                            "sort": true,
+                            "sort": false,
                             "default": "0.0.0.0"
                         },
                         {
                             "type": "text",
-                            "attr": "iod_group",
+                            "attr": "devOidGroup",
                             "width": "10% ",
-                            "title": "OID group",
+                            "title": "lblDevOidGroup",
                             "filter": false,
-                            "sort": true,
+                            "sort": false,
                             "default": ""
                         },
                         {
                             "type": "select",
-                            "attr": "snmpversion",
+                            "attr": "devSnmpVers",
                             "width": "10% ",
-                            "title": "SNMP\nversion",
+                            "title": "lblDevSnmpVers",
                             "options": [
-                                { "label": "snmp v1", "value": 1}, 
-                                { "label": "snmp v2c", "value": 2},
-                                { "label": "snmp v3", "value": 3}
+                                { "label": "SNMP v1", "value": 1}, 
+                                { "label": "SNMP v2c", "value": 2},
+                                { "label": "SNMP v3", "value": 3}
                             ],
                             "filter": false,
-                            "sort": true,
+                            "sort": false,
                             "default": "1"
                         },
                         {
                             "type": "text",
-                            "attr": "comm_user",
-                            "width": "25% ",
-                            "title": "community (v1, v2c)\nUsername (v3)",
+                            "attr": "devAuthId",
+                            "width": "20% ",
+                            "title": "lblDevAuthId",
                             "filter": false,
-                            "sort": true,
-                            "default": "public",
-							"hidden": true
+                            "sort": false,
+                            "default": ""
                         },
                         {
                             "type": "text",
-                            "attr": "timeout",
+                            "attr": "devTimeout",
                             "width": "10% ",
-                            "title": "timeout\nintervall (s)",
+                            "title": "lblDevTimeout",
                             "filter": false,
-                            "sort": true,
+                            "sort": false,
                             "default": "5"
                         },
                         {
                             "type": "text",
-                            "attr": "retry",
+                            "attr": "devRetryIntvl",
                             "width": "10% ",
-                            "title": "retry\nintervall (s)",
+                            "title": "lblDevRetryIntvl",
                             "filter": false,
-                            "sort": true,
+                            "sort": false,
                             "default": "5"
                         },
                         {
                             "type": "text",
-                            "attr": "poll",
+                            "attr": "devPollIntvl",
                             "width": "10% ",
-                            "title": "poll\nintervall (s)",
+                            "title": "lblDevPollIntvl",
                             "filter": false,
-                            "sort": true,
+                            "sort": false,
                             "default": "30"
                         }
                     ]
                 }
             }
-        }
-    }
+        },
+        
+        "authorization": {
+            "type": "panel",
+            "label": "lblAuth",
+            "items": {
+ 				"_oidsInfo_1":{
+					"type": "staticText",
+					"text": "infoAuth",
+					"style": {
+						"fontSize": 16
+					}
+				},
+               "oidsInfo_2":{
+					"type": "staticText",
+					"text": "warnAuthUnused",
+					"hidden": "for(let ii=0; ii<data.devices.length; ii++) {if (data.devices[ii].snmpversion == 3){return 1;}}; return 0;",
+					"style": {
+						"fontSize": 16
+					}
+				},
+                "authSets": {
+                    "type": "table",
+					"newLine": true,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "label": "lblAuthCfg",
+                    "items": [
+                        {
+                            "type": "text",
+                            "attr": "authId",
+                            "width": "15% ",
+                            "title": "lblAuthId",
+                            "filter": false,
+                            "sort": false,
+                            "default": "std"
+                        },
+                        {
+                            "type": "select",
+                            "attr": "authSecLvl",
+                            "width": "15% ",
+                            "title": "lblAuthSecLvl",
+                            "filter": false,
+                            "sort": false,
+                            "options": [
+                                { "label": "lblAuthSecLvlOpt1", "value": 1}, 
+                                { "label": "lblAuthSecLvlOpt2", "value": 2},
+                                { "label": "lblAuthSecLvlOpt3", "value": 3}
+                            ],
+                            "default": "1"
+                        },
+                        {
+                            "type": "text",
+                            "attr": "authUser",
+                            "width": "15% ",
+                            "title": "lblAuthUser",
+                            "filter": false,
+                            "sort": false,
+                            "default": ""
+                        },
+                        {
+                            "type": "select",
+                            "attr": "authAuthProto",
+                            "width": "15% ",
+                            "title": "lblAuthAuthProto",
+							"hidden": "data.authSecLvl<2",
+                            "filter": false,
+                            "sort": false,
+                            "options": [
+                                { "label": "md5", "value": 1}, 
+                                { "label": "sha", "value": 2}
+                            ],
+                            "default": "1"
+                        },
+                        {
+                            "type": "text",
+                            "attr": "authAuthKey",
+                            "width": "15% ",
+                            "title": "lblAuthAuthKey",
+							"hidden": "data.authSecLvl<2",
+                            "filter": false,
+                            "sort": false,
+                            "default": ""
+                        },
+                        {
+                            "type": "select",
+                            "attr": "authEncProto",
+                            "width": "15% ",
+                            "title": "lblAuthEncProto",
+							"hidden": "data.authSecLvl<3",
+                            "filter": false,
+                            "sort": false,
+                            "options": [
+                                { "label": "des", "value": 1}, 
+                                { "label": "aes", "value": 2},
+                                { "label": "aes256b", "value": 3}, 
+                                { "label": "aes256r", "value": 4}
+                            ],
+                            "default": "1"
+                        },
+                        {
+                            "type": "text",
+                            "attr": "authEncKey",
+                            "width": "15% ",
+                            "title": "lblAuthEncKey",
+  							"hidden": "data.authSecLvl<3",
+                            "filter": false,
+                            "sort": false,
+                            "default": ""
+                        }
+					]
+				}
+			}
+		},
+        
+        "options": {
+            "type": "panel",
+            "label": "lblOptions",
+            "items": {
+				"optUseName": 	{
+                    "type": "checkbox",
+                    "label": "lblOptUseIp",
+                    "default": false,
+                    "tooltip": "ttOptUseIp",
+                    "help": "hlpOptUseIp"
+                }
+            }
+		}        
+	}
 }
