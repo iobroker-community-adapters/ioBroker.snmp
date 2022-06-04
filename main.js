@@ -65,6 +65,9 @@ const mcmLogger			= require('./mcmLogger');
  // Load modules required by adapter
 const snmp = require('net-snmp');
 
+// init installation marker
+let doInstall = false;
+
 // say hello
 mcmLogger.debug("snmp adapter initializing ...");
 
@@ -766,10 +769,19 @@ function setupContices() {
  */
 async function onReady() {
 
-	// init out logger
-	mcmLogger.init(adapter);
+	// init logger
+	await mcmLogger.init(adapter);
 	mcmLogger.debug("adapter ready");
-    
+
+    if (doInstall) {
+        mcmLogger.info("performing installation");
+        const mcmInstUtils	= require('./mcmInstUtils');
+        await mcmInstUtils.init(adapter);
+        await mcmInstUtils.doUpgrade();
+        mcmLogger.info("installation completed");
+        process.exit(0);
+    }
+
 	// mark adapter as non active
 	await adapter.setStateAsync('info.connection', false, true);
 
@@ -812,19 +824,19 @@ async function onReady() {
  *
  */
 function onUnload(callback) {
-	for (let ip in IPs) {
-		if (IPs.hasOwnProperty(ip) && IPs[ip].session) {
-			try {
-				IPs[ip].session.close();
-				adapter.setState(ip.replace(/\./g, "_") + '.online', false, true);
-			} catch (e) {
-				// Ignore
-			}
-			IPs[ip].session = null;
-			IPs[ip].pollTimer && clearInterval(IPs[ip].pollTimer);
-			IPs[ip].retryTimeout && clearTimeout(IPs[ip].retryTimeout);
-		}
-	}
+//	for (let ip in IPs) {
+//		if (IPs.hasOwnProperty(ip) && IPs[ip].session) {
+//			try {
+//				IPs[ip].session.close();
+//				adapter.setState(ip.replace(/\./g, "_") + '.online', false, true);
+//			} catch (e) {
+//				// Ignore
+//			}
+//			IPs[ip].session = null;
+//			IPs[ip].pollTimer && clearInterval(IPs[ip].pollTimer);
+//			IPs[ip].retryTimeout && clearTimeout(IPs[ip].retryTimeout);
+//		}
+//	}
 
     try {
 		if (connUpdateTimer) {
@@ -848,6 +860,14 @@ function onUnload(callback) {
 /**
  * here we start
  */
+ if (process.argv) {
+    for (let a = 1; a < process.argv.length; a++) {
+        if (process.argv[a] === '--install') {
+            doInstall = true;
+        }
+    }
+}
+
 if (require.main !== module) {
 	// Export startAdapter in compact mode
 	module.exports = startAdapter;

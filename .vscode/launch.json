@@ -7,7 +7,7 @@
         {
             "name": "Launch Program",
             "program": "${workspaceFolder}/main.js",
-            "args": ["--instance", "0", "--force", "--log", "--debug"],
+            "args": ["--instance", "0", "--force", "--log", "--debug", "--install"],
             "request": "launch",
             "stopOnEntry": true,
             "console": "internalConsole",
