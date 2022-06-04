@@ -16,6 +16,9 @@ For more details and for information how to disable the error reporting see [Sen
 This adapter polls information from SNMP Device like Printers, Network ...
 
 ## Changelog
+### __WORK IN PROGRESS__
+* (McM1957) complete rewrite using async/wait mechanism
+
 ### 1.0.0 (2022-03-21)
 * IMPORTANT: This release will change the object structures!!
 * (McM1957) reduce latency for update of info.connection 
