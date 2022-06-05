@@ -16,7 +16,7 @@ For more details and for information how to disable the error reporting see [Sen
 This adapter polls information from SNMP Device like Printers, Network ...
 
 ## Changelog
-### __WORK IN PROGRESS__
+### 2.0.0-beta.0 (2022-06-05)
 * IMPORTANT: This release will change configuration structures!
   Please backup your configuration before starting the installation.
   Installation will try to convert old configuration - but its not guaranteed to succeed in all cases. 

@@ -1,188 +1,200 @@
 {
-    "common": {
-        "name": "snmp",
-        "version": "1.1.0-beta",
-        "news": {
-            "1.0.0": {
-                "en": "IMPORTANT: This release will change the object structures!!\nreduce latency for update of info.connection \navoid excessive error logs if target is unreachable, optimize logging\nadd additional online at ip base to indicate target is reachable\noutput warning if OIDs specify different communities for one device\nAdd Sentry for crash reporting",
-                "de": "WICHTIG: Diese Version wird die Objektstrukturen ändern!!\nReduzieren Sie die Latenz für die Aktualisierung von info.connection\nvermeiden Sie übermäßige Fehlerprotokolle, wenn das Ziel nicht erreichbar ist, optimieren Sie die Protokollierung\nfügen Sie zusätzliche online an der IP-Basis hinzu, um anzuzeigen, dass das Ziel erreichbar ist\nAusgabe einer Warnung, wenn OIDs unterschiedliche Communities für ein Gerät angeben\nFügen Sie Sentry für Absturzberichte hinzu",
-                "ru": "ВАЖНО: В этом релизе будут изменены структуры объектов!!\nуменьшить задержку для обновления info.connection\nизбегайте избыточных журналов ошибок, если цель недоступна, оптимизируйте ведение журнала\nдобавить дополнительный онлайн на базе ip, чтобы указать, что цель достижима\nвывод предупреждения, если OID указывают разные сообщества для одного устройства\nДобавьте Sentry для отчетов о сбоях",
-                "pt": "IMPORTANTE: Esta versão irá alterar as estruturas dos objetos!!\nreduzir a latência para atualização de info.connection\nevite logs de erros excessivos se o destino estiver inacessível, otimize o log\nadicione on-line adicional na base do ip para indicar que o destino é alcançável\naviso de saída se os OIDs especificarem comunidades diferentes para um dispositivo\nAdicionar Sentinela para relatórios de falhas",
-                "nl": "BELANGRIJK: Deze release zal de objectstructuren veranderen!!\nverminder latentie voor update van info.connection\nvermijd overmatige foutenlogboeken als het doel onbereikbaar is, optimaliseer de logboekregistratie\nvoeg extra online toe op ip-basis om aan te geven dat het doel bereikbaar is\nuitvoerwaarschuwing als OID's verschillende gemeenschappen specificeren voor één apparaat\nSentry toevoegen voor crashrapportage",
-                "fr": "IMPORTANT : Cette version modifiera les structures d'objets !\nréduire la latence pour la mise à jour d'info.connection\néviter les journaux d'erreurs excessifs si la cible est inaccessible, optimiser la journalisation\najouter en ligne supplémentaire à la base IP pour indiquer que la cible est accessible\navertissement de sortie si les OID spécifient différentes communautés pour un appareil\nAjouter Sentry pour les rapports de plantage",
-                "it": "IMPORTANTE: questa versione cambierà le strutture degli oggetti!!\nridurre la latenza per l'aggiornamento di info.connection\nevitare log di errori eccessivi se la destinazione non è raggiungibile, ottimizzare la registrazione\naggiungere ulteriore online alla base IP per indicare che l'obiettivo è raggiungibile\navviso di output se gli OID specificano comunità diverse per un dispositivo\nAggiungi Sentinella per la segnalazione degli arresti anomali",
-                "es": "IMPORTANTE: ¡Esta versión cambiará las estructuras de los objetos!\nreducir la latencia para la actualización de info.connection\nevitar registros de errores excesivos si el objetivo no es alcanzable, optimizar el registro\nagregue más en línea en la base de ip para indicar que se puede alcanzar el objetivo\nadvertencia de salida si los OID especifican diferentes comunidades para un dispositivo\nAgregar Sentry para informes de fallas",
-                "pl": "WAŻNE: Ta wersja zmieni strukturę obiektów!!\nskrócić czas oczekiwania na aktualizację info.connection\nunikaj nadmiernych rejestrów błędów, jeśli cel jest nieosiągalny, zoptymalizuj rejestrowanie\ndodaj dodatkowe online w bazie IP, aby wskazać, że cel jest osiągalny\nostrzeżenie wyjściowe, jeśli OID określają różne społeczności dla jednego urządzenia\nDodaj Sentry do zgłaszania awarii",
-                "zh-cn": "重要提示：此版本将更改对象结构！！\n减少更新 info.connection 的延迟\n如果目标不可达，避免过多的错误日志，优化日志记录\n在 ip base 添加额外的在线以指示目标是可达的\n如果 OID 为一台设备指定不同的社区，则输出警告\n添加 Sentry 以进行崩溃报告"
-            },
-            "0.5.0": {
-                "en": "Initial Release",
-                "de": "Erstveröffentlichung",
-                "ru": "Первый выпуск",
-                "pt": "Lançamento inicial",
-                "nl": "Eerste uitgave",
-                "fr": "Première version",
-                "it": "Versione iniziale",
-                "es": "Versión inicial",
-                "pl": "Pierwsze wydanie",
-                "zh-cn": "初始发行"
-            }
-        },
-        "title": "SNMP",
-        "titleLang": {
-            "en": "SNMP",
-            "de": "SNMP",
-            "ru": "SNMP",
-            "pt": "SNMP",
-            "nl": "SNMP",
-            "fr": "SNMP",
-            "it": "SNMP",
-            "es": "SNMP",
-            "pl": "SNMP",
-            "zh-cn": "SNMP"
-        },
-        "desc": {
-            "en": "Allows to poll SNMP OIDs in ioBroker",
-            "de": "Ermöglicht das Polling von SNMP Objekten im ioBroker",
-            "ru": "Позволяет считывать SNPM объекты по OID в ioBroker",
-            "pt": "ioBroker SNMP-OID Adapter",
-            "fr": "ioBroker SNMP-OID Adapter",
-            "nl": "ioBroker SNMP-OID Adapter",
-            "it": "Consente di eseguire il polling degli OID SNMP in ioBroker",
-            "es": "Permite sondear los OID de SNMP en ioBroker",
-            "pl": "Umożliwia odpytywanie identyfikatorów SNMP OID w ioBroker",
-            "zh-cn": "允许在 ioBroker 中轮询 SNMP OID"
-        },
-        "license": "MIT",
-        "platform": "Javascript/Node.js",
-        "icon": "snmp.png",
-        "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.snmp/master/admin/snmp.png",
-        "keywords": [
-            "SNMP-OID"
-        ],
-        "readme": "https://github.com/iobroker-community-adapters/ioBroker.snmp/blob/master/README.md",
-        "loglevel": "info",
-        "mode": "daemon",
-        "type": "infrastructure",
-        "connectionType": "local",
-        "dataSource": "poll",
-        "authors": [
-            {
-                "name": "Marcolotti",
-                "email": "info@ct-j.de"
-            },
-            {
-                "name": "mcm1957",
-                "email": "mcm57@gmx.at"
-            }
-        ],
-        "adminUI": {
-            "config": "json"
-        },
-        "stopBeforeUpdate": "true",
-        "plugins": {
-            "sentry": {
-                "dsn": "https://621ac710b70445f8b170cbb783045988@sentry.iobroker.net/181"
-            }
-        },
-        "globalDependencies": [
-            {
-                "admin": ">=5.1.28"
-            }
-        ],
-        "dependencies": [
-            {
-                "js-controller": ">=2.0.0"
-            }
-        ],
-        "messages": [
-            {
-                "condition": {
-                    "operand": "and",
-                    "rules": [
-                        "oldVersion<1.0.0",
-                        "newVersion>=1.0.0"
-                    ]
-                },
-                "title": {
-                    "en": "Important notice!",
-                    "de": "Wichtiger Hinweis!",
-                    "ru": "Важное замечание!",
-                    "pt": "Notícia importante!",
-                    "nl": "Belangrijke mededeling!",
-                    "fr": "Avis important!",
-                    "it": "Avviso IMPORTANTE!",
-                    "es": "Noticia importante!",
-                    "pl": "Ważna uwaga!",
-                    "zh-cn": "重要通知!"
-                },
-                "text": {
-                    "en": "The new version 1.0 will potentially change the Names of Objects when special characters like \".\", \"-\" or spaces were used in the names! Please delete the old objects manually if needed.",
-                    "de": "Die neue Version 1.0 wird möglicherweise die Namen von Objekten ändern, falls Sonderzeichen wie \".\", \"-\" oder Leerzeichen in den Namen verwendet wurden! Die alten Objekte können bei Bedarf manuell gelöscht werden.",
-                    "ru": "Новая версия 1.0 потенциально изменит имена объектов, когда в именах используются специальные символы, такие как «.», «-» или пробелы! При необходимости удалите старые объекты вручную.",
-                    "pt": "A nova versão 1.0 irá potencialmente alterar os nomes dos objetos quando caracteres especiais como \".\", \"-\" ou espaços forem usados nos nomes! Por favor, exclua os objetos antigos manualmente, se necessário.",
-                    "nl": "De nieuwe versie 1.0 zal mogelijk de namen van objecten wijzigen wanneer speciale tekens zoals \".\", \"-\" of spaties in de namen werden gebruikt! Verwijder indien nodig de oude objecten handmatig.",
-                    "fr": "La nouvelle version 1.0 changera potentiellement les noms des objets lorsque des caractères spéciaux comme \".\", \"-\" ou des espaces ont été utilisés dans les noms ! Veuillez supprimer les anciens objets manuellement si nécessaire.",
-                    "it": "La nuova versione 1.0 cambierà potenzialmente i nomi degli oggetti quando nei nomi sono stati utilizzati caratteri speciali come \".\", \"-\" o spazi! Si prega di eliminare i vecchi oggetti manualmente, se necessario.",
-                    "es": "¡La nueva versión 1.0 cambiará potencialmente los nombres de los objetos cuando se usen caracteres especiales como \".\", \"-\" o espacios en los nombres! Elimine los objetos antiguos manualmente si es necesario.",
-                    "pl": "Nowa wersja 1.0 potencjalnie zmieni Nazwy obiektów, gdy w nazwach zostaną użyte znaki specjalne, takie jak \".\", \"-\" lub spacje! W razie potrzeby usuń stare obiekty ręcznie.",
-                    "zh-cn": "当名称中使用“.”、“-”或空格等特殊字符时，新版本 1.0 可能会更改对象名称！如果需要，请手动删除旧对象。"
-                },
-                "link": "https://github.com/iobroker-community-adapters/ioBroker.snmp#changelog",
-                "level": "warn",
-                "linkText": {
-                    "en": "Changelog",
-                    "de": "Änderungsprotokoll",
-                    "ru": "Список изменений",
-                    "pt": "Registro de alterações",
-                    "nl": "Wijzigingslog",
-                    "fr": "Journal des modifications",
-                    "it": "Registro delle modifiche",
-                    "es": "registro de cambios",
-                    "pl": "Dziennik zmian",
-                    "zh-cn": "变更日志"
-                },
-                "buttons": [
-                    "agree",
-                    "cancel"
-                ]
-            }
-        ]
+  "common": {
+    "name": "snmp",
+    "version": "2.0.0-beta.0",
+    "news": {
+      "2.0.0-beta.0": {
+        "en": "* IMPORTANT: This release will change configuration structures!\n  Please backup your configuration before starting the installation.\n  Installation will try to convert old configuration - but its not guaranteed to succeed in all cases. \n* adaptercode has undergone a major rewrite\n* adapter now uses admin5 interface\n* timer values can be set differently per device (issue #105)\n* reordering configuration entries does no longer destroy data (issue #15)\n* state objects for devices can now be named. Old behavior using the ip address is available as an option.",
+        "de": "* WICHTIG: Diese Version wird Konfigurationsstrukturen ändern!\n  Bitte sichern Sie Ihre Konfiguration, bevor Sie mit der Installation beginnen.\n  Die Installation wird versuchen, die alte Konfiguration zu konvertieren - aber es ist nicht garantiert, dass sie in allen Fällen erfolgreich ist.\n* Adaptercode wurde grundlegend überarbeitet\n* Der Adapter verwendet jetzt die admin5-Schnittstelle\n* Timerwerte können pro Gerät unterschiedlich eingestellt werden (issue #105)\n* Das Neuordnen von Konfigurationseinträgen zerstört keine Daten mehr (Problem Nr. 15)\n* Zustandsobjekte für Geräte können jetzt benannt werden. Das alte Verhalten unter Verwendung der IP-Adresse ist optional verfügbar.",
+        "ru": "* ВАЖНО: В этом выпуске будут изменены структуры конфигурации!\n  Сделайте резервную копию вашей конфигурации перед началом установки.\n  Установка попытается преобразовать старую конфигурацию, но успех не гарантируется во всех случаях.\n* код адаптера был сильно переписан\n* адаптер теперь использует интерфейс admin5\n* значения таймера могут быть установлены по-разному для каждого устройства (issue #105)\n* изменение порядка записей конфигурации больше не уничтожает данные (проблема №15)\n* объекты состояния для устройств теперь могут быть названы. Старое поведение с использованием IP-адреса доступно в качестве опции.",
+        "pt": "* IMPORTANTE: Esta versão irá alterar as estruturas de configuração!\n  Faça backup de sua configuração antes de iniciar a instalação.\n  A instalação tentará converter a configuração antiga - mas não há garantia de sucesso em todos os casos.\n* adaptercode passou por uma grande reescrita\n* o adaptador agora usa a interface admin5\n* os valores do temporizador podem ser definidos de forma diferente por dispositivo (edição nº 105)\n* reordenar as entradas de configuração não destrói mais os dados (questão nº 15)\n* objetos de estado para dispositivos agora podem ser nomeados. O comportamento antigo usando o endereço IP está disponível como opção.",
+        "nl": "* BELANGRIJK: deze release verandert de configuratiestructuren!\n  Maak een back-up van uw configuratie voordat u met de installatie begint.\n  De installatie zal proberen de oude configuratie om te zetten - maar het is niet gegarandeerd dat dit in alle gevallen lukt.\n* adaptercode heeft een grote herschrijving ondergaan\n* adapter gebruikt nu admin5-interface\n* timerwaarden kunnen per apparaat anders worden ingesteld (uitgave #105)\n* het opnieuw ordenen van configuratie-items vernietigt niet langer gegevens (probleem #15)\n* statusobjecten voor apparaten kunnen nu een naam krijgen. Oud gedrag waarbij het ip-adres wordt gebruikt, is als optie beschikbaar.",
+        "fr": "* IMPORTANT : Cette version modifiera les structures de configuration !\n  Veuillez sauvegarder votre configuration avant de commencer l'installation.\n  L'installation tentera de convertir l'ancienne configuration - mais il n'est pas garanti qu'elle réussisse dans tous les cas.\n* adaptercode a subi une réécriture majeure\n* L'adaptateur utilise maintenant l'interface admin5\n* les valeurs de minuterie peuvent être définies différemment par appareil (problème #105)\n* la réorganisation des entrées de configuration ne détruit plus les données (problème #15)\n* Les objets d'état des appareils peuvent désormais être nommés. L'ancien comportement utilisant l'adresse IP est disponible en option.",
+        "it": "* IMPORTANTE: questa versione cambierà le strutture di configurazione!\n  Eseguire il backup della configurazione prima di avviare l'installazione.\n  L'installazione tenterà di convertire la vecchia configurazione, ma non è garantito che riesca in tutti i casi.\n* adaptercode ha subito un'importante riscrittura\n* l'adattatore ora utilizza l'interfaccia admin5\n* i valori del timer possono essere impostati in modo diverso per dispositivo (problema n. 105)\n* il riordino delle voci di configurazione non distrugge più i dati (problema n. 15)\n* ora è possibile assegnare un nome agli oggetti di stato per i dispositivi. Il vecchio comportamento che utilizza l'indirizzo IP è disponibile come opzione.",
+        "es": "* IMPORTANTE: ¡Esta versión cambiará las estructuras de configuración!\n  Haga una copia de seguridad de su configuración antes de comenzar la instalación.\n  La instalación intentará convertir la configuración anterior, pero no se garantiza que tenga éxito en todos los casos.\n* el código del adaptador ha sufrido una reescritura importante\n* el adaptador ahora usa la interfaz admin5\n* los valores del temporizador se pueden configurar de manera diferente según el dispositivo (problema #105)\n* reordenar las entradas de configuración ya no destruye los datos (problema #15)\n* Ahora se pueden nombrar objetos de estado para dispositivos. El antiguo comportamiento con la dirección IP está disponible como opción.",
+        "pl": "* WAŻNE: Ta wersja zmieni struktury konfiguracyjne!\n  Przed rozpoczęciem instalacji wykonaj kopię zapasową konfiguracji.\n  Instalacja będzie próbowała przekonwertować starą konfigurację — ale nie we wszystkich przypadkach gwarantuje to powodzenie.\n* kod adaptera przeszedł gruntowną przeróbkę\n* adapter używa teraz interfejsu administratora\n* wartości timera można ustawić inaczej w zależności od urządzenia (wydanie #105)\n* zmiana kolejności wpisów konfiguracyjnych nie niszczy już danych (problem #15)\n* Można teraz nazywać obiekty stanu dla urządzeń. Opcjonalnie dostępne jest stare zachowanie przy użyciu adresu IP.",
+        "zh-cn": "* 重要提示：此版本将更改配置结构！\n  请在开始安装之前备份您的配置。\n  安装将尝试转换旧配置 - 但不能保证在所有情况下都能成功。\n* 适配器代码已经过重大改写\n* 适配器现在使用 admin5 接口\n* 每个设备可以设置不同的计时器值（问题 #105）\n* 重新排序配置条目不再破坏数据（问题 #15）\n* 现在可以命名设备的状态对象。使用 ip 地址的旧行为可作为选项使用。"
+      },
+      "1.0.0": {
+        "en": "IMPORTANT: This release will change the object structures!!\nreduce latency for update of info.connection \navoid excessive error logs if target is unreachable, optimize logging\nadd additional online at ip base to indicate target is reachable\noutput warning if OIDs specify different communities for one device\nAdd Sentry for crash reporting",
+        "de": "WICHTIG: Diese Version wird die Objektstrukturen ändern!!\nReduzieren Sie die Latenz für die Aktualisierung von info.connection\nvermeiden Sie übermäßige Fehlerprotokolle, wenn das Ziel nicht erreichbar ist, optimieren Sie die Protokollierung\nfügen Sie zusätzliche online an der IP-Basis hinzu, um anzuzeigen, dass das Ziel erreichbar ist\nAusgabe einer Warnung, wenn OIDs unterschiedliche Communities für ein Gerät angeben\nFügen Sie Sentry für Absturzberichte hinzu",
+        "ru": "ВАЖНО: В этом релизе будут изменены структуры объектов!!\nуменьшить задержку для обновления info.connection\nизбегайте избыточных журналов ошибок, если цель недоступна, оптимизируйте ведение журнала\nдобавить дополнительный онлайн на базе ip, чтобы указать, что цель достижима\nвывод предупреждения, если OID указывают разные сообщества для одного устройства\nДобавьте Sentry для отчетов о сбоях",
+        "pt": "IMPORTANTE: Esta versão irá alterar as estruturas dos objetos!!\nreduzir a latência para atualização de info.connection\nevite logs de erros excessivos se o destino estiver inacessível, otimize o log\nadicione on-line adicional na base do ip para indicar que o destino é alcançável\naviso de saída se os OIDs especificarem comunidades diferentes para um dispositivo\nAdicionar Sentinela para relatórios de falhas",
+        "nl": "BELANGRIJK: Deze release zal de objectstructuren veranderen!!\nverminder latentie voor update van info.connection\nvermijd overmatige foutenlogboeken als het doel onbereikbaar is, optimaliseer de logboekregistratie\nvoeg extra online toe op ip-basis om aan te geven dat het doel bereikbaar is\nuitvoerwaarschuwing als OID's verschillende gemeenschappen specificeren voor één apparaat\nSentry toevoegen voor crashrapportage",
+        "fr": "IMPORTANT : Cette version modifiera les structures d'objets !\nréduire la latence pour la mise à jour d'info.connection\néviter les journaux d'erreurs excessifs si la cible est inaccessible, optimiser la journalisation\najouter en ligne supplémentaire à la base IP pour indiquer que la cible est accessible\navertissement de sortie si les OID spécifient différentes communautés pour un appareil\nAjouter Sentry pour les rapports de plantage",
+        "it": "IMPORTANTE: questa versione cambierà le strutture degli oggetti!!\nridurre la latenza per l'aggiornamento di info.connection\nevitare log di errori eccessivi se la destinazione non è raggiungibile, ottimizzare la registrazione\naggiungere ulteriore online alla base IP per indicare che l'obiettivo è raggiungibile\navviso di output se gli OID specificano comunità diverse per un dispositivo\nAggiungi Sentinella per la segnalazione degli arresti anomali",
+        "es": "IMPORTANTE: ¡Esta versión cambiará las estructuras de los objetos!\nreducir la latencia para la actualización de info.connection\nevitar registros de errores excesivos si el objetivo no es alcanzable, optimizar el registro\nagregue más en línea en la base de ip para indicar que se puede alcanzar el objetivo\nadvertencia de salida si los OID especifican diferentes comunidades para un dispositivo\nAgregar Sentry para informes de fallas",
+        "pl": "WAŻNE: Ta wersja zmieni strukturę obiektów!!\nskrócić czas oczekiwania na aktualizację info.connection\nunikaj nadmiernych rejestrów błędów, jeśli cel jest nieosiągalny, zoptymalizuj rejestrowanie\ndodaj dodatkowe online w bazie IP, aby wskazać, że cel jest osiągalny\nostrzeżenie wyjściowe, jeśli OID określają różne społeczności dla jednego urządzenia\nDodaj Sentry do zgłaszania awarii",
+        "zh-cn": "重要提示：此版本将更改对象结构！！\n减少更新 info.connection 的延迟\n如果目标不可达，避免过多的错误日志，优化日志记录\n在 ip base 添加额外的在线以指示目标是可达的\n如果 OID 为一台设备指定不同的社区，则输出警告\n添加 Sentry 以进行崩溃报告"
+      },
+      "0.5.0": {
+        "en": "Initial Release",
+        "de": "Erstveröffentlichung",
+        "ru": "Первый выпуск",
+        "pt": "Lançamento inicial",
+        "nl": "Eerste uitgave",
+        "fr": "Première version",
+        "it": "Versione iniziale",
+        "es": "Versión inicial",
+        "pl": "Pierwsze wydanie",
+        "zh-cn": "初始发行"
+      }
     },
-    "native": {
-        "retryTimeout": 5000,
-        "connectTimeout": 5000,
-        "pollInterval": 30000,
-        "OIDs": [
-            {
-                "ip": "127.0.0.1",
-                "name": "system.description",
-                "OID": ".1.3.6.1.2.1.1.1.0"
-            }
-        ]
+    "title": "SNMP",
+    "titleLang": {
+      "en": "SNMP",
+      "de": "SNMP",
+      "ru": "SNMP",
+      "pt": "SNMP",
+      "nl": "SNMP",
+      "fr": "SNMP",
+      "it": "SNMP",
+      "es": "SNMP",
+      "pl": "SNMP",
+      "zh-cn": "SNMP"
     },
-    "objects": [],
-    "instanceObjects": [
-        {
-            "_id": "info",
-            "type": "channel",
-            "common": {
-                "name": "Information"
-            },
-            "native": {}
+    "desc": {
+      "en": "Allows to poll SNMP OIDs in ioBroker",
+      "de": "Ermöglicht das Polling von SNMP Objekten im ioBroker",
+      "ru": "Позволяет считывать SNPM объекты по OID в ioBroker",
+      "pt": "ioBroker SNMP-OID Adapter",
+      "fr": "ioBroker SNMP-OID Adapter",
+      "nl": "ioBroker SNMP-OID Adapter",
+      "it": "Consente di eseguire il polling degli OID SNMP in ioBroker",
+      "es": "Permite sondear los OID de SNMP en ioBroker",
+      "pl": "Umożliwia odpytywanie identyfikatorów SNMP OID w ioBroker",
+      "zh-cn": "允许在 ioBroker 中轮询 SNMP OID"
+    },
+    "license": "MIT",
+    "platform": "Javascript/Node.js",
+    "icon": "snmp.png",
+    "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.snmp/master/admin/snmp.png",
+    "keywords": [
+      "SNMP-OID"
+    ],
+    "readme": "https://github.com/iobroker-community-adapters/ioBroker.snmp/blob/master/README.md",
+    "loglevel": "info",
+    "mode": "daemon",
+    "type": "infrastructure",
+    "connectionType": "local",
+    "dataSource": "poll",
+    "authors": [
+      {
+        "name": "Marcolotti",
+        "email": "info@ct-j.de"
+      },
+      {
+        "name": "mcm1957",
+        "email": "mcm57@gmx.at"
+      }
+    ],
+    "adminUI": {
+      "config": "json"
+    },
+    "stopBeforeUpdate": "true",
+    "plugins": {
+      "sentry": {
+        "dsn": "https://621ac710b70445f8b170cbb783045988@sentry.iobroker.net/181"
+      }
+    },
+    "globalDependencies": [
+      {
+        "admin": ">=5.1.28"
+      }
+    ],
+    "dependencies": [
+      {
+        "js-controller": ">=2.0.0"
+      }
+    ],
+    "messages": [
+      {
+        "condition": {
+          "operand": "and",
+          "rules": [
+            "oldVersion<1.0.0",
+            "newVersion>=1.0.0"
+          ]
         },
-        {
-            "_id": "info.connection",
-            "type": "state",
-            "common": {
-                "role": "indicator.connected",
-                "name": "If connected to device",
-                "type": "boolean",
-                "read": true,
-                "write": false,
-                "def": false
-            },
-            "native": {}
-        }
+        "title": {
+          "en": "Important notice!",
+          "de": "Wichtiger Hinweis!",
+          "ru": "Важное замечание!",
+          "pt": "Notícia importante!",
+          "nl": "Belangrijke mededeling!",
+          "fr": "Avis important!",
+          "it": "Avviso IMPORTANTE!",
+          "es": "Noticia importante!",
+          "pl": "Ważna uwaga!",
+          "zh-cn": "重要通知!"
+        },
+        "text": {
+          "en": "The new version 1.0 will potentially change the Names of Objects when special characters like \".\", \"-\" or spaces were used in the names! Please delete the old objects manually if needed.",
+          "de": "Die neue Version 1.0 wird möglicherweise die Namen von Objekten ändern, falls Sonderzeichen wie \".\", \"-\" oder Leerzeichen in den Namen verwendet wurden! Die alten Objekte können bei Bedarf manuell gelöscht werden.",
+          "ru": "Новая версия 1.0 потенциально изменит имена объектов, когда в именах используются специальные символы, такие как «.», «-» или пробелы! При необходимости удалите старые объекты вручную.",
+          "pt": "A nova versão 1.0 irá potencialmente alterar os nomes dos objetos quando caracteres especiais como \".\", \"-\" ou espaços forem usados nos nomes! Por favor, exclua os objetos antigos manualmente, se necessário.",
+          "nl": "De nieuwe versie 1.0 zal mogelijk de namen van objecten wijzigen wanneer speciale tekens zoals \".\", \"-\" of spaties in de namen werden gebruikt! Verwijder indien nodig de oude objecten handmatig.",
+          "fr": "La nouvelle version 1.0 changera potentiellement les noms des objets lorsque des caractères spéciaux comme \".\", \"-\" ou des espaces ont été utilisés dans les noms ! Veuillez supprimer les anciens objets manuellement si nécessaire.",
+          "it": "La nuova versione 1.0 cambierà potenzialmente i nomi degli oggetti quando nei nomi sono stati utilizzati caratteri speciali come \".\", \"-\" o spazi! Si prega di eliminare i vecchi oggetti manualmente, se necessario.",
+          "es": "¡La nueva versión 1.0 cambiará potencialmente los nombres de los objetos cuando se usen caracteres especiales como \".\", \"-\" o espacios en los nombres! Elimine los objetos antiguos manualmente si es necesario.",
+          "pl": "Nowa wersja 1.0 potencjalnie zmieni Nazwy obiektów, gdy w nazwach zostaną użyte znaki specjalne, takie jak \".\", \"-\" lub spacje! W razie potrzeby usuń stare obiekty ręcznie.",
+          "zh-cn": "当名称中使用“.”、“-”或空格等特殊字符时，新版本 1.0 可能会更改对象名称！如果需要，请手动删除旧对象。"
+        },
+        "link": "https://github.com/iobroker-community-adapters/ioBroker.snmp#changelog",
+        "level": "warn",
+        "linkText": {
+          "en": "Changelog",
+          "de": "Änderungsprotokoll",
+          "ru": "Список изменений",
+          "pt": "Registro de alterações",
+          "nl": "Wijzigingslog",
+          "fr": "Journal des modifications",
+          "it": "Registro delle modifiche",
+          "es": "registro de cambios",
+          "pl": "Dziennik zmian",
+          "zh-cn": "变更日志"
+        },
+        "buttons": [
+          "agree",
+          "cancel"
+        ]
+      }
     ]
+  },
+  "native": {
+    "retryTimeout": 5000,
+    "connectTimeout": 5000,
+    "pollInterval": 30000,
+    "OIDs": [
+      {
+        "ip": "127.0.0.1",
+        "name": "system.description",
+        "OID": ".1.3.6.1.2.1.1.1.0"
+      }
+    ]
+  },
+  "objects": [],
+  "instanceObjects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.connection",
+      "type": "state",
+      "common": {
+        "role": "indicator.connected",
+        "name": "If connected to device",
+        "type": "boolean",
+        "read": true,
+        "write": false,
+        "def": false
+      },
+      "native": {}
+    }
+  ]
 }
