@@ -48,7 +48,7 @@
     "install": "node main.js --install",
     "release": "release-script",
     "translate": "translate-adapter"
- },
+  },
   "bugs": {
     "url": "https://github.com/iobroker-community-adapters/ioBroker.snmp/issues"
   }
