@@ -1,9 +1,8 @@
 /node_modules/
 .DS_Store
 .idea/
-package-lock.json
-ToDo.txt
 
+ToDo.txt
 
 # ioBroker dev-server
 .dev-server/
