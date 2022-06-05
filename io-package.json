@@ -79,6 +79,7 @@
         "adminUI": {
             "config": "json"
         },
+        "stopBeforeUpdate": "true",
         "plugins": {
             "sentry": {
                 "dsn": "https://621ac710b70445f8b170cbb783045988@sentry.iobroker.net/181"

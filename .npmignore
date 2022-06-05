@@ -9,5 +9,6 @@ gulpfile.js
 !/package.json
 !/LICENSE
 !/main.js
+!/mcmInstaller.js
 !/mcmLogger.js
 !/README.md

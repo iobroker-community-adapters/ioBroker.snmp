@@ -17,15 +17,22 @@ This adapter polls information from SNMP Device like Printers, Network ...
 
 ## Changelog
 ### __WORK IN PROGRESS__
-* (McM1957) complete rewrite using async/wait mechanism
+* IMPORTANT: This release will change configuration structures!
+  Please backup your configuration before starting the installation.
+  Installation will try to convert old configuration - but its not gurateed to succed in all cases. 
+* (McM1957) adaptercode has undergone a mojor rewrite
+* (McM1957) adapter now uses admin5 interface
+* (McM1957) timer values can be set differently per device (issue #105)
+* (McM1957) reordering configuration entries does no longer destroy data (issue #15)
+* (McM1957) state objects for devices can now be named. Old behavior using the ip address is available as an option.
 
 ### 1.0.0 (2022-03-21)
 * IMPORTANT: This release will change the object structures!!
-* (McM1957) reduce latency for update of info.connection 
-* (McM1957) avoid excessive error logs if target is unreachable, optimize logging
-* (McM1957) add additional online at ip base to indicate target is reachable
-* (McM1957) output warning if OIDs specify different communities for one device
-* (Apollon77) Add Sentry for crash reporting
+* (McM1957) latency for update of info.connection has been reduced 
+* (McM1957) excessive error logging if target is unreachable hab been optimzed
+* (McM1957) additional online object at ip base to indicate target is reachable has been added
+* (McM1957) if OIDs specify different communities for one device a warning will be output
+* (Apollon77) Sentry for crash reporting has been added
 
 ### 0.5.0
 * (Marcolotti) Add documentation (de,en,ru)
