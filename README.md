@@ -19,8 +19,8 @@ This adapter polls information from SNMP Device like Printers, Network ...
 ### __WORK IN PROGRESS__
 * IMPORTANT: This release will change configuration structures!
   Please backup your configuration before starting the installation.
-  Installation will try to convert old configuration - but its not gurateed to succed in all cases. 
-* (McM1957) adaptercode has undergone a mojor rewrite
+  Installation will try to convert old configuration - but its not guaranteed to succeed in all cases. 
+* (McM1957) adaptercode has undergone a major rewrite
 * (McM1957) adapter now uses admin5 interface
 * (McM1957) timer values can be set differently per device (issue #105)
 * (McM1957) reordering configuration entries does no longer destroy data (issue #15)
