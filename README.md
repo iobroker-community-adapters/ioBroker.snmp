@@ -22,8 +22,8 @@ This adapter polls information from SNMP Device like Printers, Network ...
   Installation will try to convert old configuration - but its not guaranteed to succeed in all cases. 
 * (McM1957) adaptercode has undergone a major rewrite
 * (McM1957) adapter now uses admin5 interface
-* (McM1957) timer values can be set differently per device (issue #105)
-* (McM1957) reordering configuration entries does no longer destroy data (issue #15)
+* (McM1957) timer values can be set differently per device (#105)
+* (McM1957) reordering configuration entries does no longer destroy data (#15)
 * (McM1957) state objects for devices can now be named. Old behavior using the ip address is available as an option.
 
 ### 1.0.0 (2022-03-21)
