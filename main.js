@@ -536,6 +536,11 @@ function validateConfig() {
 
     mcmLogger.debug('validateConfig - verifying oid-sets');
 
+    // ensure that at least empty config exists
+    adapter.config.oids     = adapter.config.oids       || []; 
+    adapter.config.authsets = adapter.config.authSets   || [];
+    adapter.config.devs     = adapter.config.devs       || [];
+
     if (!adapter.config.oids.length) { 
         mcmLogger.error('no oids configured, please add configuration.');
         ok = false;
