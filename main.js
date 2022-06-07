@@ -538,7 +538,7 @@ function validateConfig() {
 
     // ensure that at least empty config exists
     adapter.config.oids     = adapter.config.oids       || []; 
-    adapter.config.authsets = adapter.config.authSets   || [];
+    adapter.config.authSets = adapter.config.authSets   || [];
     adapter.config.devs     = adapter.config.devs       || [];
 
     if (!adapter.config.oids.length) { 
