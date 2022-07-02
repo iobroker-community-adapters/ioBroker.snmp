@@ -13,7 +13,7 @@
 For more details and for information how to disable the error reporting see [Sentry-Plugin Documentation](https://github.com/ioBroker/plugin-sentry#plugin-sentry)! Sentry reporting is used starting with js-controller 3.0.
 
 ## Info
-This adapter polls information from SNMP Device like Printers, Network ...
+This adapter can be used to poll information from devices like printers, network devices, etc. using SNMP protocol.
 
 ## Changelog
 ### __WORK IN PROGRESS__
@@ -27,7 +27,7 @@ This adapter polls information from SNMP Device like Printers, Network ...
 * (McM1957) state objects for devices can now be named. Old behavior using the ip address is available as an option.
 
 ### 1.0.0 (2022-03-21)
-* IMPORTANT: This release will change the object structures!!
+* IMPORTANT: This release will change the object structures!
 * (McM1957) latency for update of info.connection has been reduced 
 * (McM1957) excessive error logging if target is unreachable hab been optimzed
 * (McM1957) additional online object at ip base to indicate target is reachable has been added
@@ -48,7 +48,52 @@ This adapter polls information from SNMP Device like Printers, Network ...
 * (Bluefox)    refactoring
 * (Marcolotti) initial release
 
-## License
+## __Adapter-Configuration__
+The adapter queries specified oids which are grouped within oid groups which in turn are assigned to devices. The configuration data is entered at several tabs:
+
+### __TAB OID-Groups__
+Here you specify all oids to be queried by the adapter, one oid per line.
+
+| Parameter     | Type        | Description                       | Comment                             |
+|---------------|-------------|-----------------------------------|-------------------------------------|
+| active        | boolean     | if set to true, OID will be used  | can be used to disable a single OID |
+| OID-Group     | text        | name of the OID group             | will used to assign group to device |
+| OID-Name      | text        | name assigned to the OID          | will used to name datapoint         |
+| OID           | text        | oid string (1.2.3.4.)             | oid string as specified by device vendor |
+| writeable     | boolean     | should be set to true if OID is writeable | reserved for future use             |
+| optional      | boolean     | should be set to true if OID is optional | reserved for future use             |
+
+### __TAB Device__
+Here you specify which devices should be queried.
+
+| Parameter     | Type        | Description                       | Comment                             |
+|---------------|-------------|-----------------------------------|-------------------------------------|
+| active        | boolean     | if set to true, the device will be used  | can be used to disable a single device |
+| Name          | text        | name of the device                | will be used to create name of data points |
+| IP address    | text        | ip address (IPv4 or IPv6) with optional port number    | NOTE: currently only IPv4 is supported |
+| OID-Group     | text        | OID group specified at tab IOD Groups | A OID group can be assigned to more than one device |                   |
+| SNMP-Version  | select      | SNMP version to use               | NOTE: currently only SNMPv1 is supported     |
+| Community (v1, v2c) or Auth-ID (v3) | text | community for SNMP v1 or V2c, authorization group for SNMP v3 | NOTE: currently only SNMPv1 is supported |
+| timeout (sec) | number      | processing timeout in seconds     |                                     |
+| retry (sec)   | number      | retry intervall in seconds        |                                     |
+| polling (sec) | number      | poll intervall in seconds         |                                     |
+
+
+### __TAB Authorization__
+This tab contains SNMP V3 authorization information. Please note that SNMP V3 is not yet implemented.
+
+| Parameter     | Type        | Description                       | Comment                             |
+|---------------|-------------|-----------------------------------|-------------------------------------|
+
+
+### __TAB Options__
+Here you specify some general options
+
+| Parameter     | Type        | Description                       | Comment                             |
+|---------------|-------------|-----------------------------------|-------------------------------------|
+| Compatibility mode | boolean | if this option is activeted, datapoint names are based on ip address   |
+
+## __License__
 The MIT License (MIT)
 
 Copyright (c) 2017-2022 Marcolotti <info@ct-j.de>, ioBroker Community Developers 
