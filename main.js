@@ -779,7 +779,7 @@ async function onReady() {
     if (doInstall) {
         mcmLogger.info("performing installation");
         const mcmInstUtils	= require('./lib/mcmInstUtils');
-        await mcmInstUtils.init(adapter);
+        await mcmInstUtils.init(adapter, mcmLogger);
         await mcmInstUtils.doUpgrade();
         mcmLogger.info("installation completed");
         didMigrationCheck = true;
