@@ -60,16 +60,14 @@ const AES256R	= 4;
 // you need to create an adapter
 const utils				= require('@iobroker/adapter-core');
 const { EXIT_CODES } 	= require('@iobroker/js-controller-common');
-const mcmLogger			= require('./mcmLogger');
+const mcmLogger			= require('./lib/mcmLogger');
 
  // Load modules required by adapter
 const snmp = require('net-snmp');
 
 // init installation marker
-let doInstall = false;
-
-// say hello
-mcmLogger.debug("snmp adapter initializing ...");
+let doInstall           = false;
+let didMigrationCheck   = false;
 
 /**
  * The adapter instance
@@ -139,9 +137,9 @@ function startAdapter(options) {
 
 // #################### global variables ####################
 
-const CTXs 		= [];		// see description at header of file
-let isConnected = false; 	// local copy of info.connection state 
-let connUpdateTimer = null;
+const   CTXs 		    = [];		// see description at header of file
+let     isConnected     = false; 	// local copy of info.connection state 
+let     connUpdateTimer = null;
 
 
 // #################### general utility functions ####################
@@ -776,14 +774,15 @@ async function onReady() {
 
 	// init logger
 	await mcmLogger.init(adapter);
-	mcmLogger.debug("adapter ready");
+	mcmLogger.debug("onReady triggered");
 
     if (doInstall) {
         mcmLogger.info("performing installation");
-        const mcmInstUtils	= require('./mcmInstUtils');
+        const mcmInstUtils	= require('./lib/mcmInstUtils');
         await mcmInstUtils.init(adapter);
         await mcmInstUtils.doUpgrade();
         mcmLogger.info("installation completed");
+        didMigrationCheck = true;
         process.exit(0);
     }
 
@@ -829,6 +828,8 @@ async function onReady() {
  *
  */
 function onUnload(callback) {
+	mcmLogger.debug("onUnload triggered");
+    
 //	for (let ip in IPs) {
 //		if (IPs.hasOwnProperty(ip) && IPs[ip].session) {
 //			try {
@@ -865,10 +866,18 @@ function onUnload(callback) {
 /**
  * here we start
  */
- if (process.argv) {
+
+mcmLogger.debug("snmp adapter initializing ("+process.argv+") ...");
+
+if (process.argv) {
     for (let a = 1; a < process.argv.length; a++) {
         if (process.argv[a] === '--install') {
             doInstall = true;
+//            process.on('exit', function(){
+//                if (!didMigrationCheck) {
+//                    console.log("WARNING: migration of config skipped - ioBroker might be stopped");
+//                }
+//            })
         }
     }
 }
