@@ -774,14 +774,14 @@ async function onReady() {
 
 	// init logger
 	await mcmLogger.init(adapter);
-	mcmLogger.debug("onReady triggered");
+	await mcmLogger.debug("onReady triggered");
 
     if (doInstall) {
-        mcmLogger.info("performing installation");
+        await mcmLogger.info("performing installation");
         const mcmInstUtils	= require('./lib/mcmInstUtils');
         await mcmInstUtils.init(adapter, mcmLogger);
         await mcmInstUtils.doUpgrade();
-        mcmLogger.info("installation completed");
+        await mcmLogger.info("installation completed");
         didMigrationCheck = true;
         process.exit(0);
     }
@@ -791,7 +791,7 @@ async function onReady() {
 
 	// validate config
 	if (!validateConfig(adapter.config)) {
-		mcmLogger.error('invalid config, cannot continue');
+		await mcmLogger.error('invalid config, cannot continue');
 		adapter.disable();
 		return;
 	}
@@ -803,20 +803,20 @@ async function onReady() {
     // init all objects
     await initAllObjects();
     
-	mcmLogger.debug('initialization completed');
+	await mcmLogger.debug('initialization completed');
 
 	// start one reader thread per device
-	mcmLogger.debug('starting reader threads');
+	await mcmLogger.debug('starting reader threads');
     for (let ii=0; ii<CTXs.length; ii++) { 
 		const CTX = CTXs[ii];
 		createSession(CTX);
 	}
 	
 	// start connection info updater
-	mcmLogger.debug('startconnection info updater');
+	await mcmLogger.debug('startconnection info updater');
     connUpdateTimer = setInterval(handleConnectionInfo, 15000)
 
-	mcmLogger.debug('startup completed');
+	await mcmLogger.debug('startup completed');
 
 }
 
