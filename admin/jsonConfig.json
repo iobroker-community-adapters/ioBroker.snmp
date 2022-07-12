@@ -158,7 +158,7 @@
                         {
                             "type": "checkbox",
                             "attr": "devAct",
-                            "width": "10% ",
+                            "width": "5% ",
                             "title": "lblDevAct",
                             "filter": false,
                             "sort": false,
@@ -167,7 +167,7 @@
                         {
                             "type": "text",
                             "attr": "devName",
-                            "width": "15% ",
+                            "width": "30% ",
                             "title": "lblDevName",
                             "filter": false,
                             "sort": false,
@@ -217,7 +217,7 @@
                         {
                             "type": "text",
                             "attr": "devTimeout",
-                            "width": "10% ",
+                            "width": "5% ",
                             "title": "lblDevTimeout",
                             "filter": false,
                             "sort": false,
@@ -226,7 +226,7 @@
                         {
                             "type": "text",
                             "attr": "devRetryIntvl",
-                            "width": "10% ",
+                            "width": "5% ",
                             "title": "lblDevRetryIntvl",
                             "filter": false,
                             "sort": false,
@@ -235,7 +235,7 @@
                         {
                             "type": "text",
                             "attr": "devPollIntvl",
-                            "width": "10% ",
+                            "width": "5% ",
                             "title": "lblDevPollIntvl",
                             "filter": false,
                             "sort": false,
