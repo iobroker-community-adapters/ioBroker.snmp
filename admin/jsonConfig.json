@@ -215,30 +215,33 @@
                             "default": ""
                         },
                         {
-                            "type": "text",
+                            "type": "number",
                             "attr": "devTimeout",
                             "width": "5% ",
                             "title": "lblDevTimeout",
                             "filter": false,
                             "sort": false,
+                            "min": "1",
                             "default": "5"
                         },
                         {
-                            "type": "text",
+                            "type": "number",
                             "attr": "devRetryIntvl",
                             "width": "5% ",
                             "title": "lblDevRetryIntvl",
                             "filter": false,
                             "sort": false,
+                            "min": "1",
                             "default": "5"
                         },
                         {
-                            "type": "text",
+                            "type": "number",
                             "attr": "devPollIntvl",
                             "width": "5% ",
                             "title": "lblDevPollIntvl",
                             "filter": false,
                             "sort": false,
+                            "min": "1",
                             "default": "30"
                         }
                     ]

@@ -627,9 +627,9 @@ function validateConfig() {
         dev.devIpAddr       = dev.devIpAddr.trim();
         dev.devOidGroup     = dev.devOidGroup.trim();
         dev.devAuthId       = dev.devAuthId.trim();
-        dev.devTimeout      = dev.devTimeout.trim();
-        dev.devRetryIntvl   = dev.devRetryIntvl.trim();
-        dev.devPollIntvl    = dev.devPollIntvl.trim();
+        dev.devTimeout      = dev.devTimeout;
+        dev.devRetryIntvl   = dev.devRetryIntvl;
+        dev.devPollIntvl    = dev.devPollIntvl;
 
         if (/^\d+\.\d+\.\d+\.\d+(\:\d+)?$/.test(dev.devIpAddr)){
             /* might be ipv4 - to be checked further */
