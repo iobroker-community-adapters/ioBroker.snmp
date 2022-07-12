@@ -61,19 +61,22 @@ const AES256R	= 4;
 const utils				= require('@iobroker/adapter-core');
 const { EXIT_CODES } 	= require('@iobroker/js-controller-common');
 const mcmLogger			= require('./lib/mcmLogger');
+const mcmInstUtils		= require('./lib/mcmInstUtils');
 
  // Load modules required by adapter
 const snmp = require('net-snmp');
 
 // init installation marker
-let doInstall           = false;
-let didMigrationCheck   = false;
+let doInstall    = false;
+let didInstall   = false;
 
-/**
- * The adapter instance
- * @type {ioBroker.Adapter}
- */
- let adapter;
+// #################### global variables ####################
+let     adapter;    // adapter instance - @type {ioBroker.Adapter}
+let     logger;     // mcmLogger instance
+
+const   CTXs 		    = [];		// see description at header of file
+let     isConnected     = false; 	// local copy of info.connection state 
+let     connUpdateTimer = null;
 
 /**
  * Start the adapter instance
@@ -81,7 +84,7 @@ let didMigrationCheck   = false;
  */
 function startAdapter(options) {
 	// Create the adapter and define its methods
-	return adapter = utils.adapter(Object.assign({}, options, {
+	adapter = utils.adapter(Object.assign({}, options, {
 		name: 'snmp',
 
 		// ready callback is called when databases are connected and adapter received configuration.
@@ -95,10 +98,10 @@ function startAdapter(options) {
 		// objectChange: (id, obj) => {
 		// 	if (obj) {
 		// 		// The object was changed
-		// 		mcmLogger.info(`object ${id} changed: ${JSON.stringify(obj)}`);
+		// 		logger.info(`object ${id} changed: ${JSON.stringify(obj)}`);
 		// 	} else {
 		// 		// The object was deleted
-		// 		mcmLogger.info(`object ${id} deleted`);
+		// 		logger.info(`object ${id} deleted`);
 		// 	}
 		// },
 
@@ -106,10 +109,10 @@ function startAdapter(options) {
 		// stateChange: (id, state) => {
 		//	if (state) {
 		//		// The state was changed
-		//		mcmLogger.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
+		//		logger.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
 		//	} else {
 		//		// The state was deleted
-		//		mcmLogger.info(`state ${id} deleted`);
+		//		logger.info(`state ${id} deleted`);
 		//	}
 		//},
 
@@ -122,7 +125,7 @@ function startAdapter(options) {
 		// 	if (typeof obj === 'object' && obj.message) {
 		// 		if (obj.command === 'send') {
 		// 			// e.g. send email or pushover or whatever
-		// 			mcmLogger.info('send command');
+		// 			logger.info('send command');
 
 		// 			// Send response in callback if required
 		// 			if (obj.callback) adapter.sendTo(obj.from, obj.command, 'Message received', obj.callback);
@@ -130,16 +133,13 @@ function startAdapter(options) {
 		// 	}
 		// },
 	}));
+    
+    logger = new mcmLogger(adapter);
+    return adapter;
 }
 
 /* *** end of initialization section *** */
 
-
-// #################### global variables ####################
-
-const   CTXs 		    = [];		// see description at header of file
-let     isConnected     = false; 	// local copy of info.connection state 
-let     connUpdateTimer = null;
 
 
 // #################### general utility functions ####################
@@ -186,11 +186,11 @@ function ip2ipStr(ip) {
  *
  */
 async function initObject(obj) {
-	mcmLogger.debug('initobject '+obj._id);
+	logger.debug('initobject '+obj._id);
 	try{ 
 		await adapter.setObjectAsync(obj._id, obj);
 	} catch(e) {
-		mcmLogger.error ('error initializing obj "' + obj._id + '" ' + e.message);
+		logger.error ('error initializing obj "' + obj._id + '" ' + e.message);
 	}
 }
 
@@ -203,7 +203,7 @@ async function initObject(obj) {
  *
  */
 async function initDeviceObjects(pId, pIp) {
-	mcmLogger.debug('initdeviceObjects ('+pId+'/'+pIp+')');
+	logger.debug('initdeviceObjects ('+pId+'/'+pIp+')');
 
 	try{ 
 		// create <ip> device object
@@ -234,7 +234,7 @@ async function initDeviceObjects(pId, pIp) {
 				}
 			);
 	} catch(e) {
-		mcmLogger.error ('error creating objects for ip "'+pIp+'" ('+pId+'), ' + e.message);
+		logger.error ('error creating objects for ip "'+pIp+'" ('+pId+'), ' + e.message);
 	}
 }
 
@@ -248,7 +248,7 @@ async function initDeviceObjects(pId, pIp) {
  *
  */
 async function initOidObjects(pId, pOid) {
-	mcmLogger.debug('initOidObjects ('+pId+')');
+	logger.debug('initOidObjects ('+pId+')');
 
 	try{ 
 		// create OID folder objects
@@ -285,7 +285,7 @@ async function initOidObjects(pId, pOid) {
 			});
 
 	} catch(e) {
-		mcmLogger.error ('error processing oid id "'+pId+'" (oid "'+pOid+') - '+e.message);
+		logger.error ('error processing oid id "'+pId+'" (oid "'+pOid+') - '+e.message);
 	}
 }
 
@@ -297,7 +297,7 @@ async function initOidObjects(pId, pOid) {
  *
  */
 async function initAllObjects(){
-	mcmLogger.debug('initAllObjects - initializing objects');
+	logger.debug('initAllObjects - initializing objects');
 
     for (let ii=0; ii<CTXs.length; ii++) {
         await initDeviceObjects(CTXs[ii].id, CTXs[ii].ipAddr);  
@@ -321,7 +321,7 @@ async function initAllObjects(){
  *
  */
 async function onSessionClose(pCTX) {
-	mcmLogger.debug('onSessionClose - device '+pCTX.name+' ('+pCTX.ipAddr+')');
+	logger.debug('onSessionClose - device '+pCTX.name+' ('+pCTX.ipAddr+')');
 	
 	clearInterval(pCTX.pollTimer);
 	pCTX.pollTimer = null;
@@ -342,7 +342,7 @@ async function onSessionClose(pCTX) {
  *
  */
 async function onSessionError(pCTX, pErr) {
-	mcmLogger.debug('onSessionError - device '+pCTX.name+' ('+pCTX.ipAddr+') - '+pErr.toString);
+	logger.debug('onSessionError - device '+pCTX.name+' ('+pCTX.ipAddr+') - '+pErr.toString);
 	
 // ### to be implemented ###
 }
@@ -366,7 +366,7 @@ var options = {
     idBitsSize: 32
 }; */
 async function createSession(pCTX) {
-	mcmLogger.debug('createSession - device '+pCTX.name+' ('+pCTX.ipAddr+')');
+	logger.debug('createSession - device '+pCTX.name+' ('+pCTX.ipAddr+')');
 	
 	// (re)set device online status
 	adapter.setState(pCTX.id + '.online', false, true);
@@ -377,7 +377,7 @@ async function createSession(pCTX) {
             clearInterval(pCTX.pollTimer);
         } catch 
         {
-            mcmLogger.warn('cannot cancel timer for device "'+pCTX.name+'" ('+pCTX.ip + '), ' + e);
+            logger.warn('cannot cancel timer for device "'+pCTX.name+'" ('+pCTX.ip + '), ' + e);
         };
         pCTX.pollTimer = null;
     };
@@ -387,7 +387,7 @@ async function createSession(pCTX) {
 			pCTX.session.on('close', null ); // avoid nesting callbacks
             pCTX.session.close();
         } catch (e) {
-            mcmLogger.warn('cannot close session for device "'+pCTX.name+'" ('+pCTX.ip + '), ' + e);
+            logger.warn('cannot close session for device "'+pCTX.name+'" ('+pCTX.ip + '), ' + e);
         }
         pCTX.session = null;
     }
@@ -411,9 +411,9 @@ async function createSession(pCTX) {
                                 idBitsSize: 32
                             });
     } else if (pCTX.snmpVers == SNMP_V3) {
-        mcmLogger.error('Sorry, SNMP V3 is not yet supported - device "'+pCTX.name+'" ('+pCTX.ip + ')');
+        logger.error('Sorry, SNMP V3 is not yet supported - device "'+pCTX.name+'" ('+pCTX.ip + ')');
     } else {
-        mcmLogger.error('unsupported snmp version code ('+pCTX.snmpVers+') for device "'+pCTX.name+'" ('+pCTX.ip + ')');
+        logger.error('unsupported snmp version code ('+pCTX.snmpVers+') for device "'+pCTX.name+'" ('+pCTX.ip + ')');
     };
 
     if (pCTX.session) {
@@ -425,7 +425,7 @@ async function createSession(pCTX) {
         readOids(pCTX);
     };
 
-	mcmLogger.debug('session for device "'+pCTX.name+'" ('+pCTX.ipAddr+')'+(pCTX.session?'':' NOT')+' created');
+	logger.debug('session for device "'+pCTX.name+'" ('+pCTX.ipAddr+')'+(pCTX.session?'':' NOT')+' created');
 
 }
 
@@ -438,7 +438,7 @@ async function createSession(pCTX) {
  *
  */
 function readOids(pCTX) {
-	mcmLogger.debug('readOIDs - device "'+pCTX.name+'" ('+pCTX.ipAddr+')');
+	logger.debug('readOIDs - device "'+pCTX.name+'" ('+pCTX.ipAddr+')');
 
 	const session 	= pCTX.session;
 	const id 		= pCTX.id;
@@ -448,18 +448,18 @@ function readOids(pCTX) {
     session.get(oids, (err, varbinds) => {
         if (err) {
 			// error occured
-            mcmLogger.debug('[' + id + '] session.get: ' + err.toString());
+            logger.debug('[' + id + '] session.get: ' + err.toString());
             if (err.toString() === 'RequestTimedOutError: Request timed out') {
 				// timeout error
                 if (!pCTX.inactive ) {
-                    mcmLogger.info('[' + id + '] device disconnected - request timout');
+                    logger.info('[' + id + '] device disconnected - request timout');
                     pCTX.inactive = true;
                     setImmediate(handleConnectionInfo);
                 }
             } else {
 				// other error
 				if (!pCTX.inactive) {
-					mcmLogger.error('[' + id + '] session.get: ' + err.toString());
+					logger.error('[' + id + '] session.get: ' + err.toString());
 					pCTX.inactive = true;
 					setImmediate(handleConnectionInfo);
 					}
@@ -468,7 +468,7 @@ function readOids(pCTX) {
         } else {
 			// success
             if ( pCTX.inactive ) {
-                mcmLogger.info('[' + id + '] device (re)connected');
+                logger.info('[' + id + '] device (re)connected');
                 pCTX.inactive = false;
                 setImmediate(handleConnectionInfo);
             }
@@ -478,10 +478,10 @@ function readOids(pCTX) {
 			// process returned values
             for (let ii = 0; ii < varbinds.length; ii++) {
                 if (snmp.isVarbindError(varbinds[ii])) {
-                    mcmLogger.warn(snmp.varbindError(varbinds[ii]));
+                    logger.warn(snmp.varbindError(varbinds[ii]));
                     adapter.setState(pCTX.ids[ii], null, true, 0x84);
                 } else {
-                    mcmLogger.debug('['+id+'] update '+pCTX.ids[ii]+': '+varbinds[ii].value.toString());
+                    logger.debug('['+id+'] update '+pCTX.ids[ii]+': '+varbinds[ii].value.toString());
                     adapter.setState(pCTX.ids[ii], varbinds[ii].value.toString(), true);
                 }
             }
@@ -497,7 +497,7 @@ function readOids(pCTX) {
 // #################### general housekeeping functions ####################
 
 function handleConnectionInfo() {
-	mcmLogger.debug('handleConnectionInfo');
+	logger.debug('handleConnectionInfo');
 
     let haveConnection = false;
     for (let ii=0; ii<CTXs.length; ii++) {
@@ -508,13 +508,13 @@ function handleConnectionInfo() {
 	
 	if (isConnected !== haveConnection)  {
 		if (haveConnection) {
-			mcmLogger.info('instance connected to at least one device');
+			logger.info('instance connected to at least one device');
 		} else {
-			mcmLogger.info('instance disconnected from all devices');
+			logger.info('instance disconnected from all devices');
 		}
 		isConnected = haveConnection;
 
-		mcmLogger.debug('info.connection set to '+ isConnected);
+		logger.debug('info.connection set to '+ isConnected);
 		adapter.setState('info.connection', isConnected, true);
 	}
 }
@@ -532,7 +532,7 @@ function validateConfig() {
 	let oidSets 	= {};
 	let authSets	= {};
 
-    mcmLogger.debug('validateConfig - verifying oid-sets');
+    logger.debug('validateConfig - verifying oid-sets');
 
     // ensure that at least empty config exists
     adapter.config.oids     = adapter.config.oids       || []; 
@@ -540,7 +540,7 @@ function validateConfig() {
     adapter.config.devs     = adapter.config.devs       || [];
 
     if (!adapter.config.oids.length) { 
-        mcmLogger.error('no oids configured, please add configuration.');
+        logger.error('no oids configured, please add configuration.');
         ok = false;
     };
     
@@ -556,22 +556,22 @@ function validateConfig() {
         let oidGroup = oid.oidGroup;
 
         if (!oid.oidGroup) { 
-            mcmLogger.error('oid group must not be empty, please correct configuration.');
+            logger.error('oid group must not be empty, please correct configuration.');
             ok = false;
         };
 
         if (!oid.oidName) { 
-            mcmLogger.error('oid name must not be empty, please correct configuration.');
+            logger.error('oid name must not be empty, please correct configuration.');
             ok = false;
         };
 
         if (!oid.oidOid) { 
-            mcmLogger.error('oid must not be empty, please correct configuration.');
+            logger.error('oid must not be empty, please correct configuration.');
             ok = false;
         };
 
         if (! /^\d+(\.\d+)*$/.test(oid.oidOid)){
-            mcmLogger.error('oid "'+oid.oidOid+'" has invalid format, please correct configuration.');
+            logger.error('oid "'+oid.oidOid+'" has invalid format, please correct configuration.');
             ok = false;
         }
     
@@ -584,22 +584,22 @@ function validateConfig() {
     }
 
     if (!ok) {
-        mcmLogger.debug('validateConfig - validation aborted (checks failed)');
+        logger.debug('validateConfig - validation aborted (checks failed)');
         return false;
     }
     
-    mcmLogger.debug('validateConfig - verifying authorization data');
+    logger.debug('validateConfig - verifying authorization data');
 
     for (let ii=0; ii < adapter.config.authSets.length; ii++) {
         let authSet = adapter.config.authSets[ii];
         let authId 	= authSet.authId;
         if (!authId || authId=='') { 
-            mcmLogger.error('empty authorization id detected, please correct configuration.');
+            logger.error('empty authorization id detected, please correct configuration.');
             ok = false;
             continue;
         };
         if (authSets[authSet]) { 
-            mcmLogger.error('duplicate authorization id '+authId+' detected, please correct configuration.');
+            logger.error('duplicate authorization id '+authId+' detected, please correct configuration.');
             ok = false;
             continue;
         };
@@ -607,14 +607,14 @@ function validateConfig() {
     }
 
     if (!ok) {
-        mcmLogger.debug('validateConfig - validation aborted (checks failed)');
+        logger.debug('validateConfig - validation aborted (checks failed)');
         return false;
     }
     
-    mcmLogger.debug('validateConfig - verifying devices');
+    logger.debug('validateConfig - verifying devices');
 
     if (!adapter.config.devs.length) { 
-        mcmLogger.error('no devices configured, please add configuration.');
+        logger.error('no devices configured, please add configuration.');
         ok = false;
     };
     
@@ -634,60 +634,60 @@ function validateConfig() {
         if (/^\d+\.\d+\.\d+\.\d+(\:\d+)?$/.test(dev.devIpAddr)){
             /* might be ipv4 - to be checked further */
         } else {
-            mcmLogger.error('ip address "'+dev.devIpAddr+'" has invalid format, please correct configuration.');
+            logger.error('ip address "'+dev.devIpAddr+'" has invalid format, please correct configuration.');
             ok = false;
         }
 
         if (!dev.devOidGroup || dev.devOidGroup == '' ) { 
-            mcmLogger.error('device '+dev.devName+' ('+dev.devIpAddr+') does not specify a oid group. Please correct configuration.');
+            logger.error('device '+dev.devName+' ('+dev.devIpAddr+') does not specify a oid group. Please correct configuration.');
             ok = false;
         };
 
         if (dev.devOidGroup && dev.devOidGroup != '' && !oidSets[dev.devOidGroup] ) { 
-            mcmLogger.error('device '+dev.devName+' ('+dev.devIpAddr+') references unknown oid group '+dev.devOidGroup+'. Please correct configuration.');
+            logger.error('device '+dev.devName+' ('+dev.devIpAddr+') references unknown oid group '+dev.devOidGroup+'. Please correct configuration.');
             ok = false;
         };
 
         if (dev.devSnmpVers == SNMP_V3 && dev.authId =='') { 
-            mcmLogger.error('device '+dev.devName+' ('+dev.devIpAddr+') requires valid authorization id. Please correct configuration.');
+            logger.error('device '+dev.devName+' ('+dev.devIpAddr+') requires valid authorization id. Please correct configuration.');
             ok = false;
         };
 
         if (dev.devSnmpVers == SNMP_V3 && dev.devAuthId !='' && !oidSets[dev.devAuthId]) { 
-            mcmLogger.error('device '+dev.devName+' ('+dev.devIpAddr+') references unknown authorization group '+dev.devAuthId+'. Please correct configuration.');
+            logger.error('device '+dev.devName+' ('+dev.devIpAddr+') references unknown authorization group '+dev.devAuthId+'. Please correct configuration.');
             ok = false;
         };
         
         if (!/^\d+$/.test(dev.devTimeout)){
-            mcmLogger.error('device "'+dev.devName+'" - timeout ('+dev.devTimeout+') must be numeric, please correct configuration.');
+            logger.error('device "'+dev.devName+'" - timeout ('+dev.devTimeout+') must be numeric, please correct configuration.');
             ok = false;
         };
         dev.devTimeout = parseInt(dev.devTimeout, 10) || 5;
         
         if (!/^\d+$/.test(dev.devRetryIntvl)){
-            mcmLogger.error('device "'+dev.devName+'" - retry intervall ('+dev.devRetryIntvl+') must be numeric, please correct configuration.');
+            logger.error('device "'+dev.devName+'" - retry intervall ('+dev.devRetryIntvl+') must be numeric, please correct configuration.');
             ok = false;
         };
         dev.devRetryIntvl = parseInt(dev.devRetryIntvl, 10) || 5;
 
         if (!/^\d+$/.test(dev.devPollIntvl)){
-            mcmLogger.error('device "'+dev.devName+'" - poll intervall ('+dev.devPollIntvl+') must be numeric, please correct configuration.');
+            logger.error('device "'+dev.devName+'" - poll intervall ('+dev.devPollIntvl+') must be numeric, please correct configuration.');
             ok = false;
         };
         dev.devPollIntvl = parseInt(dev.devPollIntvl, 10) || 30;
 
         if (dev.devPollIntvl < 5 ) {
-            mcmLogger.warn('device "'+dev.devName+'" - poll intervall ('+dev.devPollIntvl+') must be at least 5 seconds, please correct configuration.');
+            logger.warn('device "'+dev.devName+'" - poll intervall ('+dev.devPollIntvl+') must be at least 5 seconds, please correct configuration.');
             dev.devPollIntvl = 5;
         }
     };
 
     if (!ok) {
-        mcmLogger.debug('validateConfig - validation aborted (checks failed)');
+        logger.debug('validateConfig - validation aborted (checks failed)');
         return false;
     }    
     
-	mcmLogger.debug('validateConfig - validation completed (checks passed)');
+	logger.debug('validateConfig - validation completed (checks passed)');
 	return true;
 }
 
@@ -709,7 +709,7 @@ function validateConfig() {
  *		inactive	boolean	true if connection to device is active
  */
 function setupContices() {
-	mcmLogger.debug('setupContices - initializing contices');
+	logger.debug('setupContices - initializing contices');
 
     for (let ii=0, jj=0; ii < adapter.config.devs.length; ii++) {
         let dev = adapter.config.devs[ii];
@@ -718,7 +718,7 @@ function setupContices() {
             continue;
         };
         
-        mcmLogger.debug('adding device "'+dev.devIpAddr+'" ('+dev.devName+')');
+        logger.debug('adding device "'+dev.devIpAddr+'" ('+dev.devName+')');
 
         // TODO: ipV6 support
         const tmp    = dev.devIpAddr.split(':');
@@ -754,7 +754,7 @@ function setupContices() {
             CTXs[jj].oids.push(oid.oidOid);
             CTXs[jj].ids.push(id);
             
-            mcmLogger.debug('       oid "'+oid.oidOid+'" ('+id+')');
+            logger.debug('       oid "'+oid.oidOid+'" ('+id+')');
         }
         
         jj++;
@@ -772,17 +772,16 @@ function setupContices() {
  */
 async function onReady() {
 
-	// init logger
-	await mcmLogger.init(adapter);
-	await mcmLogger.debug("onReady triggered");
+	await logger.debug("onReady triggered");
 
     if (doInstall) {
-        await mcmLogger.info("performing installation");
-        const mcmInstUtils	= require('./lib/mcmInstUtils');
-        await mcmInstUtils.init(adapter, mcmLogger);
-        await mcmInstUtils.doUpgrade();
-        await mcmLogger.info("installation completed");
-        didMigrationCheck = true;
+        const instUtils =  new mcmInstUtils(adapter, logger);
+
+        logger.info("performing installation");        
+        await instUtils.doUpgrade();
+        logger.info("installation completed");
+
+        didInstall = true;
         process.exit(0);
     }
 
@@ -791,7 +790,7 @@ async function onReady() {
 
 	// validate config
 	if (!validateConfig(adapter.config)) {
-		await mcmLogger.error('invalid config, cannot continue');
+		await logger.error('invalid config, cannot continue');
 		adapter.disable();
 		return;
 	}
@@ -803,20 +802,20 @@ async function onReady() {
     // init all objects
     await initAllObjects();
     
-	await mcmLogger.debug('initialization completed');
+	await logger.debug('initialization completed');
 
 	// start one reader thread per device
-	await mcmLogger.debug('starting reader threads');
+	await logger.debug('starting reader threads');
     for (let ii=0; ii<CTXs.length; ii++) { 
 		const CTX = CTXs[ii];
 		createSession(CTX);
 	}
 	
 	// start connection info updater
-	await mcmLogger.debug('startconnection info updater');
+	await logger.debug('startconnection info updater');
     connUpdateTimer = setInterval(handleConnectionInfo, 15000)
 
-	await mcmLogger.debug('startup completed');
+	await logger.debug('startup completed');
 
 }
 
@@ -828,7 +827,7 @@ async function onReady() {
  *
  */
 function onUnload(callback) {
-	mcmLogger.debug("onUnload triggered");
+	logger.debug("onUnload triggered");
     
 //	for (let ip in IPs) {
 //		if (IPs.hasOwnProperty(ip) && IPs[ip].session) {
@@ -866,18 +865,17 @@ function onUnload(callback) {
 /**
  * here we start
  */
-
-mcmLogger.debug("snmp adapter initializing ("+process.argv+") ...");
+console.log( "DEBUG  : snmp adapter initializing ("+process.argv+") ..."); //logger not yet initialized
 
 if (process.argv) {
     for (let a = 1; a < process.argv.length; a++) {
         if (process.argv[a] === '--install') {
             doInstall = true;
-//            process.on('exit', function(){
-//                if (!didMigrationCheck) {
-//                    console.log("WARNING: migration of config skipped - ioBroker might be stopped");
-//                }
-//            })
+            process.on('exit', function(){
+                if (!didInstall) {
+                    console.log("WARNING: migration of config skipped - ioBroker might be stopped");
+                }
+            })
         }
     }
 }
