@@ -186,11 +186,11 @@ function ip2ipStr(ip) {
  *
  */
 async function initObject(obj) {
-	logger.debug('initobject '+obj._id);
+	await logger.debug('initobject '+obj._id);
 	try{ 
 		await adapter.setObjectAsync(obj._id, obj);
 	} catch(e) {
-		logger.error ('error initializing obj "' + obj._id + '" ' + e.message);
+		await logger.error ('error initializing obj "' + obj._id + '" ' + e.message);
 	}
 }
 
@@ -203,7 +203,7 @@ async function initObject(obj) {
  *
  */
 async function initDeviceObjects(pId, pIp) {
-	logger.debug('initdeviceObjects ('+pId+'/'+pIp+')');
+	await logger.debug('initdeviceObjects ('+pId+'/'+pIp+')');
 
 	try{ 
 		// create <ip> device object
@@ -234,7 +234,7 @@ async function initDeviceObjects(pId, pIp) {
 				}
 			);
 	} catch(e) {
-		logger.error ('error creating objects for ip "'+pIp+'" ('+pId+'), ' + e.message);
+		await logger.error ('error creating objects for ip "'+pIp+'" ('+pId+'), ' + e.message);
 	}
 }
 
@@ -248,7 +248,7 @@ async function initDeviceObjects(pId, pIp) {
  *
  */
 async function initOidObjects(pId, pOid) {
-	logger.debug('initOidObjects ('+pId+')');
+	await logger.debug('initOidObjects ('+pId+')');
 
 	try{ 
 		// create OID folder objects
@@ -285,7 +285,7 @@ async function initOidObjects(pId, pOid) {
 			});
 
 	} catch(e) {
-		logger.error ('error processing oid id "'+pId+'" (oid "'+pOid+') - '+e.message);
+		await logger.error ('error processing oid id "'+pId+'" (oid "'+pOid+') - '+e.message);
 	}
 }
 
@@ -297,7 +297,7 @@ async function initOidObjects(pId, pOid) {
  *
  */
 async function initAllObjects(){
-	logger.debug('initAllObjects - initializing objects');
+	await logger.debug('initAllObjects - initializing objects');
 
     for (let ii=0; ii<CTXs.length; ii++) {
         await initDeviceObjects(CTXs[ii].id, CTXs[ii].ipAddr);  
@@ -321,7 +321,7 @@ async function initAllObjects(){
  *
  */
 async function onSessionClose(pCTX) {
-	logger.debug('onSessionClose - device '+pCTX.name+' ('+pCTX.ipAddr+')');
+	await logger.debug('onSessionClose - device '+pCTX.name+' ('+pCTX.ipAddr+')');
 	
 	clearInterval(pCTX.pollTimer);
 	pCTX.pollTimer = null;
@@ -342,7 +342,7 @@ async function onSessionClose(pCTX) {
  *
  */
 async function onSessionError(pCTX, pErr) {
-	logger.debug('onSessionError - device '+pCTX.name+' ('+pCTX.ipAddr+') - '+pErr.toString);
+	await logger.debug('onSessionError - device '+pCTX.name+' ('+pCTX.ipAddr+') - '+pErr.toString);
 	
 // ### to be implemented ###
 }
@@ -366,7 +366,7 @@ var options = {
     idBitsSize: 32
 }; */
 async function createSession(pCTX) {
-	logger.debug('createSession - device '+pCTX.name+' ('+pCTX.ipAddr+')');
+	await logger.debug('createSession - device '+pCTX.name+' ('+pCTX.ipAddr+')');
 	
 	// (re)set device online status
 	adapter.setState(pCTX.id + '.online', false, true);
@@ -377,7 +377,7 @@ async function createSession(pCTX) {
             clearInterval(pCTX.pollTimer);
         } catch 
         {
-            logger.warn('cannot cancel timer for device "'+pCTX.name+'" ('+pCTX.ip + '), ' + e);
+            await logger.warn('cannot cancel timer for device "'+pCTX.name+'" ('+pCTX.ip + '), ' + e);
         };
         pCTX.pollTimer = null;
     };
@@ -387,7 +387,7 @@ async function createSession(pCTX) {
 			pCTX.session.on('close', null ); // avoid nesting callbacks
             pCTX.session.close();
         } catch (e) {
-            logger.warn('cannot close session for device "'+pCTX.name+'" ('+pCTX.ip + '), ' + e);
+            await logger.warn('cannot close session for device "'+pCTX.name+'" ('+pCTX.ip + '), ' + e);
         }
         pCTX.session = null;
     }
@@ -411,9 +411,9 @@ async function createSession(pCTX) {
                                 idBitsSize: 32
                             });
     } else if (pCTX.snmpVers == SNMP_V3) {
-        logger.error('Sorry, SNMP V3 is not yet supported - device "'+pCTX.name+'" ('+pCTX.ip + ')');
+        await logger.error('Sorry, SNMP V3 is not yet supported - device "'+pCTX.name+'" ('+pCTX.ip + ')');
     } else {
-        logger.error('unsupported snmp version code ('+pCTX.snmpVers+') for device "'+pCTX.name+'" ('+pCTX.ip + ')');
+        await logger.error('unsupported snmp version code ('+pCTX.snmpVers+') for device "'+pCTX.name+'" ('+pCTX.ip + ')');
     };
 
     if (pCTX.session) {
@@ -425,7 +425,7 @@ async function createSession(pCTX) {
         readOids(pCTX);
     };
 
-	logger.debug('session for device "'+pCTX.name+'" ('+pCTX.ipAddr+')'+(pCTX.session?'':' NOT')+' created');
+	await logger.debug('session for device "'+pCTX.name+'" ('+pCTX.ipAddr+')'+(pCTX.session?'':' NOT')+' created');
 
 }
 
@@ -777,9 +777,9 @@ async function onReady() {
     if (doInstall) {
         const instUtils =  new mcmInstUtils(adapter, logger);
 
-        logger.info("performing installation");        
+        await logger.info("performing installation");        
         await instUtils.doUpgrade();
-        logger.info("installation completed");
+        await logger.info("installation completed");
 
         didInstall = true;
         process.exit(0);
