@@ -796,7 +796,9 @@ async function onReady() {
             await logger.info("installation completed");
 
             didInstall = true;
-            process.exit(0);
+            if (await instUtils.doRestart) {
+                process.exit(0);
+            }
         }
     }
 
