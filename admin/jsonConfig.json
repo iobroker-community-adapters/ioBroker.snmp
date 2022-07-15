@@ -197,9 +197,7 @@
                             "width": "10% ",
                             "title": "lblDevSnmpVers",
                             "options": [
-                                { "label": "SNMP v1", "value": 1}, 
-                                { "label": "SNMP v2c", "value": 2},
-                                { "label": "SNMP v3", "value": 3}
+                                { "label": "SNMP v1", "value": 1}
                             ],
                             "filter": false,
                             "sort": false,
