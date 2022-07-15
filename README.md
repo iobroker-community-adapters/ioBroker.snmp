@@ -17,14 +17,14 @@ This adapter can be used to poll information from devices like printers, network
 
 ## Changelog
 ### __WORK IN PROGRESS__
-* IMPORTANT: This release will change configuration structures!
+* IMPORTANT: This release will change the configuration structures!
   Please backup your configuration before starting the installation.
-  Installation will try to convert old configuration - but its not guaranteed to succeed in all cases. 
-* (McM1957) adaptercode has undergone a major rewrite
-* (McM1957) adapter now uses admin5 interface
-* (McM1957) timer values can be set differently per device (#105)
-* (McM1957) reordering configuration entries does no longer destroy data (#15)
-* (McM1957) state objects for devices can now be named. Old behavior using the ip address is available as an option.
+  The Installation will try to convert the old configuration - but it is not guaranteed to succeed in all cases. 
+* (McM1957) Many parts of the code have been rewriten
+* (McM1957) The adapter now uses the admin5 interface
+* (McM1957) Timer values can now be set differently per device (#105)
+* (McM1957) Changing the order of configuration entries does no longer destroy data (#15)
+* (McM1957) Stateobjects for devices can now be named. The old behavior is available as an option.
 
 ### 1.0.0 (2022-03-21)
 * IMPORTANT: This release will change the object structures!
