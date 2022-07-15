@@ -25,6 +25,7 @@ This adapter can be used to poll information from devices like printers, network
 * (McM1957) Timer values can now be set differently per device (#105)
 * (McM1957) Changing the order of configuration entries does no longer destroy data (#15)
 * (McM1957) Stateobjects for devices can now be named. The old behavior is available as an option.
+* (McM1957) Known restriction: currently only SNMP V1 is supported.
 
 ### 1.0.0 (2022-03-21)
 * IMPORTANT: This release will change the object structures!
