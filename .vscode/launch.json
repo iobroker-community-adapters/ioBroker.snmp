@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch Program",
+            "name": "Launch normal",
             "program": "${workspaceFolder}/main.js",
             "args": ["--instance", "0", "--force", "--log", "--debug"],
             "request": "launch",
@@ -14,7 +14,20 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "type": "pwa-node"
+            "type": "node"
+        },
+    
+        {
+            "name": "Launch install",
+            "program": "${workspaceFolder}/main.js",
+            "args": ["--instance", "0", "--force", "--log", "--debug", "--install"],
+            "request": "launch",
+            "stopOnEntry": true,
+            "console": "internalConsole",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node"
         },
     
 
@@ -25,7 +38,7 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "type": "pwa-node"
+            "type": "node"
         }
     ]
 }
