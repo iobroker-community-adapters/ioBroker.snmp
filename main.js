@@ -785,7 +785,22 @@ async function onReady() {
         process.exit(0);
     }
 
-	// mark adapter as non active
+    {
+        const cfgVers   = adapter.config.cfgVers || '0';
+        const OIDs      = adapter.config.OIDs;
+
+        if ( cfgVers == 0 || OIDs) {
+            const instUtils =  new mcmInstUtils(adapter, logger);
+            await logger.info("performing delayed installation");        
+            await instUtils.doUpgrade(adapter.instance);
+            await logger.info("installation completed");
+
+            didInstall = true;
+            process.exit(0);
+        }
+    }
+
+    // mark adapter as non active
 	await adapter.setStateAsync('info.connection', false, true);
 
 	// validate config
