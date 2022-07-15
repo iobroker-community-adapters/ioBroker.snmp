@@ -16,7 +16,7 @@ For more details and for information how to disable the error reporting see [Sen
 This adapter can be used to poll information from devices like printers, network devices, etc. using SNMP protocol.
 
 ## Changelog
-### __WORK IN PROGRESS__
+### 2.0.0-beta.1 (2022-07-15)
 * IMPORTANT: This release will change the configuration structures!
   Please backup your configuration before starting the installation.
   The Installation will try to convert the old configuration - but it is not guaranteed to succeed in all cases. 
