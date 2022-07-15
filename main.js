@@ -844,34 +844,42 @@ async function onReady() {
 function onUnload(callback) {
 	logger.debug("onUnload triggered");
     
-//	for (let ip in IPs) {
-//		if (IPs.hasOwnProperty(ip) && IPs[ip].session) {
-//			try {
-//				IPs[ip].session.close();
-//				adapter.setState(ip.replace(/\./g, "_") + '.online', false, true);
-//			} catch (e) {
-//				// Ignore
-//			}
-//			IPs[ip].session = null;
-//			IPs[ip].pollTimer && clearInterval(IPs[ip].pollTimer);
-//			IPs[ip].retryTimeout && clearTimeout(IPs[ip].retryTimeout);
-//		}
-//	}
+    for (let ii=0; ii<CTXs.length; ii++) { 
+		const CTX = CTXs[ii];
 
-    try {
-		if (connUpdateTimer) {
-			clearInterval(connUpdateTimer);
-			connUpdateTimer = null;
-		}
-    } catch(e) {
-        // Ignore
-    }
+        // (re)set device online status
+        try {
+            adapter.setState(CTX.id + '.online', false, true);
+        } catch {};
+
+        // close session if one exists
+        if (CTX.pollTimer ) {
+            try {
+                clearInterval(CTX.pollTimer);
+            } catch {};
+            CTX.pollTimer = null;
+        };
+
+        if (CTX.session) {
+            try {
+                CTX.session.on('error', null ); // avoid nesting callbacks
+                CTX.session.on('close', null ); // avoid nesting callbacks
+                CTX.session.close();
+            } catch {}
+            CTX.session = null;
+        }
+	};
+
+	if (connUpdateTimer) {
+        try {
+            clearInterval(connUpdateTimer);
+        } catch {};
+		connUpdateTimer = null;
+    };
 
     try {
         adapter.setState('info.connection', false, true);
-    } catch(e) {
-        // Ignore
-    }
+    } catch {};
 
 	// callback must be called under all circumstances
     callback && callback();
