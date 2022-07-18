@@ -72,7 +72,7 @@
     "keywords": [
       "SNMP-OID"
     ],
-    "readme": "https://github.com/iobroker-community-adapters/ioBroker.snmp/blob/master/README.md",
+    "readme": "https://github.com/mcm1957/ioBroker.snmp/blob/master/README.md",
     "loglevel": "info",
     "mode": "daemon",
     "type": "infrastructure",
