@@ -253,9 +253,9 @@ async function initOidObjects(pId, pOid) {
 	try{ 
 		// create OID folder objects
         const idArr = pId.split('.');
-        let partlyId = idArr.pop();
-		for (let i = 1; i < idArr.length; i++) {
-			let el = idArr[i];
+        let partlyId = idArr[0];
+		for (let ii = 1; ii < idArr.length-1; ii++) {
+			let el = idArr[ii];
             partlyId += '.' + el;
 			await initObject({
 						_id: partlyId,
@@ -280,7 +280,6 @@ async function initOidObjects(pId, pOid) {
 					role: 'value'
 				},
 				native: {
-//					OID: pOid
 				}
 			});
 
