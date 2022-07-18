@@ -644,7 +644,7 @@ function validateConfig() {
         };
 
         if (dev.devOidGroup && dev.devOidGroup != '' && !oidSets[dev.devOidGroup] ) { 
-            logger.error('device '+dev.devName+' ('+dev.devIpAddr+') references unknown oid group '+dev.devOidGroup+'. Please correct configuration.');
+            logger.error('device '+dev.devName+' ('+dev.devIpAddr+') references unknown or completly inactive oid group '+dev.devOidGroup+'. Please correct configuration.');
             ok = false;
         };
 
@@ -750,7 +750,7 @@ function setupContices() {
             if (!oid.oidAct) continue;
             if (dev.devOidGroup != oid.oidGroup) continue;
             
-            let id = CTXs[ii].id + '.' + name2id(oid.oidName);
+            let id = CTXs[jj].id + '.' + name2id(oid.oidName);
             CTXs[jj].oids.push(oid.oidOid);
             CTXs[jj].ids.push(id);
             
