@@ -186,11 +186,11 @@ function ip2ipStr(ip) {
  *
  */
 async function initObject(obj) {
-    await logger.debug('initobject ' + obj._id);
+    logger.debug('initobject ' + obj._id);
     try {
         await adapter.setObjectNotExistsAsync(obj._id, obj);
     } catch (e) {
-        await logger.error('error initializing obj "' + obj._id + '" ' + e.message);
+        logger.error('error initializing obj "' + obj._id + '" ' + e.message);
     }
 }
 
@@ -203,7 +203,7 @@ async function initObject(obj) {
  *
  */
 async function initDeviceObjects(pId, pIp) {
-    await logger.debug('initdeviceObjects (' + pId + '/' + pIp + ')');
+    logger.debug('initdeviceObjects (' + pId + '/' + pIp + ')');
 
     try {
         // create <ip> device object
@@ -234,7 +234,7 @@ async function initDeviceObjects(pId, pIp) {
         }
         );
     } catch (e) {
-        await logger.error('error creating objects for ip "' + pIp + '" (' + pId + '), ' + e.message);
+        logger.error('error creating objects for ip "' + pIp + '" (' + pId + '), ' + e.message);
     }
 }
 
@@ -248,7 +248,7 @@ async function initDeviceObjects(pId, pIp) {
  *
  */
 async function initOidObjects(pId, pOid) {
-    await logger.debug('initOidObjects (' + pId + ')');
+    logger.debug('initOidObjects (' + pId + ')');
 
     try {
         // create OID folder objects
@@ -284,7 +284,7 @@ async function initOidObjects(pId, pOid) {
         });
 
     } catch (e) {
-        await logger.error('error processing oid id "' + pId + '" (oid "' + pOid + ') - ' + e.message);
+        logger.error('error processing oid id "' + pId + '" (oid "' + pOid + ') - ' + e.message);
     }
 }
 
@@ -296,7 +296,7 @@ async function initOidObjects(pId, pOid) {
  *
  */
 async function initAllObjects() {
-    await logger.debug('initAllObjects - initializing objects');
+    logger.debug('initAllObjects - initializing objects');
 
     for (let ii = 0; ii < CTXs.length; ii++) {
         await initDeviceObjects(CTXs[ii].id, CTXs[ii].ipAddr);
@@ -320,7 +320,7 @@ async function initAllObjects() {
  *
  */
 async function onSessionClose(pCTX) {
-    await logger.debug('onSessionClose - device ' + pCTX.name + ' (' + pCTX.ipAddr + ')');
+    logger.debug('onSessionClose - device ' + pCTX.name + ' (' + pCTX.ipAddr + ')');
 
     clearInterval(pCTX.pollTimer);
     pCTX.pollTimer = null;
@@ -341,7 +341,7 @@ async function onSessionClose(pCTX) {
  *
  */
 async function onSessionError(pCTX, pErr) {
-    await logger.debug('onSessionError - device ' + pCTX.name + ' (' + pCTX.ipAddr + ') - ' + pErr.toString);
+    logger.debug('onSessionError - device ' + pCTX.name + ' (' + pCTX.ipAddr + ') - ' + pErr.toString);
 
     // ### to be implemented ###
 }
@@ -365,7 +365,7 @@ var options = {
     idBitsSize: 32
 }; */
 async function createSession(pCTX) {
-    await logger.debug('createSession - device ' + pCTX.name + ' (' + pCTX.ipAddr + ')');
+    logger.debug('createSession - device ' + pCTX.name + ' (' + pCTX.ipAddr + ')');
 
     // (re)set device online status
     adapter.setState(pCTX.id + '.online', false, true);
@@ -385,7 +385,7 @@ async function createSession(pCTX) {
             pCTX.session.on('close', null); // avoid nesting callbacks
             pCTX.session.close();
         } catch (e) {
-            await logger.warn('cannot close session for device "' + pCTX.name + '" (' + pCTX.ip + '), ' + e);
+            logger.warn('cannot close session for device "' + pCTX.name + '" (' + pCTX.ip + '), ' + e);
         }
         pCTX.session = null;
     }
@@ -409,9 +409,9 @@ async function createSession(pCTX) {
             idBitsSize: 32
         });
     } else if (pCTX.snmpVers == SNMP_V3) {
-        await logger.error('Sorry, SNMP V3 is not yet supported - device "' + pCTX.name + '" (' + pCTX.ip + ')');
+        logger.error('Sorry, SNMP V3 is not yet supported - device "' + pCTX.name + '" (' + pCTX.ip + ')');
     } else {
-        await logger.error('unsupported snmp version code (' + pCTX.snmpVers + ') for device "' + pCTX.name + '" (' + pCTX.ip + ')');
+        logger.error('unsupported snmp version code (' + pCTX.snmpVers + ') for device "' + pCTX.name + '" (' + pCTX.ip + ')');
     };
 
     if (pCTX.session) {
@@ -423,7 +423,7 @@ async function createSession(pCTX) {
         readOids(pCTX);
     };
 
-    await logger.debug('session for device "' + pCTX.name + '" (' + pCTX.ipAddr + ')' + (pCTX.session ? '' : ' NOT') + ' created');
+    logger.debug('session for device "' + pCTX.name + '" (' + pCTX.ipAddr + ')' + (pCTX.session ? '' : ' NOT') + ' created');
 
 }
 
@@ -770,14 +770,14 @@ function setupContices() {
  */
 async function onReady() {
 
-    await logger.debug("onReady triggered");
+    logger.debug("onReady triggered");
 
     if (doInstall) {
         const instUtils = new mcmInstUtils(adapter, logger);
 
-        await logger.info("performing installation");
+        logger.info("performing installation");
         await instUtils.doUpgrade();
-        await logger.info("installation completed");
+        logger.info("installation completed");
 
         didInstall = true;
         adapter.terminate("exit after migration of config", EXIT_CODES.NO_ERROR);
@@ -789,9 +789,9 @@ async function onReady() {
 
         if (cfgVers == 0 || OIDs) {
             const instUtils = new mcmInstUtils(adapter, logger);
-            await logger.info("performing delayed installation");
+            logger.info("performing delayed installation");
             await instUtils.doUpgrade(adapter.instance);
-            await logger.info("installation completed");
+            logger.info("installation completed");
 
             didInstall = true;
             if (await instUtils.doRestart) {
@@ -805,7 +805,7 @@ async function onReady() {
 
     // validate config
     if (!validateConfig(adapter.config)) {
-        await logger.error('invalid config, cannot continue');
+        logger.error('invalid config, cannot continue');
         adapter.disable();
         return;
     }
@@ -817,20 +817,20 @@ async function onReady() {
     // init all objects
     await initAllObjects();
 
-    await logger.debug('initialization completed');
+    logger.debug('initialization completed');
 
     // start one reader thread per device
-    await logger.debug('starting reader threads');
+    logger.debug('starting reader threads');
     for (let ii = 0; ii < CTXs.length; ii++) {
         const CTX = CTXs[ii];
         createSession(CTX);
     }
 
     // start connection info updater
-    await logger.debug('startconnection info updater');
+    logger.debug('startconnection info updater');
     connUpdateTimer = setInterval(handleConnectionInfo, 15000)
 
-    await logger.debug('startup completed');
+    logger.debug('startup completed');
 
 }
 
