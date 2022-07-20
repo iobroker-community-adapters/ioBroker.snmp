@@ -34,23 +34,23 @@
  *      inactive   bool     flag indicating conection status of device
         
  */
- 
+
 /* jshint -W097 */
 /* jshint strict:false */
 /* jslint node: true */
 'use strict';
 
-const SNMP_V1 	= 1;
-const SNMP_V2c 	= 2;
-const SNMP_V3 	= 3;
+const SNMP_V1 = 1;
+const SNMP_V2c = 2;
+const SNMP_V3 = 3;
 
-const MD5 		= 1;
-const SHA 		= 2;
+const MD5 = 1;
+const SHA = 2;
 
-const DES 		= 1;
-const AES 		= 2;
-const AES256B	= 3;
-const AES256R	= 4;
+const DES = 1;
+const AES = 2;
+const AES256B = 3;
+const AES256R = 4;
 
 /*
  * based on template created with @iobroker/create-adapter v2.1.0
@@ -58,82 +58,82 @@ const AES256R	= 4;
 
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
-const utils				= require('@iobroker/adapter-core');
-const { EXIT_CODES } 	= require('@iobroker/js-controller-common');
-const mcmLogger			= require('./lib/mcmLogger');
-const mcmInstUtils		= require('./lib/mcmInstUtils');
+const utils = require('@iobroker/adapter-core');
+const { EXIT_CODES } = require('@iobroker/js-controller-common');
+const mcmLogger = require('./lib/mcmLogger');
+const mcmInstUtils = require('./lib/mcmInstUtils');
 
- // Load modules required by adapter
+// Load modules required by adapter
 const snmp = require('net-snmp');
 
 // init installation marker
-let doInstall    = false;
-let didInstall   = false;
+let doInstall = false;
+let didInstall = false;
 
 // #################### global variables ####################
-let     adapter;    // adapter instance - @type {ioBroker.Adapter}
-let     logger;     // mcmLogger instance
+let adapter;    // adapter instance - @type {ioBroker.Adapter}
+let logger;     // mcmLogger instance
 
-const   CTXs 		    = [];		// see description at header of file
-let     isConnected     = false; 	// local copy of info.connection state 
-let     connUpdateTimer = null;
+const CTXs = [];		// see description at header of file
+let isConnected = false; 	// local copy of info.connection state 
+let connUpdateTimer = null;
 
 /**
  * Start the adapter instance
  * @param {Partial<utils.AdapterOptions>} [options]
  */
 function startAdapter(options) {
-	// Create the adapter and define its methods
-	adapter = utils.adapter(Object.assign({}, options, {
-		name: 'snmp',
+    // Create the adapter and define its methods
+    adapter = utils.adapter(Object.assign({}, options, {
+        name: 'snmp',
 
-		// ready callback is called when databases are connected and adapter received configuration.
-		ready: onReady, // Main method defined below for readability
+        // ready callback is called when databases are connected and adapter received configuration.
+        ready: onReady, // Main method defined below for readability
 
-		// unload callback is called when adapter shuts down - callback has to be called under any circumstances!
-		unload: onUnload,
+        // unload callback is called when adapter shuts down - callback has to be called under any circumstances!
+        unload: onUnload,
 
-		// If you need to react to object changes, uncomment the following method.
-		// You also need to subscribe to the objects with `adapter.subscribeObjects`, similar to `adapter.subscribeStates`.
-		// objectChange: (id, obj) => {
-		// 	if (obj) {
-		// 		// The object was changed
-		// 		logger.info(`object ${id} changed: ${JSON.stringify(obj)}`);
-		// 	} else {
-		// 		// The object was deleted
-		// 		logger.info(`object ${id} deleted`);
-		// 	}
-		// },
+        // If you need to react to object changes, uncomment the following method.
+        // You also need to subscribe to the objects with `adapter.subscribeObjects`, similar to `adapter.subscribeStates`.
+        // objectChange: (id, obj) => {
+        // 	if (obj) {
+        // 		// The object was changed
+        // 		logger.info(`object ${id} changed: ${JSON.stringify(obj)}`);
+        // 	} else {
+        // 		// The object was deleted
+        // 		logger.info(`object ${id} deleted`);
+        // 	}
+        // },
 
-		// stateChange is called if a subscribed state changes
-		// stateChange: (id, state) => {
-		//	if (state) {
-		//		// The state was changed
-		//		logger.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
-		//	} else {
-		//		// The state was deleted
-		//		logger.info(`state ${id} deleted`);
-		//	}
-		//},
+        // stateChange is called if a subscribed state changes
+        // stateChange: (id, state) => {
+        //	if (state) {
+        //		// The state was changed
+        //		logger.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
+        //	} else {
+        //		// The state was deleted
+        //		logger.info(`state ${id} deleted`);
+        //	}
+        //},
 
-		// If you need to accept messages in your adapter, uncomment the following block.
-		// /**
-		//  * Some message was sent to this instance over message box. Used by email, pushover, text2speech, ...
-		//  * Using this method requires "common.messagebox" property to be set to true in io-package.json
-		//  */
-		// message: (obj) => {
-		// 	if (typeof obj === 'object' && obj.message) {
-		// 		if (obj.command === 'send') {
-		// 			// e.g. send email or pushover or whatever
-		// 			logger.info('send command');
+        // If you need to accept messages in your adapter, uncomment the following block.
+        // /**
+        //  * Some message was sent to this instance over message box. Used by email, pushover, text2speech, ...
+        //  * Using this method requires "common.messagebox" property to be set to true in io-package.json
+        //  */
+        // message: (obj) => {
+        // 	if (typeof obj === 'object' && obj.message) {
+        // 		if (obj.command === 'send') {
+        // 			// e.g. send email or pushover or whatever
+        // 			logger.info('send command');
 
-		// 			// Send response in callback if required
-		// 			if (obj.callback) adapter.sendTo(obj.from, obj.command, 'Message received', obj.callback);
-		// 		}
-		// 	}
-		// },
-	}));
-    
+        // 			// Send response in callback if required
+        // 			if (obj.callback) adapter.sendTo(obj.from, obj.command, 'Message received', obj.callback);
+        // 		}
+        // 	}
+        // },
+    }));
+
     logger = new mcmLogger(adapter);
     return adapter;
 }
@@ -168,7 +168,7 @@ function name2id(pName) {
  * 
  */
 function ip2ipStr(ip) {
-	return (ip || '').replace(/\./g, "_");
+    return (ip || '').replace(/\./g, "_");
 }
 
 
@@ -186,12 +186,12 @@ function ip2ipStr(ip) {
  *
  */
 async function initObject(obj) {
-	await logger.debug('initobject '+obj._id);
-	try{ 
-		await adapter.setObjectAsync(obj._id, obj);
-	} catch(e) {
-		await logger.error ('error initializing obj "' + obj._id + '" ' + e.message);
-	}
+    await logger.debug('initobject ' + obj._id);
+    try {
+        await adapter.setObjectAsync(obj._id, obj);
+    } catch (e) {
+        await logger.error('error initializing obj "' + obj._id + '" ' + e.message);
+    }
 }
 
 /**
@@ -203,39 +203,39 @@ async function initObject(obj) {
  *
  */
 async function initDeviceObjects(pId, pIp) {
-	await logger.debug('initdeviceObjects ('+pId+'/'+pIp+')');
+    await logger.debug('initdeviceObjects (' + pId + '/' + pIp + ')');
 
-	try{ 
-		// create <ip> device object
-		await initObject({
-					_id: pId,
-					type: 'device',
-					common: {
-						name: pIp
-					},
-					native: {
-					}
-				}
-			);
+    try {
+        // create <ip> device object
+        await initObject({
+            _id: pId,
+            type: 'device',
+            common: {
+                name: pIp
+            },
+            native: {
+            }
+        }
+        );
 
-		// create <ip>.online state object
-		await initObject({
-					_id: pId + '.online',
-					type: 'state',
-					common: {
-						name: pIp + ' online',
-						write: false,
-						read:  true,
-						type: 'boolean',
-						role: 'indicator.reachable'
-					},
-					native: {
-					}
-				}
-			);
-	} catch(e) {
-		await logger.error ('error creating objects for ip "'+pIp+'" ('+pId+'), ' + e.message);
-	}
+        // create <ip>.online state object
+        await initObject({
+            _id: pId + '.online',
+            type: 'state',
+            common: {
+                name: pIp + ' online',
+                write: false,
+                read: true,
+                type: 'boolean',
+                role: 'indicator.reachable'
+            },
+            native: {
+            }
+        }
+        );
+    } catch (e) {
+        await logger.error('error creating objects for ip "' + pIp + '" (' + pId + '), ' + e.message);
+    }
 }
 
 /**
@@ -248,44 +248,44 @@ async function initDeviceObjects(pId, pIp) {
  *
  */
 async function initOidObjects(pId, pOid) {
-	await logger.debug('initOidObjects ('+pId+')');
+    await logger.debug('initOidObjects (' + pId + ')');
 
-	try{ 
-		// create OID folder objects
+    try {
+        // create OID folder objects
         const idArr = pId.split('.');
         let partlyId = idArr[0];
-		for (let ii = 1; ii < idArr.length-1; ii++) {
-			let el = idArr[ii];
+        for (let ii = 1; ii < idArr.length - 1; ii++) {
+            let el = idArr[ii];
             partlyId += '.' + el;
-			await initObject({
-						_id: partlyId,
-						type: 'folder',
-						common: {
-							name: ''
-						},
-						native: {
-						}
-					});
-		};
+            await initObject({
+                _id: partlyId,
+                type: 'folder',
+                common: {
+                    name: ''
+                },
+                native: {
+                }
+            });
+        };
 
-		// create OID state object
-		await initObject({
-				_id: pId,
-				type: 'state',
-				common: {
-					name:  pId,
-//					write: !!OID.write, //## TODO
-					read:  true,
-					type: 'string',
-					role: 'value'
-				},
-				native: {
-				}
-			});
+        // create OID state object
+        await initObject({
+            _id: pId,
+            type: 'state',
+            common: {
+                name: pId,
+                //					write: !!OID.write, //## TODO
+                read: true,
+                type: 'string',
+                role: 'value'
+            },
+            native: {
+            }
+        });
 
-	} catch(e) {
-		await logger.error ('error processing oid id "'+pId+'" (oid "'+pOid+') - '+e.message);
-	}
+    } catch (e) {
+        await logger.error('error processing oid id "' + pId + '" (oid "' + pOid + ') - ' + e.message);
+    }
 }
 
 /**
@@ -295,14 +295,14 @@ async function initOidObjects(pId, pOid) {
  * @return
  *
  */
-async function initAllObjects(){
-	await logger.debug('initAllObjects - initializing objects');
+async function initAllObjects() {
+    await logger.debug('initAllObjects - initializing objects');
 
-    for (let ii=0; ii<CTXs.length; ii++) {
-        await initDeviceObjects(CTXs[ii].id, CTXs[ii].ipAddr);  
+    for (let ii = 0; ii < CTXs.length; ii++) {
+        await initDeviceObjects(CTXs[ii].id, CTXs[ii].ipAddr);
 
-        for (let jj=0; jj<CTXs[ii].ids.length; jj++){
-            await initOidObjects(CTXs[ii].ids[jj], CTXs[ii].oids[jj] );
+        for (let jj = 0; jj < CTXs[ii].ids.length; jj++) {
+            await initOidObjects(CTXs[ii].ids[jj], CTXs[ii].oids[jj]);
         }
     }
 }
@@ -320,16 +320,16 @@ async function initAllObjects(){
  *
  */
 async function onSessionClose(pCTX) {
-	await logger.debug('onSessionClose - device '+pCTX.name+' ('+pCTX.ipAddr+')');
-	
-	clearInterval(pCTX.pollTimer);
-	pCTX.pollTimer = null;
-	pCTX.session = null;
+    await logger.debug('onSessionClose - device ' + pCTX.name + ' (' + pCTX.ipAddr + ')');
 
-	pCTX.retryTimer = setTimeout((pCTX) => {
-            pCTX.retryTimer = null;
-            createSession(pCTX);
-		}, pCTX.retryIntvl, pCTX);
+    clearInterval(pCTX.pollTimer);
+    pCTX.pollTimer = null;
+    pCTX.session = null;
+
+    pCTX.retryTimer = setTimeout((pCTX) => {
+        pCTX.retryTimer = null;
+        createSession(pCTX);
+    }, pCTX.retryIntvl, pCTX);
 }
 
 /**
@@ -341,9 +341,9 @@ async function onSessionClose(pCTX) {
  *
  */
 async function onSessionError(pCTX, pErr) {
-	await logger.debug('onSessionError - device '+pCTX.name+' ('+pCTX.ipAddr+') - '+pErr.toString);
-	
-// ### to be implemented ###
+    await logger.debug('onSessionError - device ' + pCTX.name + ' (' + pCTX.ipAddr + ') - ' + pErr.toString);
+
+    // ### to be implemented ###
 }
 
 /**
@@ -365,66 +365,66 @@ var options = {
     idBitsSize: 32
 }; */
 async function createSession(pCTX) {
-	await logger.debug('createSession - device '+pCTX.name+' ('+pCTX.ipAddr+')');
-	
-	// (re)set device online status
-	adapter.setState(pCTX.id + '.online', false, true);
+    await logger.debug('createSession - device ' + pCTX.name + ' (' + pCTX.ipAddr + ')');
 
-	// close old session if one exists
-    if (pCTX.pollTimer ) {
+    // (re)set device online status
+    adapter.setState(pCTX.id + '.online', false, true);
+
+    // close old session if one exists
+    if (pCTX.pollTimer) {
         try {
             clearInterval(pCTX.pollTimer);
-        } catch 
+        } catch
         {
-            await logger.warn('cannot cancel timer for device "'+pCTX.name+'" ('+pCTX.ip + '), ' + e);
+            await logger.warn('cannot cancel timer for device "' + pCTX.name + '" (' + pCTX.ip + '), ' + e);
         };
         pCTX.pollTimer = null;
     };
     if (pCTX.session) {
-		try {
-			pCTX.session.on('error', null ); // avoid nesting callbacks
-			pCTX.session.on('close', null ); // avoid nesting callbacks
+        try {
+            pCTX.session.on('error', null); // avoid nesting callbacks
+            pCTX.session.on('close', null); // avoid nesting callbacks
             pCTX.session.close();
         } catch (e) {
-            await logger.warn('cannot close session for device "'+pCTX.name+'" ('+pCTX.ip + '), ' + e);
+            await logger.warn('cannot close session for device "' + pCTX.name + '" (' + pCTX.ip + '), ' + e);
         }
         pCTX.session = null;
     }
 
-	// create snmp session for device
+    // create snmp session for device
     if (pCTX.snmpVers == SNMP_V1 ||
         pCTX.snmpVers == SNMP_V2c) {
-        
-        const snmpTransport = pCTX.isIPv6?"udp6":"udp4";
-        const snmpVersion   = (pCTX.snmpVers==SNMP_V1)?snmp.Version1:snmp.Version2c;
-        
+
+        const snmpTransport = pCTX.isIPv6 ? "udp6" : "udp4";
+        const snmpVersion = (pCTX.snmpVers == SNMP_V1) ? snmp.Version1 : snmp.Version2c;
+
         pCTX.session = snmp.createSession(pCTX.ipAddr, pCTX.authId, {
-                                port: pCTX.ipPort,   // default:161
-                                retries: 1,
-                                timeout: pCTX.timeout,
-                                backoff: 1.0,
-                                transport: snmpTransport,
-                                //trapPort: 162,
-                                version: snmpVersion,
-                                backwardsGetNexts: true,
-                                idBitsSize: 32
-                            });
+            port: pCTX.ipPort,   // default:161
+            retries: 1,
+            timeout: pCTX.timeout,
+            backoff: 1.0,
+            transport: snmpTransport,
+            //trapPort: 162,
+            version: snmpVersion,
+            backwardsGetNexts: true,
+            idBitsSize: 32
+        });
     } else if (pCTX.snmpVers == SNMP_V3) {
-        await logger.error('Sorry, SNMP V3 is not yet supported - device "'+pCTX.name+'" ('+pCTX.ip + ')');
+        await logger.error('Sorry, SNMP V3 is not yet supported - device "' + pCTX.name + '" (' + pCTX.ip + ')');
     } else {
-        await logger.error('unsupported snmp version code ('+pCTX.snmpVers+') for device "'+pCTX.name+'" ('+pCTX.ip + ')');
+        await logger.error('unsupported snmp version code (' + pCTX.snmpVers + ') for device "' + pCTX.name + '" (' + pCTX.ip + ')');
     };
 
     if (pCTX.session) {
-        pCTX.session.on('close', () => { onSessionClose(pCTX) } );
-        pCTX.session.on('error', (err) => { onSessionError(pCTX, err) } );
+        pCTX.session.on('close', () => { onSessionClose(pCTX) });
+        pCTX.session.on('error', (err) => { onSessionError(pCTX, err) });
         pCTX.pollTimer = setInterval(readOids, pCTX.pollIntvl, pCTX);
 
         // read one time immediately
         readOids(pCTX);
     };
 
-	await logger.debug('session for device "'+pCTX.name+'" ('+pCTX.ipAddr+')'+(pCTX.session?'':' NOT')+' created');
+    await logger.debug('session for device "' + pCTX.name + '" (' + pCTX.ipAddr + ')' + (pCTX.session ? '' : ' NOT') + ' created');
 
 }
 
@@ -437,36 +437,36 @@ async function createSession(pCTX) {
  *
  */
 function readOids(pCTX) {
-	logger.debug('readOIDs - device "'+pCTX.name+'" ('+pCTX.ipAddr+')');
+    logger.debug('readOIDs - device "' + pCTX.name + '" (' + pCTX.ipAddr + ')');
 
-	const session 	= pCTX.session;
-	const id 		= pCTX.id;
-	const oids		= pCTX.oids;
-	const ids		= pCTX.ids;
-	
+    const session = pCTX.session;
+    const id = pCTX.id;
+    const oids = pCTX.oids;
+    const ids = pCTX.ids;
+
     session.get(oids, (err, varbinds) => {
         if (err) {
-			// error occured
+            // error occured
             logger.debug('[' + id + '] session.get: ' + err.toString());
             if (err.toString() === 'RequestTimedOutError: Request timed out') {
-				// timeout error
-                if (!pCTX.inactive ) {
+                // timeout error
+                if (!pCTX.inactive) {
                     logger.info('[' + id + '] device disconnected - request timout');
                     pCTX.inactive = true;
                     setImmediate(handleConnectionInfo);
                 }
             } else {
-				// other error
-				if (!pCTX.inactive) {
-					logger.error('[' + id + '] session.get: ' + err.toString());
-					pCTX.inactive = true;
-					setImmediate(handleConnectionInfo);
-					}
-				}
+                // other error
+                if (!pCTX.inactive) {
+                    logger.error('[' + id + '] session.get: ' + err.toString());
+                    pCTX.inactive = true;
+                    setImmediate(handleConnectionInfo);
+                }
+            }
             adapter.setState(id + '.online', false, true);
         } else {
-			// success
-            if ( pCTX.inactive ) {
+            // success
+            if (pCTX.inactive) {
                 logger.info('[' + id + '] device (re)connected');
                 pCTX.inactive = false;
                 setImmediate(handleConnectionInfo);
@@ -474,19 +474,19 @@ function readOids(pCTX) {
 
             adapter.setState(id + '.online', true, true);
 
-			// process returned values
+            // process returned values
             for (let ii = 0; ii < varbinds.length; ii++) {
                 if (snmp.isVarbindError(varbinds[ii])) {
                     logger.warn(snmp.varbindError(varbinds[ii]));
                     adapter.setState(pCTX.ids[ii], null, true, 0x84);
                 } else {
-                    logger.debug('['+id+'] update '+pCTX.ids[ii]+': '+varbinds[ii].value.toString());
+                    logger.debug('[' + id + '] update ' + pCTX.ids[ii] + ': ' + varbinds[ii].value.toString());
                     adapter.setState(pCTX.ids[ii], varbinds[ii].value.toString(), true);
                 }
             }
         }
 
-        if ( !pCTX.initialized ) {
+        if (!pCTX.initialized) {
             pCTX.initialized = true;
             setImmediate(handleConnectionInfo);
         }
@@ -496,26 +496,26 @@ function readOids(pCTX) {
 // #################### general housekeeping functions ####################
 
 function handleConnectionInfo() {
-	logger.debug('handleConnectionInfo');
+    logger.debug('handleConnectionInfo');
 
     let haveConnection = false;
-    for (let ii=0; ii<CTXs.length; ii++) {
-		if (!CTXs[ii].inactive)  {
+    for (let ii = 0; ii < CTXs.length; ii++) {
+        if (!CTXs[ii].inactive) {
             haveConnection = true;
-		}
-	}
-	
-	if (isConnected !== haveConnection)  {
-		if (haveConnection) {
-			logger.info('instance connected to at least one device');
-		} else {
-			logger.info('instance disconnected from all devices');
-		}
-		isConnected = haveConnection;
+        }
+    }
 
-		logger.debug('info.connection set to '+ isConnected);
-		adapter.setState('info.connection', isConnected, true);
-	}
+    if (isConnected !== haveConnection) {
+        if (haveConnection) {
+            logger.info('instance connected to at least one device');
+        } else {
+            logger.info('instance disconnected from all devices');
+        }
+        isConnected = haveConnection;
+
+        logger.debug('info.connection set to ' + isConnected);
+        adapter.setState('info.connection', isConnected, true);
+    }
 }
 
 /**
@@ -526,79 +526,79 @@ function handleConnectionInfo() {
  *
  */
 function validateConfig() {
-	let ok			= true;
+    let ok = true;
 
-	let oidSets 	= {};
-	let authSets	= {};
+    let oidSets = {};
+    let authSets = {};
 
     logger.debug('validateConfig - verifying oid-sets');
 
     // ensure that at least empty config exists
-    adapter.config.oids     = adapter.config.oids       || []; 
-    adapter.config.authSets = adapter.config.authSets   || [];
-    adapter.config.devs     = adapter.config.devs       || [];
+    adapter.config.oids = adapter.config.oids || [];
+    adapter.config.authSets = adapter.config.authSets || [];
+    adapter.config.devs = adapter.config.devs || [];
 
-    if (!adapter.config.oids.length) { 
+    if (!adapter.config.oids.length) {
         logger.error('no oids configured, please add configuration.');
         ok = false;
     };
-    
-    for (let ii=0; ii < adapter.config.oids.length; ii++) {
+
+    for (let ii = 0; ii < adapter.config.oids.length; ii++) {
         let oid = adapter.config.oids[ii];
 
         if (!oid.oidAct) continue;
 
-        oid.oidGroup    = oid.oidGroup.trim();
-        oid.oidName     = oid.oidName.trim();
-        oid.oidOid      = oid.oidOid.trim().replace(/^\./, '');
+        oid.oidGroup = oid.oidGroup.trim();
+        oid.oidName = oid.oidName.trim();
+        oid.oidOid = oid.oidOid.trim().replace(/^\./, '');
 
         let oidGroup = oid.oidGroup;
 
-        if (!oid.oidGroup) { 
+        if (!oid.oidGroup) {
             logger.error('oid group must not be empty, please correct configuration.');
             ok = false;
         };
 
-        if (!oid.oidName) { 
+        if (!oid.oidName) {
             logger.error('oid name must not be empty, please correct configuration.');
             ok = false;
         };
 
-        if (!oid.oidOid) { 
+        if (!oid.oidOid) {
             logger.error('oid must not be empty, please correct configuration.');
             ok = false;
         };
 
-        if (! /^\d+(\.\d+)*$/.test(oid.oidOid)){
-            logger.error('oid "'+oid.oidOid+'" has invalid format, please correct configuration.');
+        if (! /^\d+(\.\d+)*$/.test(oid.oidOid)) {
+            logger.error('oid "' + oid.oidOid + '" has invalid format, please correct configuration.');
             ok = false;
         }
-    
+
         // TODO: oidGroup                       must be unique
         // TODO: oidGroup + oidName             must be unique
         // TODO: oidGroup + oidName + oidOid    must be unique
-        
+
         oidSets[oidGroup] = true;
-    
+
     }
 
     if (!ok) {
         logger.debug('validateConfig - validation aborted (checks failed)');
         return false;
     }
-    
+
     logger.debug('validateConfig - verifying authorization data');
 
-    for (let ii=0; ii < adapter.config.authSets.length; ii++) {
+    for (let ii = 0; ii < adapter.config.authSets.length; ii++) {
         let authSet = adapter.config.authSets[ii];
-        let authId 	= authSet.authId;
-        if (!authId || authId=='') { 
+        let authId = authSet.authId;
+        if (!authId || authId == '') {
             logger.error('empty authorization id detected, please correct configuration.');
             ok = false;
             continue;
         };
-        if (authSets[authSet]) { 
-            logger.error('duplicate authorization id '+authId+' detected, please correct configuration.');
+        if (authSets[authSet]) {
+            logger.error('duplicate authorization id ' + authId + ' detected, please correct configuration.');
             ok = false;
             continue;
         };
@@ -609,74 +609,74 @@ function validateConfig() {
         logger.debug('validateConfig - validation aborted (checks failed)');
         return false;
     }
-    
+
     logger.debug('validateConfig - verifying devices');
 
-    if (!adapter.config.devs.length) { 
+    if (!adapter.config.devs.length) {
         logger.error('no devices configured, please add configuration.');
         ok = false;
     };
-    
-    for (let ii=0; ii < adapter.config.devs.length; ii++) {
+
+    for (let ii = 0; ii < adapter.config.devs.length; ii++) {
         let dev = adapter.config.devs[ii];
-        
+
         if (!dev.devAct) continue;
 
-        dev.devName         = dev.devName.trim();
-        dev.devIpAddr       = dev.devIpAddr.trim();
-        dev.devOidGroup     = dev.devOidGroup.trim();
-        dev.devAuthId       = dev.devAuthId.trim();
-        dev.devTimeout      = dev.devTimeout;
-        dev.devRetryIntvl   = dev.devRetryIntvl;
-        dev.devPollIntvl    = dev.devPollIntvl;
+        dev.devName = dev.devName.trim();
+        dev.devIpAddr = dev.devIpAddr.trim();
+        dev.devOidGroup = dev.devOidGroup.trim();
+        dev.devAuthId = dev.devAuthId.trim();
+        dev.devTimeout = dev.devTimeout;
+        dev.devRetryIntvl = dev.devRetryIntvl;
+        dev.devPollIntvl = dev.devPollIntvl;
 
-        if (/^\d+\.\d+\.\d+\.\d+(\:\d+)?$/.test(dev.devIpAddr)){
+        if (/^\d+\.\d+\.\d+\.\d+(\:\d+)?$/.test(dev.devIpAddr)) {
             /* might be ipv4 - to be checked further */
         } else {
-            logger.error('ip address "'+dev.devIpAddr+'" has invalid format, please correct configuration.');
+            logger.error('ip address "' + dev.devIpAddr + '" has invalid format, please correct configuration.');
             ok = false;
         }
 
-        if (!dev.devOidGroup || dev.devOidGroup == '' ) { 
-            logger.error('device '+dev.devName+' ('+dev.devIpAddr+') does not specify a oid group. Please correct configuration.');
+        if (!dev.devOidGroup || dev.devOidGroup == '') {
+            logger.error('device ' + dev.devName + ' (' + dev.devIpAddr + ') does not specify a oid group. Please correct configuration.');
             ok = false;
         };
 
-        if (dev.devOidGroup && dev.devOidGroup != '' && !oidSets[dev.devOidGroup] ) { 
-            logger.error('device '+dev.devName+' ('+dev.devIpAddr+') references unknown or completly inactive oid group '+dev.devOidGroup+'. Please correct configuration.');
+        if (dev.devOidGroup && dev.devOidGroup != '' && !oidSets[dev.devOidGroup]) {
+            logger.error('device ' + dev.devName + ' (' + dev.devIpAddr + ') references unknown or completly inactive oid group ' + dev.devOidGroup + '. Please correct configuration.');
             ok = false;
         };
 
-        if (dev.devSnmpVers == SNMP_V3 && dev.authId =='') { 
-            logger.error('device '+dev.devName+' ('+dev.devIpAddr+') requires valid authorization id. Please correct configuration.');
+        if (dev.devSnmpVers == SNMP_V3 && dev.authId == '') {
+            logger.error('device ' + dev.devName + ' (' + dev.devIpAddr + ') requires valid authorization id. Please correct configuration.');
             ok = false;
         };
 
-        if (dev.devSnmpVers == SNMP_V3 && dev.devAuthId !='' && !oidSets[dev.devAuthId]) { 
-            logger.error('device '+dev.devName+' ('+dev.devIpAddr+') references unknown authorization group '+dev.devAuthId+'. Please correct configuration.');
+        if (dev.devSnmpVers == SNMP_V3 && dev.devAuthId != '' && !oidSets[dev.devAuthId]) {
+            logger.error('device ' + dev.devName + ' (' + dev.devIpAddr + ') references unknown authorization group ' + dev.devAuthId + '. Please correct configuration.');
             ok = false;
         };
-        
-        if (!/^\d+$/.test(dev.devTimeout)){
-            logger.error('device "'+dev.devName+'" - timeout ('+dev.devTimeout+') must be numeric, please correct configuration.');
+
+        if (!/^\d+$/.test(dev.devTimeout)) {
+            logger.error('device "' + dev.devName + '" - timeout (' + dev.devTimeout + ') must be numeric, please correct configuration.');
             ok = false;
         };
         dev.devTimeout = parseInt(dev.devTimeout, 10) || 5;
-        
-        if (!/^\d+$/.test(dev.devRetryIntvl)){
-            logger.error('device "'+dev.devName+'" - retry intervall ('+dev.devRetryIntvl+') must be numeric, please correct configuration.');
+
+        if (!/^\d+$/.test(dev.devRetryIntvl)) {
+            logger.error('device "' + dev.devName + '" - retry intervall (' + dev.devRetryIntvl + ') must be numeric, please correct configuration.');
             ok = false;
         };
         dev.devRetryIntvl = parseInt(dev.devRetryIntvl, 10) || 5;
 
-        if (!/^\d+$/.test(dev.devPollIntvl)){
-            logger.error('device "'+dev.devName+'" - poll intervall ('+dev.devPollIntvl+') must be numeric, please correct configuration.');
+        if (!/^\d+$/.test(dev.devPollIntvl)) {
+            logger.error('device "' + dev.devName + '" - poll intervall (' + dev.devPollIntvl + ') must be numeric, please correct configuration.');
             ok = false;
         };
         dev.devPollIntvl = parseInt(dev.devPollIntvl, 10) || 30;
 
-        if (dev.devPollIntvl < 5 ) {
-            logger.warn('device "'+dev.devName+'" - poll intervall ('+dev.devPollIntvl+') must be at least 5 seconds, please correct configuration.');
+        if (dev.devPollIntvl < 5) {
+            logger.warn('device "' + dev.devName + '" - poll intervall (' + dev.devPollIntvl + ') must be at least 5 seconds, please correct configuration.');
             dev.devPollIntvl = 5;
         }
     };
@@ -684,10 +684,10 @@ function validateConfig() {
     if (!ok) {
         logger.debug('validateConfig - validation aborted (checks failed)');
         return false;
-    }    
-    
-	logger.debug('validateConfig - validation completed (checks passed)');
-	return true;
+    }
+
+    logger.debug('validateConfig - validation completed (checks passed)');
+    return true;
 }
 
 /**
@@ -708,54 +708,54 @@ function validateConfig() {
  *		inactive	boolean	true if connection to device is active
  */
 function setupContices() {
-	logger.debug('setupContices - initializing contices');
+    logger.debug('setupContices - initializing contices');
 
-    for (let ii=0, jj=0; ii < adapter.config.devs.length; ii++) {
+    for (let ii = 0, jj = 0; ii < adapter.config.devs.length; ii++) {
         let dev = adapter.config.devs[ii];
-        
-        if (!dev.devAct){ 
+
+        if (!dev.devAct) {
             continue;
         };
-        
-        logger.debug('adding device "'+dev.devIpAddr+'" ('+dev.devName+')');
+
+        logger.debug('adding device "' + dev.devIpAddr + '" (' + dev.devName + ')');
 
         // TODO: ipV6 support
-        const tmp    = dev.devIpAddr.split(':');
+        const tmp = dev.devIpAddr.split(':');
         const ipAddr = tmp[0];
         const ipPort = tmp[1] || 161;
 
-        CTXs[jj]            = {};
-        CTXs[jj].name       = dev.devName;
-        CTXs[jj].ipAddr     = ipAddr;
-        CTXs[jj].ipPort     = ipPort;
-        CTXs[jj].id         = adapter.config.optUseName ? dev.devName : ip2ipStr(CTXs[jj].ipAddr); //TODO: IPv6 requires changes
-        CTXs[jj].isIPv6     = false;
-        CTXs[jj].timeout    = dev.devTimeout*1000;      //s -> ms
-        CTXs[jj].retryIntvl = dev.devRetryIntvl*1000;    //s -> ms
-        CTXs[jj].pollIntvl  = dev.devPollIntvl*1000;     //s -> ms
-        CTXs[jj].snmpVers   = dev.devSnmpVers;
-        CTXs[jj].authId     = dev.devAuthId;
-        CTXs[jj].oids       = [];
-        CTXs[jj].ids        = [];
+        CTXs[jj] = {};
+        CTXs[jj].name = dev.devName;
+        CTXs[jj].ipAddr = ipAddr;
+        CTXs[jj].ipPort = ipPort;
+        CTXs[jj].id = adapter.config.optUseName ? dev.devName : ip2ipStr(CTXs[jj].ipAddr); //TODO: IPv6 requires changes
+        CTXs[jj].isIPv6 = false;
+        CTXs[jj].timeout = dev.devTimeout * 1000;      //s -> ms
+        CTXs[jj].retryIntvl = dev.devRetryIntvl * 1000;    //s -> ms
+        CTXs[jj].pollIntvl = dev.devPollIntvl * 1000;     //s -> ms
+        CTXs[jj].snmpVers = dev.devSnmpVers;
+        CTXs[jj].authId = dev.devAuthId;
+        CTXs[jj].oids = [];
+        CTXs[jj].ids = [];
 
-        CTXs[jj].pollTimer  = null;     // poll intervall timer
-        CTXs[jj].session    = null;     // snmp session
-        CTXs[jj].inactive   = true;     // connection status of device
-        
-        for (let oo=0; oo < adapter.config.oids.length; oo++) {
+        CTXs[jj].pollTimer = null;     // poll intervall timer
+        CTXs[jj].session = null;     // snmp session
+        CTXs[jj].inactive = true;     // connection status of device
+
+        for (let oo = 0; oo < adapter.config.oids.length; oo++) {
             let oid = adapter.config.oids[oo];
 
             // skip inactive oids and oids belonging to other oid groups
             if (!oid.oidAct) continue;
             if (dev.devOidGroup != oid.oidGroup) continue;
-            
+
             let id = CTXs[jj].id + '.' + name2id(oid.oidName);
             CTXs[jj].oids.push(oid.oidOid);
             CTXs[jj].ids.push(id);
-            
-            logger.debug('       oid "'+oid.oidOid+'" ('+id+')');
+
+            logger.debug('       oid "' + oid.oidOid + '" (' + id + ')');
         }
-        
+
         jj++;
     }
 }
@@ -771,12 +771,12 @@ function setupContices() {
  */
 async function onReady() {
 
-	await logger.debug("onReady triggered");
+    await logger.debug("onReady triggered");
 
     if (doInstall) {
-        const instUtils =  new mcmInstUtils(adapter, logger);
+        const instUtils = new mcmInstUtils(adapter, logger);
 
-        await logger.info("performing installation");        
+        await logger.info("performing installation");
         await instUtils.doUpgrade();
         await logger.info("installation completed");
 
@@ -785,12 +785,12 @@ async function onReady() {
     }
 
     {
-        const cfgVers   = adapter.config.cfgVers || '0';
-        const OIDs      = adapter.config.OIDs;
+        const cfgVers = adapter.config.cfgVers || '0';
+        const OIDs = adapter.config.OIDs;
 
-        if ( cfgVers == 0 || OIDs) {
-            const instUtils =  new mcmInstUtils(adapter, logger);
-            await logger.info("performing delayed installation");        
+        if (cfgVers == 0 || OIDs) {
+            const instUtils = new mcmInstUtils(adapter, logger);
+            await logger.info("performing delayed installation");
             await instUtils.doUpgrade(adapter.instance);
             await logger.info("installation completed");
 
@@ -802,36 +802,36 @@ async function onReady() {
     }
 
     // mark adapter as non active
-	await adapter.setStateAsync('info.connection', false, true);
+    await adapter.setStateAsync('info.connection', false, true);
 
-	// validate config
-	if (!validateConfig(adapter.config)) {
-		await logger.error('invalid config, cannot continue');
-		adapter.disable();
-		return;
-	}
+    // validate config
+    if (!validateConfig(adapter.config)) {
+        await logger.error('invalid config, cannot continue');
+        adapter.disable();
+        return;
+    }
 
-	
+
     // setup worker thread contices
     setupContices();
-    
+
     // init all objects
     await initAllObjects();
-    
-	await logger.debug('initialization completed');
 
-	// start one reader thread per device
-	await logger.debug('starting reader threads');
-    for (let ii=0; ii<CTXs.length; ii++) { 
-		const CTX = CTXs[ii];
-		createSession(CTX);
-	}
-	
-	// start connection info updater
-	await logger.debug('startconnection info updater');
+    await logger.debug('initialization completed');
+
+    // start one reader thread per device
+    await logger.debug('starting reader threads');
+    for (let ii = 0; ii < CTXs.length; ii++) {
+        const CTX = CTXs[ii];
+        createSession(CTX);
+    }
+
+    // start connection info updater
+    await logger.debug('startconnection info updater');
     connUpdateTimer = setInterval(handleConnectionInfo, 15000)
 
-	await logger.debug('startup completed');
+    await logger.debug('startup completed');
 
 }
 
@@ -843,59 +843,59 @@ async function onReady() {
  *
  */
 function onUnload(callback) {
-	logger.debug("onUnload triggered");
-    
-    for (let ii=0; ii<CTXs.length; ii++) { 
-		const CTX = CTXs[ii];
+    logger.debug("onUnload triggered");
+
+    for (let ii = 0; ii < CTXs.length; ii++) {
+        const CTX = CTXs[ii];
 
         // (re)set device online status
         try {
             adapter.setState(CTX.id + '.online', false, true);
-        } catch {};
+        } catch { };
 
         // close session if one exists
-        if (CTX.pollTimer ) {
+        if (CTX.pollTimer) {
             try {
                 clearInterval(CTX.pollTimer);
-            } catch {};
+            } catch { };
             CTX.pollTimer = null;
         };
 
         if (CTX.session) {
             try {
-                CTX.session.on('error', null ); // avoid nesting callbacks
-                CTX.session.on('close', null ); // avoid nesting callbacks
+                CTX.session.on('error', null); // avoid nesting callbacks
+                CTX.session.on('close', null); // avoid nesting callbacks
                 CTX.session.close();
-            } catch {}
+            } catch { }
             CTX.session = null;
         }
-	};
+    };
 
-	if (connUpdateTimer) {
+    if (connUpdateTimer) {
         try {
             clearInterval(connUpdateTimer);
-        } catch {};
-		connUpdateTimer = null;
+        } catch { };
+        connUpdateTimer = null;
     };
 
     try {
         adapter.setState('info.connection', false, true);
-    } catch {};
+    } catch { };
 
-	// callback must be called under all circumstances
+    // callback must be called under all circumstances
     callback && callback();
 }
 
 /**
  * here we start
  */
-console.log( "DEBUG  : snmp adapter initializing ("+process.argv+") ..."); //logger not yet initialized
+console.log("DEBUG  : snmp adapter initializing (" + process.argv + ") ..."); //logger not yet initialized
 
 if (process.argv) {
     for (let a = 1; a < process.argv.length; a++) {
         if (process.argv[a] === '--install') {
             doInstall = true;
-            process.on('exit', function(){
+            process.on('exit', function () {
                 if (!didInstall) {
                     console.log("WARNING: migration of config skipped - ioBroker might be stopped");
                 }
@@ -905,9 +905,9 @@ if (process.argv) {
 }
 
 if (require.main !== module) {
-	// Export startAdapter in compact mode
-	module.exports = startAdapter;
+    // Export startAdapter in compact mode
+    module.exports = startAdapter;
 } else {
-	// otherwise start the instance directly
-	startAdapter();
+    // otherwise start the instance directly
+    startAdapter();
 }
