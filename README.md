@@ -20,7 +20,7 @@ This adapter can be used to poll information from devices like printers, network
 <!--
 ## __WORK IN PROGRESS__
 -->
-### __WORK IN PROGRESS__
+### 2.0.0-beta.6 (2022-07-20)
 * IMPORTANT: This release will change the configuration structures!
   Please backup your configuration before starting the installation.
   The Installation will try to convert the old configuration - but it is not guaranteed to succeed in all cases. 
