@@ -371,13 +371,12 @@ async function createSession(pCTX) {
     adapter.setState(pCTX.id + '.online', false, true);
 
     // close old session if one exists
+    if (pCTX.retryTimer) {
+        clearTimeout(pCTX.retryTimer);
+        pCTX.retryTimer = null;
+    };
     if (pCTX.pollTimer) {
-        try {
-            clearInterval(pCTX.pollTimer);
-        } catch
-        {
-            await logger.warn('cannot cancel timer for device "' + pCTX.name + '" (' + pCTX.ip + '), ' + e);
-        };
+        clearInterval(pCTX.pollTimer);
         pCTX.pollTimer = null;
     };
     if (pCTX.session) {
