@@ -7,10 +7,11 @@
         {
             "name": "Launch normal",
             "program": "${workspaceFolder}/main.js",
-            "args": ["--instance", "0", "--force", "--log", "--debug"],
+            "args": ["--instance", "0", "--force", "--logs", "--debug"],
             "request": "launch",
             "stopOnEntry": true,
             "console": "internalConsole",
+            "outputCapture": "std",
             "skipFiles": [
                 "<node_internals>/**"
             ],
@@ -20,10 +21,11 @@
         {
             "name": "Launch install",
             "program": "${workspaceFolder}/main.js",
-            "args": ["--instance", "0", "--force", "--log", "--debug", "--install"],
+            "args": ["--instance", "0", "--force", "--logs", "--debug", "--install"],
             "request": "launch",
             "stopOnEntry": true,
             "console": "internalConsole",
+            "outputCapture": "std",
             "skipFiles": [
                 "<node_internals>/**"
             ],
