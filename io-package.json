@@ -15,18 +15,6 @@
         "pl": "* IMPORTANT: Wydanie zmieni strukturę konfiguracji!\nPozwólcie na tył przed rozpoczęciem instalacji.\nInstalacja będzie starała się przekształcić starą konfigurację, ale nie jest zagwarantowana w żadnych przypadkach.\n* Wiele fragmentów kodu zostało przepisanych\n* Administrator korzysta z interfejsu admin5\nWartość * Timer może być ustawiona w różny sposób (#105)\n* Zmianowanie kolejności konfiguracyjnych nie niszcza danych (#15)\n* Narządy dla urządzeń mogą być obecnie nazywane. Stare zachowanie jest dostępne jako opcja.\n* Znana restrykcja: obecnie tylko SNMP V1.\n* Znana restrykcja: Atrybuty opcjonalne i piśmienne nie są jeszcze wdrożone.",
         "zh-cn": "* IMPORTANT:这一释放将改变结构!\n请在开始安装之前支持你的配置。.\n乱葬将设法改变旧的格局,但不能保证在所有情况下取得成功。.\n* A/64/50。 守则的许多部分已经改写。\n* A/64/50。 适应者现在使用了特明5个接口。\n* 时间数值现在可按不同类型确定(第105号)。\n* 更改组合物品的顺序不再销毁数据(第15号)。\n* 目前可以指定国家对装置的控制。 旧的行为可以作为一种选择。.\n* Known限制:目前只有SNMP V1得到支持。.\n* Known限制: 未执行裁研所的任择和可写性。."
       },
-      "2.0.0-beta.4": {
-        "en": "* IMPORTANT: This release will change the configuration structures!\n  Please backup your configuration before starting the installation.\n  The Installation will try to convert the old configuration - but it is not guaranteed to succeed in all cases. \n* Many parts of the code have been rewriten\n* The adapter now uses the admin5 interface\n* Timer values can now be set differently per device (#105)\n* Changing the order of configuration entries does no longer destroy data (#15)\n* Stateobjects for devices can now be named. The old behavior is available as an option.\n* Known restriction: currently only SNMP V1 is supported.\n* Known restriction: OID attributes optional and writeable are not yet implemented.",
-        "de": "* WICHTIG: Diese Veröffentlichung wird die Konfigurationsstrukturen ändern!\nBitte sichern Sie Ihre Konfiguration, bevor Sie die Installation starten.\nDie Installation wird versuchen, die alte Konfiguration umzuwandeln - aber in allen Fällen ist es nicht garantiert, erfolgreich zu sein.\n* Viele Teile des Codes wurden neu geschrieben\n* Der Adapter nutzt nun die Admin5-Schnittstelle\n* Timer-Werte können nun je Gerät unterschiedlich eingestellt werden (#105)\n* Die Änderung der Reihenfolge der Konfigurationseinträge zerstört keine Daten mehr (#15)\n* Stateobjects für Geräte können jetzt benannt werden. Das alte Verhalten ist als Option verfügbar.\n* Bekannte Einschränkung: derzeit wird nur SNMP V1 unterstützt.\n* Bekannte Einschränkung: OID-Attribute optional und schreibbar sind noch nicht implementiert.",
-        "ru": "* ВАЖНО: Этот релиз изменит структуры конфигурации!\nПожалуйста, резервируйте конфигурацию перед запуском установки.\nУстановка попытается конвертировать старую конфигурацию - но она не гарантирована для достижения успеха во всех случаях.\n* Много частей кода были rewriten\n* Теперь адаптер использует интерфейс admin5\n* Значения таймера теперь могут быть установлены по-разному на устройство (#105)\n* Изменение порядка записи конфигурации больше не уничтожает данные (#15)\n* Stateobjects для устройств теперь можно назвать. Старое поведение доступно как вариант.\n* Известное ограничение: в настоящее время поддерживается только SNMP V1.\n* Известное ограничение: OID атрибуты необязательные и таблички еще не реализованы.",
-        "pt": "* IMPORTANTE: Esta versão irá alterar as estruturas de configuração!\nFaça backup da configuração antes de iniciar a instalação.\nA instalação tentará converter a configuração antiga - mas não é garantido para ter sucesso em todos os casos.\n* Muitas partes do código foram reescrevedas\n* O adaptador agora usa a interface admin5\n* Os valores do temporizador agora podem ser definidos de forma diferente por dispositivo (#105)\n* Alterar a ordem de entradas de configuração não destrói mais dados (#15)\n* Os objetos estatais para dispositivos podem agora ser nomeados. O comportamento antigo está disponível como opção.\n* Limitação conhecida: atualmente apenas SNMP V1 é suportado.\n* Limitação conhecida: Os atributos OID opcionais e escritíveis ainda não são implementados.",
-        "nl": "Deze vrijlating zal de zelfverzekeringsstructuur veranderen!\nVersterking voor de installatie.\nDe installatie zal proberen de oude zelfvertrouwen te bekeren, maar het is niet gegarandeerd te slagen in alle gevallen.\n♪ Veel delen van de code zijn herschreven\n♪ De adapter gebruikt nu de administratie interface\n♪ Timer waarden kunnen nu anders worden opgezet\n♪ Changing the order of configuration intries don't vernietigen data (15)\n♪ Stateobjects for apparatuur kan nu genoemd worden. Het oude gedrag is beschikbaar als een optie.\nOp dit moment is alleen SNMP V1 ondersteund.\n♪ Known beperking: OID geeft optie en schrijfbaarheid nog niet toe.",
-        "fr": "* IMPORTANT: Cette version changera les structures de configuration!\nVeuillez sauvegarder votre configuration avant de démarrer l'installation.\nL'Installation tentera de convertir l'ancienne configuration - mais il n'est pas garanti de réussir dans tous les cas.\n* De nombreuses parties du code ont été réécrites\n* L'adaptateur utilise maintenant l'interface admin5\n* Les valeurs temporelles peuvent maintenant être définies différemment selon le dispositif (#105)\n* Changer l'ordre des entrées de configuration ne détruit plus les données (#15)\n* Les objets d'état pour les appareils peuvent maintenant être nommés. L'ancien comportement est disponible en option.\n* Limite connue: actuellement seul SNMP V1 est supporté.\n* Limite connue: Les attributs OID en option et écriture ne sont pas encore implémentés.",
-        "it": "* IMPORTANTE: Questa versione cambierà le strutture di configurazione!\nSi prega di eseguire il backup della configurazione prima di avviare l'installazione.\nL'installazione cercherà di convertire la vecchia configurazione - ma non è garantito avere successo in tutti i casi.\n# Molte parti del codice sono state riscritte\n# L'adattatore ora utilizza l'interfaccia di admin5\n* I valori del timer possono ora essere impostati in modo diverso per dispositivo (#105)\n* Cambiare l'ordine delle voci di configurazione non distrugge più i dati (#15)\n* Gli oggetti di stato per i dispositivi possono ora essere nominati. Il vecchio comportamento è disponibile come opzione.\n* Limite noto: attualmente solo SNMP V1 è supportato.\n* Limite noto: Gli attributi OID facoltativi e scrivibili non sono ancora implementati.",
-        "es": "* IMPORTANTE: ¡Esta versión cambiará las estructuras de configuración!\nPor favor, respalde su configuración antes de iniciar la instalación.\nLa instalación intentará convertir la antigua configuración - pero no está garantizada a tener éxito en todos los casos.\n* Muchas partes del código han sido reescribidas\n* El adaptador ahora utiliza la interfaz admin5\n* Los valores del temporizador se pueden configurar de forma diferente por dispositivo (#105)\n* Cambiar el orden de las entradas de configuración ya no destruye datos (#15)\n* Los objetivos de los dispositivos pueden ser nombrados ahora. El comportamiento antiguo está disponible como opción.\n* Restricción conocida: actualmente sólo se admite SNMP V1.\n* Restricción conocida: Atributos OID opcionales y escribibles todavía no se implementan.",
-        "pl": "* IMPORTANT: Wydanie zmieni strukturę konfiguracji!\nPozwólcie na tył przed rozpoczęciem instalacji.\nInstalacja będzie starała się przekształcić starą konfigurację, ale nie jest zagwarantowana w żadnych przypadkach.\n* Wiele fragmentów kodu zostało przepisanych\n* Administrator korzysta z interfejsu admin5\nWartość * Timer może być ustawiona w różny sposób (#105)\n* Zmianowanie kolejności konfiguracyjnych nie niszcza danych (#15)\n* Narządy dla urządzeń mogą być obecnie nazywane. Stare zachowanie jest dostępne jako opcja.\n* Znana restrykcja: obecnie tylko SNMP V1.\n* Znana restrykcja: Atrybuty opcjonalne i piśmienne nie są jeszcze wdrożone.",
-        "zh-cn": "* IMPORTANT:这一释放将改变结构!\n请在开始安装之前支持你的配置。.\n乱葬将设法改变旧的格局,但不能保证在所有情况下取得成功。.\n* A/64/50。 守则的许多部分已经改写。\n* A/64/50。 适应者现在使用了特明5个接口。\n* 时间数值现在可按不同类型确定(第105号)。\n* 更改组合物品的顺序不再销毁数据(第15号)。\n* 目前可以指定国家对装置的控制。 旧的行为可以作为一种选择。.\n* Known限制:目前只有SNMP V1得到支持。.\n* Known限制: 未执行裁研所的任择和可写性。."
-      },
       "1.0.0": {
         "en": "IMPORTANT: This release will change the object structures!!\nreduce latency for update of info.connection \navoid excessive error logs if target is unreachable, optimize logging\nadd additional online at ip base to indicate target is reachable\noutput warning if OIDs specify different communities for one device\nAdd Sentry for crash reporting",
         "de": "WICHTIG: Diese Version wird die Objektstrukturen ändern!!\nLatenzreduzierung für die Aktualisierung von info.connection\nVermeidung von übermäßigen Fehlerprotokollen, falls das Ziel nicht erreichbar ist und Protokollierungoptimierung\nOnline Status der IP-Adresse zur Anzeige der Erreichbarkeit hinzugefügt\nAusgabe einer Warnung, wenn OIDs unterschiedlicher Communities für ein Gerät angeben werden\nSentry für Absturzberichte hinzugefügt",
@@ -124,6 +112,57 @@
         "condition": {
           "operand": "and",
           "rules": [
+            "oldVersion<1.0.0",
+            "newVersion>=1.0.0"
+          ]
+        },
+        "title": {
+          "en": "Important notice!",
+          "de": "Wichtiger Hinweis!",
+          "ru": "Важное замечание!",
+          "pt": "Notícia importante!",
+          "nl": "Belangrijke mededeling!",
+          "fr": "Avis important!",
+          "it": "Avviso IMPORTANTE!",
+          "es": "Noticia importante!",
+          "pl": "Ważna uwaga!",
+          "zh-cn": "重要通知!"
+        },
+        "text": {
+          "en": "Version 1.0.0 will change the names of objects containing special characters like \\\".\\\", \\\"-\\\" or spaces! Please delete the old objects manually if needed.",
+          "de": "Version 1.0.0 ändert die Namen von Objekten, die spezielle Zeichen wie \\\"\\\", \\\"-\\\" oder Leerzeichen enthalten! Bitte löschen Sie die alten Objekte bei Bedarf manuell.",
+          "ru": "Версия 1.0.0 изменит имена объектов, содержащих специальные символы, такие как \\\".\\\", \\\"-\\\" или пространства! Пожалуйста, удалите старые объекты вручную, если это необходимо.",
+          "pt": "A versão 1.0.0 mudará os nomes de objetos contendo caracteres especiais como \\\".\\\", \\\"-\\\" ou espaços! Por favor, exclua os objetos antigos manualmente, se necessário.",
+          "nl": "Version 1.0.0 zal de namen veranderen van objecten met speciale personages zoals . Verwijder de oude objecten handmatig als het nodig is.",
+          "fr": "La version 1.0.0 va changer les noms des objets contenant des caractères spéciaux comme \\\".\\\", \\\"-\\\" ou des espaces! Veuillez supprimer les anciens objets manuellement si nécessaire.",
+          "it": "La versione 1.0.0 cambierà i nomi di oggetti contenenti caratteri speciali come \\\", \\\"-\\\" o spazi! Si prega di eliminare i vecchi oggetti manualmente se necessario.",
+          "es": "Versión 1.0.0 cambiará los nombres de objetos que contienen caracteres especiales como \\\".\\\", \\\"-\\\" o espacios! Por favor, borre los viejos objetos manualmente si es necesario.",
+          "pl": "Wersja 1.0.0 zmienia nazwę obiektów o specjalnych postaciach, takich jak: \\, \\ lub przestrzeni! Okazuje się, że stare obiekty ręcznie będą potrzebne.",
+          "zh-cn": "Version1.0.0将改变含有特殊特性的物体的名称,如乙型号、乙型号或空间。 请在必要时删除旧物体。."
+        },
+        "link": "https://github.com/iobroker-community-adapters/ioBroker.snmp#changelog",
+        "level": "warn",
+        "linkText": {
+          "en": "Changelog",
+          "de": "Änderungsprotokoll",
+          "ru": "Список изменений",
+          "pt": "Registro de alterações",
+          "nl": "Wijzigingslog",
+          "fr": "Journal des modifications",
+          "it": "Registro delle modifiche",
+          "es": "registro de cambios",
+          "pl": "Dziennik zmian",
+          "zh-cn": "变更日志"
+        },
+        "buttons": [
+          "agree",
+          "cancel"
+        ]
+      },
+      {
+        "condition": {
+          "operand": "and",
+          "rules": [
             "oldVersion<2.0.0",
             "newVersion>=2.0.0"
           ]
@@ -141,16 +180,16 @@
           "zh-cn": "重要通知!"
         },
         "text": {
-          "en": "Version 1.0.0 will change the names of objects containing special characters like \\\".\\\", \\\"-\\\" or spaces! Please delete the old objects manually if needed.\nConfiguration data has been changed for version 2.0.0 (and newer). Installation will try to migrate data but there is a chance that this fails. Please ensure that you have a backup and a external documention of your configuration before upgrading to version 2.0.0 or newer.",
-          "de": "Version 1.0.0 ändert die Namen von Objekten, die spezielle Zeichen wie \\\"\\\", \\\"-\\\" oder Leerzeichen enthalten! Bitte löschen Sie die alten Objekte bei Bedarf manuell.\nKonfigurationsdaten wurden für Version 2.0.0 (und neuer) geändert. Die Installation wird versuchen, Daten zu migrieren, aber es gibt eine Chance, dass dies versagt. Bitte stellen Sie sicher, dass Sie ein Backup und eine externe Dokumentation Ihrer Konfiguration vor dem Upgrade auf Version 2.0.0 oder neuer haben.",
-          "ru": "Версия 1.0.0 изменит имена объектов, содержащих специальные символы, такие как \\\".\\\", \\\"-\\\" или пространства! Пожалуйста, удалите старые объекты вручную, если это необходимо.\nДанные конфигурации были изменены для версии 2.0.0 (и новее). Установка будет пытаться перенести данные, но есть шанс, что это не работает. Пожалуйста, убедитесь, что у вас есть резервное копирование и внешний документирование вашей конфигурации перед обновлением до версии 2.0.0 или новее.",
-          "pt": "A versão 1.0.0 mudará os nomes de objetos contendo caracteres especiais como \\\".\\\", \\\"-\\\" ou espaços! Por favor, exclua os objetos antigos manualmente, se necessário.\nOs dados de configuração foram alterados para a versão 2.0.0 (e mais recente). A instalação tentará migrar dados, mas há uma chance de que isso falha. Certifique-se de ter um backup e uma documentação externa de sua configuração antes de atualizar para a versão 2.0.0 ou mais recente.",
-          "nl": "Version 1.0.0 zal de namen veranderen van objecten met speciale personages zoals . Verwijder de oude objecten handmatig als het nodig is.\nVermoedende data is veranderd voor versie 2.0. Installatie zal proberen data te verminderen maar er is een kans dat dit mislukt. Zorg ervoor dat je een back-up hebt en een externe documentie van je zelfvertrouwen voordat je verstoort naar versie 2.0 of nieuwer.",
-          "fr": "La version 1.0.0 va changer les noms des objets contenant des caractères spéciaux comme \\\".\\\", \\\"-\\\" ou des espaces! Veuillez supprimer les anciens objets manuellement si nécessaire.\nLes données de configuration ont été modifiées pour la version 2.0.0 (et plus récente). L'installation tentera de migrer les données, mais il y a une chance que cela échoue. Assurez-vous d'avoir une sauvegarde et une documentation externe de votre configuration avant de passer à la version 2.0.0 ou plus récente.",
-          "it": "La versione 1.0.0 cambierà i nomi di oggetti contenenti caratteri speciali come \\\", \\\"-\\\" o spazi! Si prega di eliminare i vecchi oggetti manualmente se necessario.\nI dati di configurazione sono stati modificati per la versione 2.0.0 (e più recente). L'installazione cercherà di migrare i dati, ma c'è la possibilità che questo fallisca. Si prega di assicurarsi di avere un backup e un documento esterno della configurazione prima di aggiornare alla versione 2.0.0 o più recente.",
-          "es": "Versión 1.0.0 cambiará los nombres de objetos que contienen caracteres especiales como \\\".\\\", \\\"-\\\" o espacios! Por favor, borre los viejos objetos manualmente si es necesario.\nLos datos de configuración se han modificado para la versión 2.0.0 (y más reciente). La instalación intentará migrar datos pero hay una posibilidad de que esto falle. Por favor, asegúrese de tener una copia de seguridad y una documentación externa de su configuración antes de actualizar a la versión 2.0.0 o más reciente.",
-          "pl": "Wersja 1.0.0 zmienia nazwę obiektów o specjalnych postaciach, takich jak: \\, \\ lub przestrzeni! Okazuje się, że stare obiekty ręcznie będą potrzebne.\nDane konfiguracyjne zostały zmienione na wersję 2.0.0 (i nowszą). Instalacja stara się wyemitować dane, ale istnieje szansa, że to się nie udaje. Zapewniajcie, że mamy backup i zewnętrzną dokumentację twojej wersji 2.0.0 lub nowszego.",
-          "zh-cn": "Version1.0.0将改变含有特殊特性的物体的名称,如乙型号、乙型号或空间。 请在必要时删除旧物体。.\n对2.0.0版本(和新版)的合并数据进行了修改。 绝大部分将试图迁移数据,但有失败的机会。 请确保在更新至2.0.0或新版之前,对你的配置进行反馈和外部记录。."
+          "en": "Configuration data has been changed for version 2.0.0 (and newer). Installation will try to migrate data but there is a chance that this fails. Please ensure that you have a backup and a external documention of your configuration before upgrading to version 2.0.0 or newer.",
+          "de": "Konfigurationsdaten wurden für Version 2.0.0 (und neuer) geändert. Die Installation wird versuchen, Daten zu migrieren, aber es gibt eine Chance, dass dies versagt. Bitte stellen Sie sicher, dass Sie ein Backup und eine externe Dokumentation Ihrer Konfiguration vor dem Upgrade auf Version 2.0.0 oder neuer haben.",
+          "ru": "Данные конфигурации были изменены для версии 2.0.0 (и новее). Установка будет пытаться перенести данные, но есть шанс, что это не работает. Пожалуйста, убедитесь, что у вас есть резервное копирование и внешний документирование вашей конфигурации перед обновлением до версии 2.0.0 или новее.",
+          "pt": "Os dados de configuração foram alterados para a versão 2.0.0 (e mais recente). A instalação tentará migrar dados, mas há uma chance de que isso falha. Certifique-se de ter um backup e uma documentação externa de sua configuração antes de atualizar para a versão 2.0.0 ou mais recente.",
+          "nl": "Vermoedende data is veranderd voor versie 2.0. Installatie zal proberen data te verminderen maar er is een kans dat dit mislukt. Zorg ervoor dat je een back-up hebt en een externe documentie van je zelfvertrouwen voordat je verstoort naar versie 2.0 of nieuwer.",
+          "fr": "Les données de configuration ont été modifiées pour la version 2.0.0 (et plus récente). L'installation tentera de migrer les données, mais il y a une chance que cela échoue. Assurez-vous d'avoir une sauvegarde et une documentation externe de votre configuration avant de passer à la version 2.0.0 ou plus récente.",
+          "it": "I dati di configurazione sono stati modificati per la versione 2.0.0 (e più recente). L'installazione cercherà di migrare i dati, ma c'è la possibilità che questo fallisca. Si prega di assicurarsi di avere un backup e un documento esterno della configurazione prima di aggiornare alla versione 2.0.0 o più recente.",
+          "es": "Los datos de configuración se han modificado para la versión 2.0.0 (y más reciente). La instalación intentará migrar datos pero hay una posibilidad de que esto falle. Por favor, asegúrese de tener una copia de seguridad y una documentación externa de su configuración antes de actualizar a la versión 2.0.0 o más reciente.",
+          "pl": "Dane konfiguracyjne zostały zmienione na wersję 2.0.0 (i nowszą). Instalacja stara się wyemitować dane, ale istnieje szansa, że to się nie udaje. Zapewniajcie, że mamy backup i zewnętrzną dokumentację twojej wersji 2.0.0 lub nowszego.",
+          "zh-cn": "对2.0.0版本(和新版)的合并数据进行了修改。 绝大部分将试图迁移数据,但有失败的机会。 请确保在更新至2.0.0或新版之前,对你的配置进行反馈和外部记录。."
         },
         "link": "https://github.com/iobroker-community-adapters/ioBroker.snmp#changelog",
         "level": "warn",
