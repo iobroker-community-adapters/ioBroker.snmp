@@ -188,7 +188,7 @@ function ip2ipStr(ip) {
 async function initObject(obj) {
     await logger.debug('initobject ' + obj._id);
     try {
-        await adapter.setObjectAsync(obj._id, obj);
+        await adapter.setObjectNotExistsAsync(obj._id, obj);
     } catch (e) {
         await logger.error('error initializing obj "' + obj._id + '" ' + e.message);
     }
