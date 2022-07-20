@@ -60,7 +60,7 @@ const AES256R = 4;
 // you need to create an adapter
 const utils = require('@iobroker/adapter-core');
 const { EXIT_CODES } = require('@iobroker/js-controller-common');
-const mcmInstUtils = require('./lib/mcmInstUtils');
+const InstallUtils = require('./lib/installUtils');
 
 // Load modules required by adapter
 const snmp = require('net-snmp');
@@ -770,7 +770,7 @@ async function onReady() {
     adapter.log.debug("onReady triggered");
 
     if (doInstall) {
-        const instUtils = new mcmInstUtils(adapter);
+        const instUtils = new InstallUtils(adapter);
 
         adapter.log.info("performing installation");
         await instUtils.doUpgrade();
@@ -786,7 +786,7 @@ async function onReady() {
         const OIDs = adapter.config.OIDs;
 
         if (cfgVers == 0 || OIDs) {
-            const instUtils = new mcmInstUtils(adapter);
+            const instUtils = new InstallUtils(adapter);
             adapter.log.info("performing delayed installation");
             await instUtils.doUpgrade(adapter.instance);
             adapter.log.info("installation completed");
