@@ -781,6 +781,7 @@ async function onReady() {
 
         didInstall = true;
         adapter.terminate("exit after migration of config", EXIT_CODES.NO_ERROR);
+        return; // shut down as soon as possible
     }
 
     {
@@ -796,6 +797,7 @@ async function onReady() {
             didInstall = true;
             if (await instUtils.doRestart) {
                 adapter.terminate("restart after migration of config", EXIT_CODES.NO_ERROR);
+                return; // shut down as soon as possible
             }
         }
     }
