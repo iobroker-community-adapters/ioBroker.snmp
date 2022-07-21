@@ -65,7 +65,7 @@
     "test:integration": "mocha test/integration --exit",
     "test": "npm run test:js && npm run test:package",
     "check": "tsc --noEmit -p tsconfig.check.json",
-    "install": "node main.js --install --debug --logs",
+    "install": "node main.js --install --logs",
     "lint": "eslint --ext .js,.jsx",
     "release": "release-script",
     "translate": "translate-adapter"
