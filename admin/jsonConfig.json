@@ -1,0 +1,378 @@
+{
+    "i18n": true,
+    "type": "tabs",
+    "items": {
+        "oidSets": {
+            "type": "panel",
+            "label": "lblOidSets",
+            "items": {
+				"_oidsInfo_1":{
+					"type": "staticText",
+					"text": "infoOidSets",
+					"style": {
+						"fontSize": 16
+					}
+				},
+				"_oidsErr_1":{
+					"type": "staticText",
+					"text": "errOidGrpMissing",
+					"newLine": true,
+					"hidden": "data.oids&&data.oids.length",
+					"validator":"data.oids&&data.oids.length",
+					"validatorNoSaveOnError": true,
+					"style": {
+						"fontSize": 16,
+						"color": "red"
+					}
+				},
+				"_oidsErr_2":{
+					"type": "staticText",
+					"text": "errOidGrpEmpty",
+					"newLine": true,
+					"hidden": "for(let ii=0; ii<data.oids.length; ii++) {if (data.oids[ii].oidGroup != ''){return 1;}}; return 0;",
+					"validator": "for(let ii=0; ii<data.oids.length; ii++) {if (data.oids[ii].oidGroup != ''){return 1;}}; return 0;",
+					"validatorNoSaveOnError": true,
+					"style": {
+						"fontSize": 16,
+						"color": "red"
+					}
+				},
+				"_oidsErr_3":{
+					"type": "staticText",
+					"text": "errOidEmpty",
+					"newLine": true,
+					"hidden": "for(let ii=0; ii<data.oids.length; ii++) {if (data.oids[ii].oid != ''){return 1;}}; return 0;",
+					"validator": "for(let ii=0; ii<data.oids.length; ii++) {if (data.oids[ii].oid != ''){return 1;}}; return 0;",
+					"validatorNoSaveOnError": true,
+					"style": {
+						"fontSize": 16,
+						"color": "red"
+					}
+				},
+				"divider":{
+					"type": "divider"
+				},
+                "oids": {
+                    "type": "table",
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "label": "lblOidGroups",
+                    "items": [
+                        {
+                            "type": "checkbox",
+                            "attr": "oidAct",
+                            "width": "10% ",
+                            "title": "lblOidAct",
+                            "filter": false,
+                            "sort": false,
+                            "default": true
+                        },
+                        {
+                            "type": "text",
+                            "attr": "oidGroup",
+                            "width": "15% ",
+                            "title": "lblOidGroup",
+                            "filter": false,
+                            "sort": true,
+							"validator": "data.oidGroup&&data.oidGroup!=''",
+							"validatorErrorText": "errOidGrpEmpty",
+							"validatorNoSaveOnError": true,
+                            "default": ""
+                        },
+                        {
+                            "type": "text",
+                            "attr": "oidName",
+                            "width": "20% ",
+                            "title": "lblOidName",
+                            "filter": false,
+                            "sort": true,
+							"validator": "data.oidName&&data.oidName!=''",
+							"validatorErrorText": "errOidNameEmpty",
+							"validatorNoSaveOnError": true,
+                            "default": ""
+                        },
+                        {
+                            "type": "text",
+                            "attr": "oidOid",
+                            "width": "30% ",
+                            "title": "lblOidOid",
+                            "filter": false,
+                            "sort": true,
+							"validator": "data.oidOid&&data.oidOid!=''",
+							"validatorErrorText": "errOidEmpty",
+							"validatorNoSaveOnError": true,
+                            "default": ""
+                        },
+                        {
+                            "type": "checkbox",
+                            "attr": "OidWriteable",
+                            "width": "10% ",
+                            "title": "lblOidWriteable",
+                            "filter": false,
+                            "sort": false,
+                            "default": false
+                        },
+                        {
+                            "type": "checkbox",
+                            "attr": "oidOptional",
+                            "width": "10% ",
+                            "title": "lblOidOptional",
+                            "filter": false,
+                            "sort": false,
+                            "default": false
+                        }						
+					]
+				}
+			}
+		},
+        
+        "devices": {
+            "type": "panel",
+            "label": "lblDevs",
+            "items": {
+				"_errDevices_1": {
+					"type": "staticText",
+					"text": "lblDevsInfo",
+					"newLine": true,
+					"hidden": "data.oids&&data.oids.length",
+					"validator":"data.oids&&data.oids.length",
+					"validatorNoSaveOnError": true,
+					"style": {
+						"fontSize": 16,
+						"textAlign": "center"
+					}
+				},
+				"divider":{
+					"type": "divider"
+				},
+                "devs": {
+                    "type": "table",
+					"newLine": true,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+					"hidden": "!(data.oids&&data.oids.length)",
+                    "label": "lblDevsDevices",
+                    "items": [
+                        {
+                            "type": "checkbox",
+                            "attr": "devAct",
+                            "width": "5% ",
+                            "title": "lblDevAct",
+                            "filter": false,
+                            "sort": false,
+                            "default": true
+                        },
+                        {
+                            "type": "text",
+                            "attr": "devName",
+                            "width": "30% ",
+                            "title": "lblDevName",
+                            "filter": false,
+                            "sort": false,
+                            "default": ""
+                        },
+                        {
+                            "type": "text",
+                            "attr": "devIpAddr",
+                            "width": "30% ",
+                            "title": "lblDevIpAddr",
+                            "filter": false,
+                            "sort": false,
+                            "default": "0.0.0.0"
+                        },
+                        {
+                            "type": "text",
+                            "attr": "devOidGroup",
+                            "width": "10% ",
+                            "title": "lblDevOidGroup",
+                            "filter": false,
+                            "sort": false,
+                            "default": ""
+                        },
+                        {
+                            "type": "select",
+                            "attr": "devSnmpVers",
+                            "width": "10% ",
+                            "title": "lblDevSnmpVers",
+                            "options": [
+                                { "label": "SNMP v1", "value": 1}
+                            ],
+                            "filter": false,
+                            "sort": false,
+                            "default": "1"
+                        },
+                        {
+                            "type": "text",
+                            "attr": "devAuthId",
+                            "width": "20% ",
+                            "title": "lblDevAuthId",
+                            "filter": false,
+                            "sort": false,
+                            "default": ""
+                        },
+                        {
+                            "type": "number",
+                            "attr": "devTimeout",
+                            "width": "5% ",
+                            "title": "lblDevTimeout",
+                            "filter": false,
+                            "sort": false,
+                            "min": "1",
+                            "default": "5"
+                        },
+                        {
+                            "type": "number",
+                            "attr": "devRetryIntvl",
+                            "width": "5% ",
+                            "title": "lblDevRetryIntvl",
+                            "filter": false,
+                            "sort": false,
+                            "min": "1",
+                            "default": "5"
+                        },
+                        {
+                            "type": "number",
+                            "attr": "devPollIntvl",
+                            "width": "5% ",
+                            "title": "lblDevPollIntvl",
+                            "filter": false,
+                            "sort": false,
+                            "min": "1",
+                            "default": "30"
+                        }
+                    ]
+                }
+            }
+        },
+        
+        "authorization": {
+            "type": "panel",
+            "label": "lblAuth",
+            "items": {
+ 				"_oidsInfo_1":{
+					"type": "staticText",
+					"text": "infoAuth",
+					"style": {
+						"fontSize": 16
+					}
+				},
+               "oidsInfo_2":{
+					"type": "staticText",
+					"text": "warnAuthUnused",
+					"hidden": "for(let ii=0; ii<data.devices.length; ii++) {if (data.devices[ii].snmpversion == 3){return 1;}}; return 0;",
+					"style": {
+						"fontSize": 16
+					}
+				},
+                "authSets": {
+                    "type": "table",
+					"newLine": true,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "label": "lblAuthCfg",
+                    "items": [
+                        {
+                            "type": "text",
+                            "attr": "authId",
+                            "width": "15% ",
+                            "title": "lblAuthId",
+                            "filter": false,
+                            "sort": false,
+                            "default": "std"
+                        },
+                        {
+                            "type": "select",
+                            "attr": "authSecLvl",
+                            "width": "15% ",
+                            "title": "lblAuthSecLvl",
+                            "filter": false,
+                            "sort": false,
+                            "options": [
+                                { "label": "lblAuthSecLvlOpt1", "value": 1}, 
+                                { "label": "lblAuthSecLvlOpt2", "value": 2},
+                                { "label": "lblAuthSecLvlOpt3", "value": 3}
+                            ],
+                            "default": "1"
+                        },
+                        {
+                            "type": "text",
+                            "attr": "authUser",
+                            "width": "15% ",
+                            "title": "lblAuthUser",
+                            "filter": false,
+                            "sort": false,
+                            "default": ""
+                        },
+                        {
+                            "type": "select",
+                            "attr": "authAuthProto",
+                            "width": "15% ",
+                            "title": "lblAuthAuthProto",
+							"hidden": "data.authSecLvl<2",
+                            "filter": false,
+                            "sort": false,
+                            "options": [
+                                { "label": "md5", "value": 1}, 
+                                { "label": "sha", "value": 2}
+                            ],
+                            "default": "1"
+                        },
+                        {
+                            "type": "text",
+                            "attr": "authAuthKey",
+                            "width": "15% ",
+                            "title": "lblAuthAuthKey",
+							"hidden": "data.authSecLvl<2",
+                            "filter": false,
+                            "sort": false,
+                            "default": ""
+                        },
+                        {
+                            "type": "select",
+                            "attr": "authEncProto",
+                            "width": "15% ",
+                            "title": "lblAuthEncProto",
+							"hidden": "data.authSecLvl<3",
+                            "filter": false,
+                            "sort": false,
+                            "options": [
+                                { "label": "des", "value": 1}, 
+                                { "label": "aes", "value": 2},
+                                { "label": "aes256b", "value": 3}, 
+                                { "label": "aes256r", "value": 4}
+                            ],
+                            "default": "1"
+                        },
+                        {
+                            "type": "text",
+                            "attr": "authEncKey",
+                            "width": "15% ",
+                            "title": "lblAuthEncKey",
+  							"hidden": "data.authSecLvl<3",
+                            "filter": false,
+                            "sort": false,
+                            "default": ""
+                        }
+					]
+				}
+			}
+		},
+        
+        "options": {
+            "type": "panel",
+            "label": "lblOptions",
+            "items": {
+				"optUseName": 	{
+                    "type": "checkbox",
+                    "label": "lblOptUseIp",
+                    "default": false,
+                    "tooltip": "ttOptUseIp",
+                    "help": "hlpOptUseIp"
+                }
+            }
+		}        
+	}
+}

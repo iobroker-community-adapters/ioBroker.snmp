@@ -1,6 +1,6 @@
 {
   "name": "iobroker.snmp",
-  "version": "1.0.0",
+  "version": "2.0.0-beta.9",
   "description": "ioBroker SNMP Adapter",
   "author": {
     "name": "Marcolotti",
@@ -36,6 +36,7 @@
     "@alcalzone/release-script": "^3.5.9",
     "@alcalzone/release-script-plugin-iobroker": "^3.5.9",
     "@alcalzone/release-script-plugin-license": "^3.5.9",
+    "@alcalzone/release-script-plugin-manual-review": "^3.5.9",
     "@iobroker/adapter-dev": "^1.0.0",
     "@iobroker/testing": "^3.0.2",
     "@types/chai": "^4.3.1",
@@ -64,11 +65,10 @@
     "test:integration": "mocha test/integration --exit",
     "test": "npm run test:js && npm run test:package",
     "check": "tsc --noEmit -p tsconfig.check.json",
+    "install": "node main.js --install --logs",
     "lint": "eslint --ext .js,.jsx",
-    "translate": "translate-adapter",
-    "release": "release-script patch --yes",
-    "release-minor": "release-script minor --yes",
-    "release-major": "release-script major --yes"
+    "release": "release-script",
+    "translate": "translate-adapter"
   },
   "bugs": {
     "url": "https://github.com/iobroker-community-adapters/ioBroker.snmp/issues"
