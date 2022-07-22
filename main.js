@@ -446,14 +446,14 @@ function readOids(pCTX) {
             adapter.log.debug('[' + id + '] session.get: ' + err.toString());
             if (err.toString() === 'RequestTimedOutError: Request timed out') {
                 // timeout error
-                if (!pCTX.inactive) {
+                if (!pCTX.inactive || !pCTX.initialized) {
                     adapter.log.info('[' + id + '] device disconnected - request timout');
                     pCTX.inactive = true;
                     setImmediate(handleConnectionInfo);
                 }
             } else {
                 // other error
-                if (!pCTX.inactive) {
+                if (!pCTX.inactive || !pCTX.initialized) {
                     adapter.log.error('[' + id + '] session.get: ' + err.toString());
                     pCTX.inactive = true;
                     setImmediate(handleConnectionInfo);
