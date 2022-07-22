@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "snmp",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "news": {
+      "2.0.1": {
+        "en": "Faulty handling of compatibility mode flag has been corrected (#135)\nLogging of errors for invalid OIDs corrected (#134)",
+        "de": "Fehlerhafte Handhabung des Kompatibilitätsmodus-Flags wurde korrigiert (#135)\nProtokollierung von Fehlern für ungültige OIDs korrigiert (#134)",
+        "ru": "Исправлена неисправная обработка флага режима совместимости (#135)\nЗапись ошибок для недействительных OID (#134)",
+        "pt": "O manuseio defeituoso da bandeira do modo de compatibilidade foi corrigido (#135)\nRegisto de erros para OIDs inválidos corrigido (#134)",
+        "nl": "Faulty Handling van compatibility mode vlag is gecorrigeerd (135)\nErnstige fouten voor invalide OIDs gecorrigeerd (134)",
+        "fr": "La manipulation par défaut du drapeau du mode de compatibilité a été corrigée (#135)\nDésignation d'erreurs pour des OID invalides corrigées (#134)",
+        "it": "È stata corretta la gestione della bandierina della modalità di compatibilità (#135)\nRegistrazione di errori per OID non validi corretti (#134)",
+        "es": "Se ha corregido el manejo predeterminado de la bandera del modo de compatibilidad (#135)\nRegistro de errores para los OID inválidos corregidos (#134)",
+        "pl": "Poprawiona flaga trybu kompatybilności została poprawiona (#135)\nUszkodzenie błędów w nieprawidłowości (pol.)",
+        "zh-cn": "对兼容方式旗帜的意外处理(第135号)进行了纠正。\n纠正无效的OIDs错误的赔偿(第134号)"
+      },
       "2.0.0": {
         "en": "* IMPORTANT: This release will change the configuration structures!\n  Please backup your configuration before starting the installation.\n  The Installation will try to convert the old configuration - but it is not guaranteed to succeed in all cases. \n* Many parts of the code have been rewriten\n* The adapter now uses the admin5 interface\n* Timer values can now be set differently per device (#105)\n* Changing the order of configuration entries does no longer destroy data (#15)\n* Stateobjects for devices can now be named. The old behavior is available as an option.\n* Known restriction: currently only SNMP V1 is supported.\n* Known restriction: OID attributes optional and writeable are not yet implemented.",
         "de": "* WICHTIG: Diese Veröffentlichung wird die Konfigurationsstrukturen ändern!\nBitte sichern Sie Ihre Konfiguration, bevor Sie die Installation starten.\nDie Installation wird versuchen, die alte Konfiguration umzuwandeln - aber in allen Fällen ist es nicht garantiert, erfolgreich zu sein.\n* Viele Teile des Codes wurden neu geschrieben\n* Der Adapter nutzt nun die Admin5-Schnittstelle\n* Timer-Werte können nun je Gerät unterschiedlich eingestellt werden (#105)\n* Die Änderung der Reihenfolge der Konfigurationseinträge zerstört keine Daten mehr (#15)\n* Stateobjects für Geräte können jetzt benannt werden. Das alte Verhalten ist als Option verfügbar.\n* Bekannte Einschränkung: derzeit wird nur SNMP V1 unterstützt.\n* Bekannte Einschränkung: OID-Attribute optional und schreibbar sind noch nicht implementiert.",

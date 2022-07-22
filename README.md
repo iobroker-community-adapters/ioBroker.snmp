@@ -20,10 +20,9 @@ This adapter can be used to poll information from devices like printers, network
 <!--
 ## __WORK IN PROGRESS__
 -->
-### __WORK IN PROGRESS__
+### 2.0.1 (2022-07-22)
 * (McM1957) Faulty handling of compatibility mode flag has been corrected (#135)
 * (McM1957) Logging of errors for invalid OIDs corrected (#134)
-
 
 ### 2.0.0 (2022-07-21)
 * IMPORTANT: This release will change the configuration structures!
