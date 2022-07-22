@@ -20,6 +20,10 @@ This adapter can be used to poll information from devices like printers, network
 <!--
 ## __WORK IN PROGRESS__
 -->
+### __WORK IN PROGRESS__
+* (McM1957) Bogus handling of compatibility mode flag has been corrected (#135)
+
+
 ### 2.0.0 (2022-07-21)
 * IMPORTANT: This release will change the configuration structures!
   Please backup your configuration before starting the installation.

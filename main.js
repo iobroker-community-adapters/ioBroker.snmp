@@ -724,7 +724,8 @@ function setupContices() {
         CTXs[jj].name = dev.devName;
         CTXs[jj].ipAddr = ipAddr;
         CTXs[jj].ipPort = ipPort;
-        CTXs[jj].id = adapter.config.optUseName ? dev.devName : ip2ipStr(CTXs[jj].ipAddr); //TODO: IPv6 requires changes
+        CTXs[jj].id = adapter.config.optUseName ? ip2ipStr(CTXs[jj].ipAddr) : dev.devName; // optUseName is UNSET if name should be used
+                                //TODO: IPv6 might require changes
         CTXs[jj].isIPv6 = false;
         CTXs[jj].timeout = dev.devTimeout * 1000;      //s -> ms
         CTXs[jj].retryIntvl = dev.devRetryIntvl * 1000;    //s -> ms
