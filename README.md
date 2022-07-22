@@ -21,7 +21,7 @@ This adapter can be used to poll information from devices like printers, network
 ## __WORK IN PROGRESS__
 -->
 ### __WORK IN PROGRESS__
-* (McM1957) Bogus handling of compatibility mode flag has been corrected (#135)
+* (McM1957) Faulty handling of compatibility mode flag has been corrected (#135)
 * (McM1957) Logging of error for invalid oids corrected (#134)
 
 
