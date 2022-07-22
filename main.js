@@ -446,15 +446,16 @@ function readOids(pCTX) {
             adapter.log.debug('[' + id + '] session.get: ' + err.toString());
             if (err.toString() === 'RequestTimedOutError: Request timed out') {
                 // timeout error
-                if (!pCTX.inactive) {
+                if (!pCTX.inactive || !pCTX.initialized) {
                     adapter.log.info('[' + id + '] device disconnected - request timout');
                     pCTX.inactive = true;
                     setImmediate(handleConnectionInfo);
                 }
             } else {
                 // other error
-                if (!pCTX.inactive) {
+                if (!pCTX.inactive || !pCTX.initialized) {
                     adapter.log.error('[' + id + '] session.get: ' + err.toString());
+                    adapter.log.info('[' + id + '] device disconnected');
                     pCTX.inactive = true;
                     setImmediate(handleConnectionInfo);
                 }
@@ -724,7 +725,8 @@ function setupContices() {
         CTXs[jj].name = dev.devName;
         CTXs[jj].ipAddr = ipAddr;
         CTXs[jj].ipPort = ipPort;
-        CTXs[jj].id = adapter.config.optUseName ? dev.devName : ip2ipStr(CTXs[jj].ipAddr); //TODO: IPv6 requires changes
+        CTXs[jj].id = adapter.config.optUseName ? ip2ipStr(CTXs[jj].ipAddr) : dev.devName; // optUseName is UNSET if name should be used
+                                //TODO: IPv6 might require changes
         CTXs[jj].isIPv6 = false;
         CTXs[jj].timeout = dev.devTimeout * 1000;      //s -> ms
         CTXs[jj].retryIntvl = dev.devRetryIntvl * 1000;    //s -> ms
