@@ -455,6 +455,7 @@ function readOids(pCTX) {
                 // other error
                 if (!pCTX.inactive || !pCTX.initialized) {
                     adapter.log.error('[' + id + '] session.get: ' + err.toString());
+                    adapter.log.info('[' + id + '] device disconnected');
                     pCTX.inactive = true;
                     setImmediate(handleConnectionInfo);
                 }
