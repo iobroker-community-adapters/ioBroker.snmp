@@ -124,57 +124,6 @@
         "condition": {
           "operand": "and",
           "rules": [
-            "oldVersion<1.0.0",
-            "newVersion>=1.0.0"
-          ]
-        },
-        "title": {
-          "en": "Important notice!",
-          "de": "Wichtiger Hinweis!",
-          "ru": "Важное замечание!",
-          "pt": "Notícia importante!",
-          "nl": "Belangrijke mededeling!",
-          "fr": "Avis important!",
-          "it": "Avviso IMPORTANTE!",
-          "es": "Noticia importante!",
-          "pl": "Ważna uwaga!",
-          "zh-cn": "重要通知!"
-        },
-        "text": {
-          "en": "Version 1.0.0 will change the names of objects containing special characters like \\\".\\\", \\\"-\\\" or spaces! Please delete the old objects manually if needed.",
-          "de": "Version 1.0.0 ändert die Namen von Objekten, die spezielle Zeichen wie \\\"\\\", \\\"-\\\" oder Leerzeichen enthalten! Bitte löschen Sie die alten Objekte bei Bedarf manuell.",
-          "ru": "Версия 1.0.0 изменит имена объектов, содержащих специальные символы, такие как \\\".\\\", \\\"-\\\" или пространства! Пожалуйста, удалите старые объекты вручную, если это необходимо.",
-          "pt": "A versão 1.0.0 mudará os nomes de objetos contendo caracteres especiais como \\\".\\\", \\\"-\\\" ou espaços! Por favor, exclua os objetos antigos manualmente, se necessário.",
-          "nl": "Version 1.0.0 zal de namen veranderen van objecten met speciale personages zoals . Verwijder de oude objecten handmatig als het nodig is.",
-          "fr": "La version 1.0.0 va changer les noms des objets contenant des caractères spéciaux comme \\\".\\\", \\\"-\\\" ou des espaces! Veuillez supprimer les anciens objets manuellement si nécessaire.",
-          "it": "La versione 1.0.0 cambierà i nomi di oggetti contenenti caratteri speciali come \\\", \\\"-\\\" o spazi! Si prega di eliminare i vecchi oggetti manualmente se necessario.",
-          "es": "Versión 1.0.0 cambiará los nombres de objetos que contienen caracteres especiales como \\\".\\\", \\\"-\\\" o espacios! Por favor, borre los viejos objetos manualmente si es necesario.",
-          "pl": "Wersja 1.0.0 zmienia nazwę obiektów o specjalnych postaciach, takich jak: \\, \\ lub przestrzeni! Okazuje się, że stare obiekty ręcznie będą potrzebne.",
-          "zh-cn": "Version1.0.0将改变含有特殊特性的物体的名称,如乙型号、乙型号或空间。 请在必要时删除旧物体。."
-        },
-        "link": "https://github.com/iobroker-community-adapters/ioBroker.snmp#changelog",
-        "level": "warn",
-        "linkText": {
-          "en": "Changelog",
-          "de": "Änderungsprotokoll",
-          "ru": "Список изменений",
-          "pt": "Registro de alterações",
-          "nl": "Wijzigingslog",
-          "fr": "Journal des modifications",
-          "it": "Registro delle modifiche",
-          "es": "registro de cambios",
-          "pl": "Dziennik zmian",
-          "zh-cn": "变更日志"
-        },
-        "buttons": [
-          "agree",
-          "cancel"
-        ]
-      },
-      {
-        "condition": {
-          "operand": "and",
-          "rules": [
             "oldVersion<2.0.0",
             "newVersion>=2.0.0"
           ]
@@ -202,6 +151,57 @@
           "es": "Los datos de configuración se han modificado para la versión 2.0.0 (y más reciente). La instalación intentará migrar datos pero hay una posibilidad de que esto falle. Por favor, asegúrese de tener una copia de seguridad y una documentación externa de su configuración antes de actualizar a la versión 2.0.0 o más reciente.",
           "pl": "Dane konfiguracyjne zostały zmienione na wersję 2.0.0 (i nowszą). Instalacja stara się wyemitować dane, ale istnieje szansa, że to się nie udaje. Zapewniajcie, że mamy backup i zewnętrzną dokumentację twojej wersji 2.0.0 lub nowszego.",
           "zh-cn": "对2.0.0版本(和新版)的合并数据进行了修改。 绝大部分将试图迁移数据,但有失败的机会。 请确保在更新至2.0.0或新版之前,对你的配置进行反馈和外部记录。."
+        },
+        "link": "https://github.com/iobroker-community-adapters/ioBroker.snmp#changelog",
+        "level": "warn",
+        "linkText": {
+          "en": "Changelog",
+          "de": "Änderungsprotokoll",
+          "ru": "Список изменений",
+          "pt": "Registro de alterações",
+          "nl": "Wijzigingslog",
+          "fr": "Journal des modifications",
+          "it": "Registro delle modifiche",
+          "es": "registro de cambios",
+          "pl": "Dziennik zmian",
+          "zh-cn": "变更日志"
+        },
+        "buttons": [
+          "agree",
+          "cancel"
+        ]
+      },
+      {
+        "condition": {
+          "operand": "and",
+          "rules": [
+            "oldVersion<1.0.0",
+            "newVersion>=1.0.0"
+          ]
+        },
+        "title": {
+          "en": "Important notice!",
+          "de": "Wichtiger Hinweis!",
+          "ru": "Важное замечание!",
+          "pt": "Notícia importante!",
+          "nl": "Belangrijke mededeling!",
+          "fr": "Avis important!",
+          "it": "Avviso IMPORTANTE!",
+          "es": "Noticia importante!",
+          "pl": "Ważna uwaga!",
+          "zh-cn": "重要通知!"
+        },
+        "text": {
+          "en": "Version 1.0.0 will change the names of objects containing special characters like \\\".\\\", \\\"-\\\" or spaces! Please delete the old objects manually if needed.",
+          "de": "Version 1.0.0 ändert die Namen von Objekten, die spezielle Zeichen wie \\\"\\\", \\\"-\\\" oder Leerzeichen enthalten! Bitte löschen Sie die alten Objekte bei Bedarf manuell.",
+          "ru": "Версия 1.0.0 изменит имена объектов, содержащих специальные символы, такие как \\\".\\\", \\\"-\\\" или пространства! Пожалуйста, удалите старые объекты вручную, если это необходимо.",
+          "pt": "A versão 1.0.0 mudará os nomes de objetos contendo caracteres especiais como \\\".\\\", \\\"-\\\" ou espaços! Por favor, exclua os objetos antigos manualmente, se necessário.",
+          "nl": "Version 1.0.0 zal de namen veranderen van objecten met speciale personages zoals . Verwijder de oude objecten handmatig als het nodig is.",
+          "fr": "La version 1.0.0 va changer les noms des objets contenant des caractères spéciaux comme \\\".\\\", \\\"-\\\" ou des espaces! Veuillez supprimer les anciens objets manuellement si nécessaire.",
+          "it": "La versione 1.0.0 cambierà i nomi di oggetti contenenti caratteri speciali come \\\", \\\"-\\\" o spazi! Si prega di eliminare i vecchi oggetti manualmente se necessario.",
+          "es": "Versión 1.0.0 cambiará los nombres de objetos que contienen caracteres especiales como \\\".\\\", \\\"-\\\" o espacios! Por favor, borre los viejos objetos manualmente si es necesario.",
+          "pl": "Wersja 1.0.0 zmienia nazwę obiektów o specjalnych postaciach, takich jak: \\, \\ lub przestrzeni! Okazuje się, że stare obiekty ręcznie będą potrzebne.",
+          "zh-cn": "Version1.0.0将改变含有特殊特性的物体的名称,如乙型号、乙型号或空间。 请在必要时删除旧物体。."
         },
         "link": "https://github.com/iobroker-community-adapters/ioBroker.snmp#changelog",
         "level": "warn",
