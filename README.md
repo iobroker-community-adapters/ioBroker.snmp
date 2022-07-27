@@ -18,7 +18,7 @@ This adapter can be used to poll information from devices like printers, network
 ## Changelog
 
 <!--
-### __WORK IN PROGRESS__
+## __WORK IN PROGRESS__
 -->
 
 ### __WORK IN PROGRESS__
