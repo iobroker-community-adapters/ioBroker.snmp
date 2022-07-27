@@ -23,8 +23,8 @@ This adapter can be used to poll information from devices like printers, network
 
 ### __WORK IN PROGRESS__
 * (McM1957) net-snmp has been upgraded to version 3.8.2
-* (McM1957) Support for SNMP v2c has been added
-* (McM1957) The quality marker of stateobjects will be set in case of error or timeout
+* (McM1957) Support for SNMP v2c has been added (#116)
+* (McM1957) The quality marker of stateobjects will be used in case of error or timeout
 * (McM1957) The OID flag "optional" has been implemented. This flag suppresses errors for OIDs which are not always available. (#116)
 
 ### 2.0.1 (2022-07-22)
