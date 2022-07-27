@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "snmp",
-    "version": "2.0.1",
+    "version": "2.1.0-beta.0",
     "news": {
+      "2.1.0-beta.0": {
+        "en": "net-snmp has been upgraded to version 3.8.2\nSupport for SNMP v2c has been added (#116)\nThe quality marker of stateobjects will be used in case of error or timeout\nThe OID marker 'Optional' has been implemented. This marker suppresses errors for OIDs which are not always available. (#116)",
+        "de": "net-snmp wurde auf version 3.8.2 aktualisiert\nUnterstützung für SNMP v2c wurde hinzugefügt (#116)\nDer Qualitätsmarker von Stateobjects wird bei Fehler oder Timeout verwendet\nDer OID-Marker Optional wurde implementiert. Dieser Marker unterdrückt Fehler für OIDs, die nicht immer verfügbar sind. (#116)",
+        "ru": "net-snmp был обновлен до версии 3.8.2\nДобавлена поддержка SNMP v2c (#116)\nКачественный маркер государственного объекта будет использоваться в случае ошибки или таймаут\nРеализован OID маркер Опционный. Этот маркер подавляет ошибки для OID, которые не всегда доступны. (#116)",
+        "pt": "net-snmp foi atualizado para a versão 3.8.2\nSuporte para SNMP v2c foi adicionado (#116)\nO marcador de qualidade dos objetos de estado será usado em caso de erro ou timeout\nO marcador OID Opcional foi implementado. Este marcador suprime erros para OIDs que nem sempre estão disponíveis. (#116)",
+        "nl": "net-snmp is geüpgradeerd tot versie 3,8,2\nSNMP V2c is toegevoegd\nDe kwaliteitsmarkt van de staatobjecten zal worden gebruikt in geval van fout of time-out\nDe OID marker Optional is ingevoerd. Deze marker onderdrukt fouten voor OID's die niet altijd beschikbaar zijn. (116)",
+        "fr": "net-snmp a été amélioré à la version 3.8.2\nLe support pour SNMP v2c a été ajouté (#116)\nLe marqueur de qualité des Stateobjects sera utilisé en cas d'erreur ou de timeout\nLe marqueur OID Optional a été mis en œuvre. Ce marqueur supprime les erreurs pour les OID qui ne sont pas toujours disponibles. (#116)",
+        "it": "net-snmp è stato aggiornato alla versione 3.8.2\nÈ stato aggiunto il supporto per SNMP v2c (#116)\nIl marcatore di qualità degli oggetti di stato verrà utilizzato in caso di errore o timeout\nIl marcatore OID opzionale è stato implementato. Questo marcatore sopprime gli errori per OID che non sono sempre disponibili. (#116)",
+        "es": "net-snmp ha sido actualizado a la versión 3.8.2\nSe ha añadido soporte para SNMP v2c (#116)\nEl marcador de calidad de los stateobjects se utilizará en caso de error o timeout\nSe ha implementado el marcador OID Opcional. Este marcador suprime errores para OIDs que no siempre están disponibles. (#116)",
+        "pl": "wersja 3.8.2 została zmodernizowana do wersji 3.8.2\nWsparcie dla SNMP v2c zostało dodane (#116)\nZnak jakości obiektów będzie używany w przypadku błędu lub czasu\nZaimplementowany został znak OID. Ten znak niszczy błędy OID, które nie zawsze są dostępne. (#116)",
+        "zh-cn": "净经验已升级为3.8.2。\n添加了对SNMP v2c的支持(第116号)\n在错误或时间推断的情况下,将使用国家目标的质量标志。\n裁研所的标志已经实施。 这名标示了不总是可供使用的裁研所的错误。 (第116号)"
+      },
       "2.0.1": {
         "en": "Faulty handling of compatibility mode flag has been corrected (#135)\nLogging of errors for invalid OIDs corrected (#134)",
         "de": "Fehlerhafte Handhabung des Kompatibilitätsmodus-Flags wurde korrigiert (#135)\nProtokollierung von Fehlern für ungültige OIDs korrigiert (#134)",
