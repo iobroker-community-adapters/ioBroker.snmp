@@ -18,10 +18,10 @@ This adapter can be used to poll information from devices like printers, network
 ## Changelog
 
 <!--
-## __WORK IN PROGRESS__
+### __WORK IN PROGRESS__
 -->
 
-## __WORK IN PROGRESS__
+### __WORK IN PROGRESS__
 * (McM1957) net-snmp has been upgraded to version 3.8.2
 * (McM1957) Support for SNMP v2c has been added
 * (McM1957) Quality flag of states will be set in case of error or timeout
