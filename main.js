@@ -427,6 +427,121 @@ async function createSession(pCTX) {
 }
 
 /**
+ * processVarbind - process single varbind
+ *
+ * @param {pVarbind} snmp varbind object
+ * @return string
+ *
+ */
+function processVarbind(pCTX, pId, pIdx, pVarbind) {
+    adapter.log.debug('processVarbind');
+
+    let valStr;
+    let valTypeStr;
+
+    switch (pVarbind.type){
+        case snmp.ObjectType.Boolean:{
+            valTypeStr = 'Boolean';
+            valStr = pVarbind.value.toString();
+            break;
+        }
+        case snmp.ObjectType.Integer:{
+            valTypeStr = 'Integer';
+            valStr = pVarbind.value.toString();
+            break;
+        }
+        case snmp.ObjectType.OctetString:{
+            valTypeStr = 'OctetString';
+            valStr = pVarbind.value.toString();
+            break;
+        }
+        case snmp.ObjectType.Null:{
+            valTypeStr = 'Null';
+            valStr = pVarbind.value.toString();
+            break;
+        }
+        case snmp.ObjectType.OID:{
+            valTypeStr = 'OID';
+            valStr = pVarbind.value.toString();
+            break;
+        }
+        case snmp.ObjectType.IpAddress:{
+            valTypeStr = 'IpAddress';
+            valStr = pVarbind.value.toString();
+            break;
+        }
+        case snmp.ObjectType.Counter:{
+            valTypeStr = 'Counter';
+            valStr = pVarbind.value.toString();
+            break;
+        }
+        case snmp.ObjectType.Gauge:{
+            valTypeStr = 'Gauge';
+            valStr = pVarbind.value.toString();
+            break;
+        }
+        case snmp.ObjectType.TimeTicks:{
+            valTypeStr = 'TimeTicks';
+            valStr = pVarbind.value.toString();
+            break;
+        }
+        case snmp.ObjectType.Opaque:{
+            valTypeStr = 'Opaque';
+            valStr = pVarbind.value.toString();
+            break;
+        }
+        case snmp.ObjectType.Integer32:{
+            valTypeStr = 'Integer32';
+            valStr = pVarbind.value.toString();
+            break;
+        }
+        case snmp.ObjectType.Counter32:{
+            valTypeStr = 'Counter32';
+            valStr = pVarbind.value.toString();
+            break;
+        }
+        case snmp.ObjectType.Gauge32:{
+            valTypeStr = 'Gauge32';
+            valStr = pVarbind.value.toString();
+            break;
+        }
+        case snmp.ObjectType.Unsigned32:{
+            valTypeStr = 'Unsigned32';
+            valStr = pVarbind.value.toString();
+            break;
+        }
+        case snmp.ObjectType.Counter64:{
+            valTypeStr = 'Counter64';
+            valStr = pVarbind.value.toString();
+            break;
+        }
+        case snmp.ObjectType.NoSuchObject:{
+            valTypeStr = 'NoSuchObject';
+            valStr = pVarbind.value.toString();
+            break;
+        }
+        case snmp.ObjectType.NoSuchInstance:{
+            valTypeStr = 'NoSuchInstance';
+            valStr = pVarbind.value.toString();
+            break;
+        }
+        case snmp.ObjectType.EndOfMibView:{
+            valTypeStr = 'EndOfMibView';
+            valStr = pVarbind.value.toString();
+            break;
+        }
+        default:{
+            valTypeStr = 'Unknown';
+            valStr = pVarbind.value.toString();
+            break;
+        }
+    }
+    adapter.log.debug('[' + pId + '] ' + pCTX.ids[pIdx] + '(' + valTypeStr + ')' + JSON.stringify(pVarbind));
+    adapter.log.debug('[' + pId + '] update ' + pCTX.ids[pIdx] + ': ' + valStr);
+    adapter.setState(pCTX.ids[pIdx], valStr, true); // data OK
+    return;
+}
+    
 /**
  * readOids - read all oids from a specific target device
  *
@@ -487,8 +602,9 @@ function readOids(pCTX) {
                     }                   
                     adapter.setState(pCTX.ids[ii], { val: null, ack: true, q: 0x84}); // sensor reports error
                 } else {
-                    adapter.log.debug('[' + id + '] update ' + pCTX.ids[ii] + ': ' + varbinds[ii].value.toString());
-                    adapter.setState(pCTX.ids[ii], varbinds[ii].value.toString(), true); // data OK
+                    //adapter.log.debug('[' + id + '] update ' + pCTX.ids[ii] + ': ' + varbinds[ii].value.toString());
+                    //adapter.setState(pCTX.ids[ii], varbinds[ii].value.toString(), true); // data OK
+                    processVarbind(pCTX, id, ii, varbinds[ii]);
                 }
             }
         }
