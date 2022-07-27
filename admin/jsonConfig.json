@@ -106,7 +106,7 @@
                         },
                         {
                             "type": "checkbox",
-                            "attr": "OidWriteable",
+                            "attr": "oidWriteable",
                             "width": "10% ",
                             "title": "lblOidWriteable",
                             "filter": false,
