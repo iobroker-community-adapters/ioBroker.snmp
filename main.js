@@ -23,6 +23,8 @@
  *      pollIntvl  number   snmp poll intervall (ms)
  *      snmpVers   number   snmp version
  *      community  string   snmp comunity (v1, v2c)
+ *      OIDs       array of objects
+ *                          oid config object (contains i.e. flags)
  *      oids       array of strings
  *                          oids to be read
  *      ids        array of strings
@@ -479,7 +481,10 @@ function readOids(pCTX) {
             // process returned values
             for (let ii = 0; ii < varbinds.length; ii++) {
                 if (snmp.isVarbindError(varbinds[ii])) {
-                    adapter.log.error('[' + id + '] session.get: ' + snmp.varbindError(varbinds[ii]));
+                   if ( ! pCTX.OIDs[ii].oidOptional || 
+                        ! snmp.varbindError(varbinds[ii]).startsWith("NoSuchObject:") ) {
+                            adapter.log.error('[' + id + '] session.get: ' + snmp.varbindError(varbinds[ii]));               
+                    }                   
                     adapter.setState(pCTX.ids[ii], { val: null, ack: true, q: 0x84}); // sensor reports error
                 } else {
                     adapter.log.debug('[' + id + '] update ' + pCTX.ids[ii] + ': ' + varbinds[ii].value.toString());
@@ -738,6 +743,7 @@ function setupContices() {
         CTXs[jj].pollIntvl = dev.devPollIntvl * 1000;     //s -> ms
         CTXs[jj].snmpVers = dev.devSnmpVers;
         CTXs[jj].authId = dev.devAuthId;
+        CTXs[jj].OIDs = [];
         CTXs[jj].oids = [];
         CTXs[jj].ids = [];
 
@@ -755,6 +761,7 @@ function setupContices() {
             let id = CTXs[jj].id + '.' + name2id(oid.oidName);
             CTXs[jj].oids.push(oid.oidOid);
             CTXs[jj].ids.push(id);
+            CTXs[jj].OIDs.push(oid);
 
             adapter.log.debug('       oid "' + oid.oidOid + '" (' + id + ')');
         }
