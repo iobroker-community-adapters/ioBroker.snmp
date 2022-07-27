@@ -446,6 +446,9 @@ function readOids(pCTX) {
             adapter.log.debug('[' + id + '] session.get: ' + err.toString());
             if (err.toString() === 'RequestTimedOutError: Request timed out') {
                 // timeout error
+                for (let ii = 0; ii < pCTX.ids.length; ii++) {
+                    adapter.setState(pCTX.ids[ii], {q:0x02} ); // connection problem
+                }
                 if (!pCTX.inactive || !pCTX.initialized) {
                     adapter.log.info('[' + id + '] device disconnected - request timout');
                     pCTX.inactive = true;
@@ -453,6 +456,9 @@ function readOids(pCTX) {
                 }
             } else {
                 // other error
+                for (let ii = 0; ii < pCTX.ids.length; ii++) {
+                    adapter.setState(pCTX.ids[ii], {val: null, ack: true, q:0x44} ); // device reports error
+                }
                 if (!pCTX.inactive || !pCTX.initialized) {
                     adapter.log.error('[' + id + '] session.get: ' + err.toString());
                     adapter.log.info('[' + id + '] device disconnected');
@@ -468,17 +474,16 @@ function readOids(pCTX) {
                 pCTX.inactive = false;
                 setImmediate(handleConnectionInfo);
             }
-
             adapter.setState(id + '.online', true, true);
 
             // process returned values
             for (let ii = 0; ii < varbinds.length; ii++) {
                 if (snmp.isVarbindError(varbinds[ii])) {
-                    adapter.log.warn(snmp.varbindError(varbinds[ii]));
-                    adapter.setState(pCTX.ids[ii], null, true, 0x84);
+                    adapter.log.error('[' + id + '] session.get: ' + snmp.varbindError(varbinds[ii]));
+                    adapter.setState(pCTX.ids[ii], { val: null, ack: true, q: 0x84}); // sensor reports error
                 } else {
                     adapter.log.debug('[' + id + '] update ' + pCTX.ids[ii] + ': ' + varbinds[ii].value.toString());
-                    adapter.setState(pCTX.ids[ii], varbinds[ii].value.toString(), true);
+                    adapter.setState(pCTX.ids[ii], varbinds[ii].value.toString(), true); // data OK
                 }
             }
         }
