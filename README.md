@@ -26,7 +26,7 @@ This adapter can be used to poll information from devices like printers, network
 * (McM1957) The quality marker of stateobjects will be used in case of error or timeout
 * (McM1957) The OID marker 'Optional' has been implemented. This marker suppresses errors for OIDs which are not always available. (#116)
 * (McM1957) Support for Counter64 OIDs has been added. (#57)
-* (McM1957) Logging has been extended to show details of returned data.
+* (McM1957) The data returned by snmp calls will be logged with more details now.
 
 ### 2.0.1 (2022-07-22)
 * (McM1957) Faulty handling of compatibility mode flag has been corrected (#135)
