@@ -434,7 +434,7 @@ async function createSession(pCTX) {
  *
  */
 function processVarbind(pCTX, pId, pIdx, pVarbind) {
-    adapter.log.debug('processVarbind');
+    adapter.log.debug('processVarbind - [' + pId + '] ' + pCTX.ids[pIdx]);
 
     let valStr;
     let valTypeStr;
@@ -512,7 +512,12 @@ function processVarbind(pCTX, pId, pIdx, pVarbind) {
         }
         case snmp.ObjectType.Counter64:{
             valTypeStr = 'Counter64';
-            valStr = pVarbind.value.toString();
+            // convert buffer to string using bigin
+            let val = 0n; //bigint constant
+            for (let ii= 0; ii<pVarbind.value.length; ii++){
+                val=val*256n + BigInt(pVarbind.value[ii]);
+            }
+            valStr = val.toString();
             break;
         }
         case snmp.ObjectType.NoSuchObject:{
