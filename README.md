@@ -20,7 +20,7 @@ This adapter can be used to poll information from devices like printers, network
 <!--
 ## __WORK IN PROGRESS__
 -->
-### 2.1.0-beta.2 (2022-07-29)
+### __WORK IN PROGRESS__
 * (McM1957) net-snmp has been upgraded to version 3.8.2
 * (McM1957) Support for SNMP v2c has been added (#116)
 * (McM1957) The quality marker of stateobjects will be used in case of error or timeout
@@ -28,6 +28,8 @@ This adapter can be used to poll information from devices like printers, network
 * (McM1957) Support for Counter64 OIDs has been added. (#57)
 * (McM1957) The data returned by snmp communication  will be logged with more details now.
 * (McM1957) Compact mode has been enabled. (#20)
+* (McM1957) Known restriction: currently only SNMP V1 and SNMP V2c are supported.
+* (McM1957) Known restriction: OID attribute writeable is not yet implemented.
 
 ### 2.0.1 (2022-07-22)
 * (McM1957) Faulty handling of compatibility mode flag has been corrected (#135)
