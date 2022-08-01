@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "snmp",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "news": {
+      "2.1.1": {
+        "en": "some external packages have been updated",
+        "de": "einige externe pakete wurden aktualisiert",
+        "ru": "некоторые внешние пакеты были обновлены",
+        "pt": "alguns pacotes externos foram atualizados",
+        "nl": "sommige externe pakketten zijn geüpload",
+        "fr": "certains paquets externes ont été mis à jour",
+        "it": "alcuni pacchetti esterni sono stati aggiornati",
+        "es": "algunos paquetes externos se han actualizado",
+        "pl": "niektóre zewnętrzne pakiety zostały zaktualizowane",
+        "zh-cn": "一些外部一揽子计划已经更新。"
+      },
       "2.1.0": {
         "en": "net-snmp has been upgraded to version 3.8.2\nSupport for SNMP v2c has been added (#116)\nThe quality marker of stateobjects will be used in case of error or timeout\nThe OID marker 'Optional' has been implemented. This marker suppresses errors for OIDs which are not always available. (#116)\nSupport for Counter64 OIDs has been added. (#57)\nThe data returned by snmp communication  will be logged with more details now.\nCompact mode has been enabled. (#20)\nKnown restriction: currently only SNMP V1 and SNMP V2c are supported.\nKnown restriction: OID attribute writeable is not yet implemented.",
         "de": "net-snmp wurde auf version 3.8.2 aktualisiert\nUnterstützung für SNMP v2c wurde hinzugefügt (#116)\nDer Qualitätsmarker von Stateobjects wird bei Fehler oder Timeout verwendet\nDer OID-Marker Optional wurde implementiert. Dieser Marker unterdrückt Fehler für OIDs, die nicht immer verfügbar sind. (#116)\nUnterstützung für Counter64 OIDs wurde hinzugefügt. (#57)\nDie von der SNMP-Kommunikation zurückgegebenen Daten werden jetzt mit weiteren Details protokolliert.\nDer kompakte Modus wurde aktiviert. (#20)\nBekannte Einschränkung: Derzeit werden nur SNMP V1 und SNMP V2c unterstützt.\nBekannte Einschränkung: OID-Attribut Schreibbar ist noch nicht implementiert.",
