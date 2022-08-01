@@ -20,6 +20,9 @@ This adapter can be used to poll information from devices like printers, network
 <!--
 ## __WORK IN PROGRESS__
 -->
+### __WORK IN PROGRESS__
+* (McM1957) some packages have been upgraded by dependbot
+
 ### 2.1.0 (2022-07-30)
 * (McM1957) net-snmp has been upgraded to version 3.8.2
 * (McM1957) Support for SNMP v2c has been added (#116)
