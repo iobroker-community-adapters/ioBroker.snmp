@@ -21,7 +21,7 @@ This adapter can be used to poll information from devices like printers, network
 ## __WORK IN PROGRESS__
 -->
 ### __WORK IN PROGRESS__
-* (McM1957) some extenal packages have been updated
+* (McM1957) some external packages have been updated
 
 ### 2.1.0 (2022-07-30)
 * (McM1957) net-snmp has been upgraded to version 3.8.2
