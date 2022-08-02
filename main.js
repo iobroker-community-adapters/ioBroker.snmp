@@ -487,7 +487,17 @@ function processVarbind(pCTX, pId, pIdx, pVarbind) {
         }
         case snmp.ObjectType.Opaque:{
             valTypeStr = 'Opaque';
-            valStr = pVarbind.value.toString();
+            if ( pVarbind.value.length === 7 &&
+                pVarbind.value[0] === 159 &&
+                pVarbind.value[1] === 120 &&
+                pVarbind.value[2] === 4 ) {
+                    let value = pVarbind.value.readFloatBE(3);
+                    valStr = value.toString();
+                 }
+            else {
+                valStr = null;
+                adapter.log.error('[' + pId + '] ' + pCTX.ids[pIdx] + ' cannot convert opaque data ' + JSON.stringify(pVarbind));
+            }
             break;
         }
         case snmp.ObjectType.Integer32:{
