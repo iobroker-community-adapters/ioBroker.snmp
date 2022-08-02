@@ -20,7 +20,7 @@ This adapter can be used to poll information from devices like printers, network
 <!--
 ## __WORK IN PROGRESS__
 -->
-### __WORK IN PROGRESS__
+### 2.1.2 (2022-08-02)
 * (McM1957) conversion of floatingpoint values has been corrected (#16)
 
 ### 2.1.1 (2022-08-01)

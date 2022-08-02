@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "snmp",
-    "version": "2.1.1",
+    "version": "2.1.2",
     "news": {
+      "2.1.2": {
+        "en": "conversion of floatingpoint values has been corrected (#16)",
+        "de": "die umwandlung von floatingpoint-werten wurde korrigiert (#16)",
+        "ru": "исправлена конверсия значений плавающих точек (#16)",
+        "pt": "conversão de valores de ponto flutuante foi corrigida (#16)",
+        "nl": "de bekering van zwevende waarden is gecorrigeerd",
+        "fr": "la conversion des valeurs flottantes a été corrigée (#16)",
+        "it": "la conversione dei valori dei punti fluttuanti è stata corretta (#16)",
+        "es": "se ha corregido la conversión de valores de puntos flotantes (#16)",
+        "pl": "zmiana wartości zmiennoprzecinkowych została poprawiona (#16)",
+        "zh-cn": "改变浮标值(第16)"
+      },
       "2.1.1": {
         "en": "some external packages have been updated",
         "de": "einige externe pakete wurden aktualisiert",
