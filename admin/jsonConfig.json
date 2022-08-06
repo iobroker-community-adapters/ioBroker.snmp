@@ -372,7 +372,7 @@
 				"optChunkSize": 	{
                     "type": "number",
                     "width": "15% ",
-                    "title": "lblOptChunkSize",
+                    "label": "lblOptChunkSize",
                     "filter": false,
                     "sort": false,
                     "min": "1",
