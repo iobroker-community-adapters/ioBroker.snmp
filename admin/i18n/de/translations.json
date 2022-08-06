@@ -40,5 +40,8 @@
     "lblOptions": "Optionen",
     "lblOptUseIp": "Kompatibilitätsmodus - Verwenden Sie die IP-Adresse für Status-IDs",
     "ttOptUseIp": "markieren, um IP-Adresse für Zustands-IDs zu verwenden",
-    "hlpOptUseIp": "Wenn Sie diese Option auswählen, wird die IP-Adresse für Zustands-IDs wie in früheren Versionen verwendet."
+    "hlpOptUseIp": "Wenn Sie diese Option auswählen, wird die IP-Adresse für Zustands-IDs wie in früheren Versionen verwendet.",
+    "lblOptChunkSize": "Paketgröße",
+    "ttOptChunkSize": "Maximale OID-Anzahl innerhalb einer Anfrage",
+    "hlpOptChunkSize": "Dieser Parameter gibt die maximale OID-Anzahl innerhalb einer Anfrage an. "
 }

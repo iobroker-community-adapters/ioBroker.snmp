@@ -58,6 +58,7 @@
                     "md": 12,
                     "lg": 12,
                     "label": "lblOidGroups",
+                    "showSecondAddAt":5,
                     "items": [
                         {
                             "type": "checkbox",
@@ -154,6 +155,7 @@
                     "lg": 12,
 					"hidden": "!(data.oids&&data.oids.length)",
                     "label": "lblDevsDevices",
+                    "showSecondAddAt":5,
                     "items": [
                         {
                             "type": "checkbox",
@@ -274,6 +276,7 @@
                     "md": 12,
                     "lg": 12,
                     "label": "lblAuthCfg",
+                    "showSecondAddAt":5,
                     "items": [
                         {
                             "type": "text",
@@ -366,9 +369,22 @@
             "type": "panel",
             "label": "lblOptions",
             "items": {
+				"optChunkSize": 	{
+                    "type": "number",
+                    "width": "15% ",
+                    "title": "lblOptChunkSize",
+                    "filter": false,
+                    "sort": false,
+                    "min": "1",
+                    "max": "50",
+                    "default": "20",
+                    "tooltip": "ttOptChunkSize",
+                    "help": "hlpOptChunkSize"
+                },
 				"optUseName": 	{
                     "type": "checkbox",
                     "label": "lblOptUseIp",
+					"newLine": true,
                     "default": false,
                     "tooltip": "ttOptUseIp",
                     "help": "hlpOptUseIp"
