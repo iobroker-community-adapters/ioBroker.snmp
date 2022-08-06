@@ -7,6 +7,42 @@
  */
 
 /*
+ * Remark related to REAL / FLOAT values returned:
+ *
+ * see http://www.net-snmp.org/docs/mibs/NET-SNMP-TC.txt
+ * 
+ * --
+ * -- Define the Float Textual Convention
+ * --   This definition was written by David Perkins.
+ * --
+ * 
+ * Float ::= TEXTUAL-CONVENTION
+ *     STATUS      current
+ *     DESCRIPTION
+ *         "A single precision floating-point number.  The semantics
+ *          and encoding are identical for type 'single' defined in
+ *          IEEE Standard for Binary Floating-Point,
+ *          ANSI/IEEE Std 754-1985.
+ *          The value is restricted to the BER serialization of
+ *          the following ASN.1 type:
+ *              FLOATTYPE ::= [120] IMPLICIT FloatType
+ *          (note: the value 120 is the sum of '30'h and '48'h)
+ *          The BER serialization of the length for values of
+ *          this type must use the definite length, short
+ *          encoding form.
+ * 
+ *          For example, the BER serialization of value 123
+ *          of type FLOATTYPE is '9f780442f60000'h.  (The tag
+ *          is '9f78'h; the length is '04'h; and the value is
+ *          '42f60000'h.) The BER serialization of value
+ *          '9f780442f60000'h of data type Opaque is
+ *          '44079f780442f60000'h. (The tag is '44'h; the length
+ *          is '07'h; and the value is '9f780442f60000'h.)"
+ *     SYNTAX Opaque (SIZE (7))
+ * 
+ */
+ 
+/*
  * description if major internal objects
  *
  *	CTXs		object (array) of CTX objectes
@@ -33,8 +69,7 @@
  *      pollTimer  object   timer object for poll timer
  *      retryTimer object   timer object for retry timer
  *      session    object   snmp session object
- *      inactive   bool     flag indicating conection status of device
-        
+ *      inactive   bool     flag indicating conection status of device        
  */
 
 /* jshint -W097 */
