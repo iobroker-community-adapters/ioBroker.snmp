@@ -222,7 +222,7 @@
                             "title": "lblDevTimeout",
                             "filter": false,
                             "sort": false,
-                            "min": "1",
+                            "min": 1,
                             "default": "5"
                         },
                         {
@@ -232,7 +232,7 @@
                             "title": "lblDevRetryIntvl",
                             "filter": false,
                             "sort": false,
-                            "min": "1",
+                            "min": 1,
                             "default": "5"
                         },
                         {
@@ -242,7 +242,7 @@
                             "title": "lblDevPollIntvl",
                             "filter": false,
                             "sort": false,
-                            "min": "1",
+                            "min": 1,
                             "default": "30"
                         }
                     ]
@@ -375,8 +375,8 @@
                     "label": "lblOptChunkSize",
                     "filter": false,
                     "sort": false,
-                    "min": "1",
-                    "max": "50",
+                    "min": 1,
+                    "max": 50,
                     "default": "20",
                     "tooltip": "ttOptChunkSize",
                     "help": "hlpOptChunkSize"
