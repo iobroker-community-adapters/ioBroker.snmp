@@ -1037,6 +1037,9 @@ async function onReady() {
         return;
     }
 
+    // read global config
+    g_chunkSize = adapter.config.optChunkSize || 20;
+    adapter.log.info("adapter initializing, chunk size set to " + g_chunkSize);
 
     // setup worker thread contices
     setupContices();
