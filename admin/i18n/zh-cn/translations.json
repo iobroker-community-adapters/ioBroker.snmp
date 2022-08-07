@@ -40,5 +40,8 @@
     "lblOptions": "选项",
     "lblOptUseIp": "兼容模式 - 使用 IP 地址作为状态 ID",
     "ttOptUseIp": "标记为使用 IP 地址作为状态 ID",
-    "hlpOptUseIp": "选择此选项会导致 ip-address 用于状态 id，就像在以前的版本中一样。"
+    "hlpOptUseIp": "选择此选项会导致 ip-address 用于状态 id，就像在以前的版本中一样。",
+    "lblOptChunkSize": "包大小",
+    "ttOptChunkSize": "一个请求中的最大 oid 计数",
+    "hlpOptChunkSize": "此参数指定一个请求中的最大 oid 计数。"
 }

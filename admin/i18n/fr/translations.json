@@ -40,5 +40,8 @@
     "lblOptions": "Choix",
     "lblOptUseIp": "Mode de compatibilité - utiliser l'adresse IP pour les identifiants d'état",
     "ttOptUseIp": "marquer pour utiliser l'adresse IP pour les identifiants d'état",
-    "hlpOptUseIp": "La sélection de cette option entraîne l'utilisation de l'adresse IP pour les ID d'état comme dans les versions précédentes."
+    "hlpOptUseIp": "La sélection de cette option entraîne l'utilisation de l'adresse IP pour les ID d'état comme dans les versions précédentes.",
+    "lblOptChunkSize": "Taille de paquet",
+    "ttOptChunkSize": "Nombre maximal d'ID dans une requête",
+    "hlpOptChunkSize": "Ce paramètre spécifie le nombre maximal d'oid dans une requête. "
 }

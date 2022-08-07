@@ -7,6 +7,42 @@
  */
 
 /*
+ * Remark related to REAL / FLOAT values returned:
+ *
+ * see http://www.net-snmp.org/docs/mibs/NET-SNMP-TC.txt
+ * 
+ * --
+ * -- Define the Float Textual Convention
+ * --   This definition was written by David Perkins.
+ * --
+ * 
+ * Float ::= TEXTUAL-CONVENTION
+ *     STATUS      current
+ *     DESCRIPTION
+ *         "A single precision floating-point number.  The semantics
+ *          and encoding are identical for type 'single' defined in
+ *          IEEE Standard for Binary Floating-Point,
+ *          ANSI/IEEE Std 754-1985.
+ *          The value is restricted to the BER serialization of
+ *          the following ASN.1 type:
+ *              FLOATTYPE ::= [120] IMPLICIT FloatType
+ *          (note: the value 120 is the sum of '30'h and '48'h)
+ *          The BER serialization of the length for values of
+ *          this type must use the definite length, short
+ *          encoding form.
+ * 
+ *          For example, the BER serialization of value 123
+ *          of type FLOATTYPE is '9f780442f60000'h.  (The tag
+ *          is '9f78'h; the length is '04'h; and the value is
+ *          '42f60000'h.) The BER serialization of value
+ *          '9f780442f60000'h of data type Opaque is
+ *          '44079f780442f60000'h. (The tag is '44'h; the length
+ *          is '07'h; and the value is '9f780442f60000'h.)"
+ *     SYNTAX Opaque (SIZE (7))
+ * 
+ */
+ 
+/*
  * description if major internal objects
  *
  *	CTXs		object (array) of CTX objectes
@@ -23,18 +59,19 @@
  *      pollIntvl  number   snmp poll intervall (ms)
  *      snmpVers   number   snmp version
  *      community  string   snmp comunity (v1, v2c)
- *      OIDs       array of objects
+ *      chunks     array    array of oid data consiting of 
+ *      {
+ *          OIDs       array of objects
  *                          oid config object (contains i.e. flags)
- *      oids       array of strings
+ *          oids       array of strings
  *                          oids to be read
- *      ids        array of strings
- *                          ids fro oids to be read
- *
+ *          ids        array of strings
+ *                          ids for oids to be read
+ *      }
  *      pollTimer  object   timer object for poll timer
  *      retryTimer object   timer object for retry timer
  *      session    object   snmp session object
- *      inactive   bool     flag indicating conection status of device
-        
+ *      inactive   bool     flag indicating conection status of device        
  */
 
 /* jshint -W097 */
@@ -74,9 +111,10 @@ let didInstall = false;
 // #################### global variables ####################
 let adapter;    // adapter instance - @type {ioBroker.Adapter}
 
-const CTXs = [];		// see description at header of file
-let isConnected = false; 	// local copy of info.connection state 
-let connUpdateTimer = null;
+const CTXs = [];		    // see description at header of file
+let g_isConnected = false; 	// local copy of info.connection state 
+let g_connUpdateTimer = null;
+let g_chunkSize = 3;         // mximum number of OIDs per request
 
 /**
  * Start the adapter instance
@@ -300,8 +338,10 @@ async function initAllObjects() {
     for (let ii = 0; ii < CTXs.length; ii++) {
         await initDeviceObjects(CTXs[ii].id, CTXs[ii].ipAddr);
 
-        for (let jj = 0; jj < CTXs[ii].ids.length; jj++) {
-            await initOidObjects(CTXs[ii].ids[jj], CTXs[ii].oids[jj]);
+        for (let cc = 0; cc < CTXs[ii].chunks.length; cc++) {
+            for (let jj = 0; jj < CTXs[ii].chunks[cc].ids.length; jj++) {
+                await initOidObjects(CTXs[ii].chunks[cc].ids[jj], CTXs[ii].chunks[cc].oids[jj]);
+            }
         }
     }
 }
@@ -433,8 +473,8 @@ async function createSession(pCTX) {
  * @return string
  *
  */
-function processVarbind(pCTX, pId, pIdx, pVarbind) {
-    adapter.log.debug('processVarbind - [' + pId + '] ' + pCTX.ids[pIdx]);
+function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
+    adapter.log.debug('processVarbind - [' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx]);
 
     let valStr;
     let valTypeStr;
@@ -551,12 +591,91 @@ function processVarbind(pCTX, pId, pIdx, pVarbind) {
             break;
         }
     }
-    adapter.log.debug('[' + pId + '] ' + pCTX.ids[pIdx] + '(' + valTypeStr + ')' + JSON.stringify(pVarbind));
-    adapter.log.debug('[' + pId + '] update ' + pCTX.ids[pIdx] + ': ' + valStr);
-    adapter.setState(pCTX.ids[pIdx], valStr, true); // data OK
+    adapter.log.debug('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + '(' + valTypeStr + ')' + JSON.stringify(pVarbind));
+    adapter.log.debug('[' + pId + '] update ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ': ' + valStr);
+    adapter.setState(pCTX.chunks[pChunkIdx].ids[pIdx], valStr, true); // data OK
     return;
 }
     
+/**
+ * readChunkOids - read all oids within one chunk from a specific target device
+ *
+ * @param {pCtx} specific context
+ * @param {pIdx} chunk index
+ * @return
+ *
+ */
+ function readChunkOids(pCTX, pIdx) {
+    adapter.log.debug('readChunkOIDs - device "' + pCTX.name + '" (' + pCTX.ipAddr + '), chunk idx ' + pIdx);
+
+    return new Promise((resolve,_reject)=>{
+        const session = pCTX.session;
+        const id = pCTX.id;
+        const oids = pCTX.chunks[pIdx].oids;
+        const ids = pCTX.chunks[pIdx].ids;
+
+        session.get(oids, (err, varbinds) => {
+            adapter.log.debug('[' + id + '] session.get completed for chunk index ' + pIdx );
+            if (err) {
+                // error occured
+                adapter.log.debug('[' + id + '] session.get: ' + err.toString());
+                if (err.toString() === 'RequestTimedOutError: Request timed out') {
+                    // timeout error
+                    for (let ii = 0; ii < pCTX.chunks[pIdx].ids.length; ii++) {
+                        adapter.setState(pCTX.chunks[pIdx].ids[ii], {q:0x02} ); // connection problem
+                    }
+                    if (!pCTX.inactive || !pCTX.initialized) {
+                        adapter.log.info('[' + id + '] device disconnected - request timout');
+                        pCTX.inactive = true;
+                        setImmediate(handleConnectionInfo);
+                    }
+                } else {
+                    // other error
+                    for (let ii = 0; ii < pCTX.ids.length; ii++) {
+                        adapter.setState(pCTX.chunks[cc].ids[ii], {val: null, ack: true, q:0x44} ); // device reports error
+                    }
+                    if (!pCTX.inactive || !pCTX.initialized) {
+                        adapter.log.error('[' + id + '] session.get: ' + err.toString());
+                        adapter.log.info('[' + id + '] device disconnected');
+                        pCTX.inactive = true;
+                        setImmediate(handleConnectionInfo);
+                    }
+                }
+                adapter.setState(id + '.online', false, true);
+            } else {
+                // success
+                if (pCTX.inactive) {
+                    adapter.log.info('[' + id + '] device (re)connected');
+                    pCTX.inactive = false;
+                    setImmediate(handleConnectionInfo);
+                }
+                adapter.setState(id + '.online', true, true);
+
+                // process returned values
+                for (let ii = 0; ii < varbinds.length; ii++) {
+                    if (snmp.isVarbindError(varbinds[ii])) {
+                    if ( ! pCTX.chunks[pIdx].OIDs[ii].oidOptional || 
+                            ! snmp.varbindError(varbinds[ii]).startsWith("NoSuchObject:") ) {
+                                adapter.log.error('[' + id + '] session.get: ' + snmp.varbindError(varbinds[ii]));               
+                        }                   
+                        adapter.setState(pCTX.chunks[pIdx].ids[ii], { val: null, ack: true, q: 0x84}); // sensor reports error
+                    } else {
+                        //adapter.log.debug('[' + id + '] update ' + pCTX.ids[ii] + ': ' + varbinds[ii].value.toString());
+                        //adapter.setState(pCTX.ids[ii], varbinds[ii].value.toString(), true); // data OK
+                        processVarbind(pCTX, pIdx, id, ii, varbinds[ii]);
+                    }
+                }
+            }
+
+            if (!pCTX.initialized) {
+                pCTX.initialized = true;
+                setImmediate(handleConnectionInfo);
+            }
+            resolve();
+        });
+    });
+}
+
 /**
  * readOids - read all oids from a specific target device
  *
@@ -564,71 +683,17 @@ function processVarbind(pCTX, pId, pIdx, pVarbind) {
  * @return
  *
  */
-function readOids(pCTX) {
+async function readOids(pCTX) {
     adapter.log.debug('readOIDs - device "' + pCTX.name + '" (' + pCTX.ipAddr + ')');
 
     const session = pCTX.session;
     const id = pCTX.id;
-    const oids = pCTX.oids;
-    const ids = pCTX.ids;
 
-    session.get(oids, (err, varbinds) => {
-        if (err) {
-            // error occured
-            adapter.log.debug('[' + id + '] session.get: ' + err.toString());
-            if (err.toString() === 'RequestTimedOutError: Request timed out') {
-                // timeout error
-                for (let ii = 0; ii < pCTX.ids.length; ii++) {
-                    adapter.setState(pCTX.ids[ii], {q:0x02} ); // connection problem
-                }
-                if (!pCTX.inactive || !pCTX.initialized) {
-                    adapter.log.info('[' + id + '] device disconnected - request timout');
-                    pCTX.inactive = true;
-                    setImmediate(handleConnectionInfo);
-                }
-            } else {
-                // other error
-                for (let ii = 0; ii < pCTX.ids.length; ii++) {
-                    adapter.setState(pCTX.ids[ii], {val: null, ack: true, q:0x44} ); // device reports error
-                }
-                if (!pCTX.inactive || !pCTX.initialized) {
-                    adapter.log.error('[' + id + '] session.get: ' + err.toString());
-                    adapter.log.info('[' + id + '] device disconnected');
-                    pCTX.inactive = true;
-                    setImmediate(handleConnectionInfo);
-                }
-            }
-            adapter.setState(id + '.online', false, true);
-        } else {
-            // success
-            if (pCTX.inactive) {
-                adapter.log.info('[' + id + '] device (re)connected');
-                pCTX.inactive = false;
-                setImmediate(handleConnectionInfo);
-            }
-            adapter.setState(id + '.online', true, true);
-
-            // process returned values
-            for (let ii = 0; ii < varbinds.length; ii++) {
-                if (snmp.isVarbindError(varbinds[ii])) {
-                   if ( ! pCTX.OIDs[ii].oidOptional || 
-                        ! snmp.varbindError(varbinds[ii]).startsWith("NoSuchObject:") ) {
-                            adapter.log.error('[' + id + '] session.get: ' + snmp.varbindError(varbinds[ii]));               
-                    }                   
-                    adapter.setState(pCTX.ids[ii], { val: null, ack: true, q: 0x84}); // sensor reports error
-                } else {
-                    //adapter.log.debug('[' + id + '] update ' + pCTX.ids[ii] + ': ' + varbinds[ii].value.toString());
-                    //adapter.setState(pCTX.ids[ii], varbinds[ii].value.toString(), true); // data OK
-                    processVarbind(pCTX, id, ii, varbinds[ii]);
-                }
-            }
-        }
-
-        if (!pCTX.initialized) {
-            pCTX.initialized = true;
-            setImmediate(handleConnectionInfo);
-        }
-    });
+    for (let cc = 0; cc < pCTX.chunks.length; cc++) {
+        adapter.log.debug('[' + id + '] processing oid chunk index ' + cc );    
+        await readChunkOids( pCTX, cc);
+        adapter.log.debug('[' + id + '] processing oid chunk index ' + cc + ' completed' );    
+    }
 }
 
 // #################### general housekeeping functions ####################
@@ -643,16 +708,16 @@ function handleConnectionInfo() {
         }
     }
 
-    if (isConnected !== haveConnection) {
+    if (g_isConnected !== haveConnection) {
         if (haveConnection) {
             adapter.log.info('instance connected to at least one device');
         } else {
             adapter.log.info('instance disconnected from all devices');
         }
-        isConnected = haveConnection;
+        g_isConnected = haveConnection;
 
-        adapter.log.debug('info.connection set to ' + isConnected);
-        adapter.setState('info.connection', isConnected, true);
+        adapter.log.debug('info.connection set to ' + g_isConnected);
+        adapter.setState('info.connection', g_isConnected, true);
     }
 }
 
@@ -874,13 +939,17 @@ function setupContices() {
         CTXs[jj].pollIntvl = dev.devPollIntvl * 1000;     //s -> ms
         CTXs[jj].snmpVers = dev.devSnmpVers;
         CTXs[jj].authId = dev.devAuthId;
-        CTXs[jj].OIDs = [];
-        CTXs[jj].oids = [];
-        CTXs[jj].ids = [];
+//        CTXs[jj].OIDs = [];
+//        CTXs[jj].oids = [];
+//        CTXs[jj].ids = [];
+        CTXs[jj].chunks = [];
 
-        CTXs[jj].pollTimer = null;     // poll intervall timer
-        CTXs[jj].session = null;     // snmp session
-        CTXs[jj].inactive = true;     // connection status of device
+        CTXs[jj].pollTimer = null;  // poll intervall timer
+        CTXs[jj].session = null;    // snmp session
+        CTXs[jj].inactive = true;   // connection status of device
+
+        let cIdx = -1;              // chunk index
+        let cCnt = 0;     // chunk element count
 
         for (let oo = 0; oo < adapter.config.oids.length; oo++) {
             let oid = adapter.config.oids[oo];
@@ -890,9 +959,23 @@ function setupContices() {
             if (dev.devOidGroup != oid.oidGroup) continue;
 
             let id = CTXs[jj].id + '.' + name2id(oid.oidName);
-            CTXs[jj].oids.push(oid.oidOid);
-            CTXs[jj].ids.push(id);
-            CTXs[jj].OIDs.push(oid);
+            if (cCnt <=0 )
+            {
+                cIdx++;
+                CTXs[jj].chunks.push([]);
+                CTXs[jj].chunks[cIdx].OIDs = [];
+                CTXs[jj].chunks[cIdx].oids = [];
+                CTXs[jj].chunks[cIdx].ids = [];
+                cCnt = g_chunkSize;
+                adapter.log.debug('       oid chunk index ' + cIdx + ' created');
+            }
+//            CTXs[jj].oids.push(oid.oidOid);
+//            CTXs[jj].ids.push(id);
+//            CTXs[jj].OIDs.push(oid);
+            CTXs[jj].chunks[cIdx].oids.push(oid.oidOid);
+            CTXs[jj].chunks[cIdx].ids.push(id);
+            CTXs[jj].chunks[cIdx].OIDs.push(oid);
+            cCnt--;
 
             adapter.log.debug('       oid "' + oid.oidOid + '" (' + id + ')');
         }
@@ -954,6 +1037,9 @@ async function onReady() {
         return;
     }
 
+    // read global config
+    g_chunkSize = adapter.config.optChunkSize || 20;
+    adapter.log.info("adapter initializing, chunk size set to " + g_chunkSize);
 
     // setup worker thread contices
     setupContices();
@@ -972,7 +1058,7 @@ async function onReady() {
 
     // start connection info updater
     adapter.log.debug('startconnection info updater');
-    connUpdateTimer = setInterval(handleConnectionInfo, 15000)
+    g_connUpdateTimer = setInterval(handleConnectionInfo, 15000)
 
     adapter.log.debug('startup completed');
 
@@ -1014,11 +1100,11 @@ function onUnload(callback) {
         }
     };
 
-    if (connUpdateTimer) {
+    if (g_connUpdateTimer) {
         try {
-            clearInterval(connUpdateTimer);
+            clearInterval(g_connUpdateTimer);
         } catch { };
-        connUpdateTimer = null;
+        g_connUpdateTimer = null;
     };
 
     try {

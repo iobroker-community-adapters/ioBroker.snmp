@@ -20,6 +20,9 @@ This adapter can be used to poll information from devices like printers, network
 <!--
 ## __WORK IN PROGRESS__
 -->
+### __WORK IN PROGRESS__
+* (McM1957) A new option to control the number of OIDs within a single request has been added to avoid TOOBIG errors (#72)
+
 ### 2.1.2 (2022-08-02)
 * (McM1957) conversion of floatingpoint values has been corrected (#16)
 
@@ -118,7 +121,10 @@ Here you specify some general options
 
 | Parameter     | Type        | Description                       | Comment                             |
 |---------------|-------------|-----------------------------------|-------------------------------------|
-| Compatibility mode | boolean | if this option is activeted, datapoint names are based on ip address   |
+| Packetsize    | integer     | myximum number of OIDs sent within a single request   | reduce this value in case of TOOBIG errors |
+| Compatibility mode | boolean | if this option is activeted, datapoint names are based on ip address | |
+
+
 
 ## __License__
 The MIT License (MIT)

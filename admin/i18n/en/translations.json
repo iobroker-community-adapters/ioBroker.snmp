@@ -41,6 +41,9 @@
     "lblAuthEncKey":    "encryption key",
 
     "lblOptions":       "Options",
+    "lblOptChunkSize":  "Packetsize",
+    "ttOptChunkSize":   "Maximum oid count within one request",
+    "hlpOptChunkSize":  "This parameter specifies the maximum oid count within one request.",
     "lblOptUseIp":      "Compatibility mode - use ip address for state ids",
     "ttOptUseIp":       "mark to use ip adress for state ids",
     "hlpOptUseIp":      "Selecting this option causes the ip-address to be used for state ids as in prior releases."

@@ -40,5 +40,8 @@
     "lblOptions": "Opções",
     "lblOptUseIp": "Modo de compatibilidade - use o endereço IP para ids de estado",
     "ttOptUseIp": "marque para usar o endereço IP para ids de estado",
-    "hlpOptUseIp": "Selecionar esta opção faz com que o endereço IP seja usado para ids de estado como nas versões anteriores."
+    "hlpOptUseIp": "Selecionar esta opção faz com que o endereço IP seja usado para ids de estado como nas versões anteriores.",
+    "lblOptChunkSize": "Tamanho do pacote",
+    "ttOptChunkSize": "Contagem máxima de oid em uma solicitação",
+    "hlpOptChunkSize": "Este parâmetro especifica a contagem máxima de oid em uma solicitação. "
 }

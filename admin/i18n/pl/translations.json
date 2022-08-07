@@ -40,5 +40,8 @@
     "lblOptions": "Opcje",
     "lblOptUseIp": "Tryb zgodności - użyj adresu IP dla identyfikatorów stanu",
     "ttOptUseIp": "zaznacz, aby użyć adresu IP dla identyfikatorów państwowych",
-    "hlpOptUseIp": "Wybranie tej opcji powoduje, że adres IP będzie używany do identyfikatorów stanu, tak jak we wcześniejszych wydaniach."
+    "hlpOptUseIp": "Wybranie tej opcji powoduje, że adres IP będzie używany do identyfikatorów stanu, tak jak we wcześniejszych wydaniach.",
+    "lblOptChunkSize": "Rozmiar pakietu",
+    "ttOptChunkSize": "Maksymalna liczba oid w ramach jednego żądania",
+    "hlpOptChunkSize": "Ten parametr określa maksymalną liczbę oid w ramach jednego żądania. "
 }
