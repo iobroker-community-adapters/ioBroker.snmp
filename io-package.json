@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "snmp",
-    "version": "2.1.2",
+    "version": "2.1.3",
     "news": {
+      "2.1.3": {
+        "en": "A new option to control the number of OIDs within a single request has been added to avoid TOOBIG errors (#72)",
+        "de": "Um TOOBIG Fehler zu vermeiden, wurde eine neue Option zur Steuerung der Anzahl der OIDs innerhalb einer einzigen Anfrage hinzugefügt (#72)",
+        "ru": "Добавлен новый вариант для контроля количества OID в рамках одного запроса, чтобы избежать ошибок TOOBIG (#72)",
+        "pt": "Uma nova opção para controlar o número de OIDs dentro de uma única solicitação foi adicionada para evitar erros TOOBIG (#72)",
+        "nl": "Een nieuwe optie om het aantal OID's binnen één verzoek te controleren is toegevoegd om te vermijden dat er teveel fouten zijn",
+        "fr": "Une nouvelle option pour contrôler le nombre d'IDO dans une seule demande a été ajoutée pour éviter les erreurs TOOBIG (#72)",
+        "it": "È stata aggiunta una nuova opzione per controllare il numero di OID all'interno di una singola richiesta per evitare errori TOOBIG (#72)",
+        "es": "Se ha añadido una nueva opción para controlar el número de OID dentro de una sola solicitud para evitar errores TOOBIG (#72)",
+        "pl": "Nowa opcja dotycząca liczby OID została dodana, aby uniknąć błędów TOOBIG (#72)",
+        "zh-cn": "添加了一种新的办法,在单一请求范围内控制裁研所的数目,以避免联机错误(第72号)"
+      },
       "2.1.2": {
         "en": "conversion of floatingpoint values has been corrected (#16)",
         "de": "die umwandlung von floatingpoint-werten wurde korrigiert (#16)",
@@ -74,18 +86,6 @@
         "es": "IMPORTANTE: ¡Esta versión cambiará las estructuras de los objetos!\nreducir la latencia para la actualización de info.connection\nevitar registros de errores excesivos si el objetivo no es alcanzable, optimizar el registro\nagregue más en línea en la base de ip para indicar que se puede alcanzar el objetivo\nadvertencia de salida si los OID especifican diferentes comunidades para un dispositivo\nAgregar Sentry para informes de fallas",
         "pl": "WAŻNE: Ta wersja zmieni strukturę obiektów!!\nskrócić czas oczekiwania na aktualizację info.connection\nunikaj nadmiernych rejestrów błędów, jeśli cel jest nieosiągalny, zoptymalizuj rejestrowanie\ndodaj dodatkowe online w bazie IP, aby wskazać, że cel jest osiągalny\nostrzeżenie wyjściowe, jeśli OID określają różne społeczności dla jednego urządzenia\nDodaj Sentry do zgłaszania awarii",
         "zh-cn": "重要提示：此版本将更改对象结构！！\n减少更新 info.connection 的延迟\n如果目标不可达，避免过多的错误日志，优化日志记录\n在 ip base 添加额外的在线以指示目标是可达的\n如果 OID 为一台设备指定不同的社区，则输出警告\n添加 Sentry 以进行崩溃报告"
-      },
-      "0.5.0": {
-        "en": "Initial Release",
-        "de": "Erstveröffentlichung",
-        "ru": "Первый выпуск",
-        "pt": "Lançamento inicial",
-        "nl": "Eerste uitgave",
-        "fr": "Première version",
-        "it": "Versione iniziale",
-        "es": "Versión inicial",
-        "pl": "Pierwsze wydanie",
-        "zh-cn": "初始发行"
       }
     },
     "title": "SNMP",

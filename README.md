@@ -20,7 +20,7 @@ This adapter can be used to poll information from devices like printers, network
 <!--
 ## __WORK IN PROGRESS__
 -->
-### __WORK IN PROGRESS__
+### 2.1.3 (2022-08-07)
 * (McM1957) A new option to control the number of OIDs within a single request has been added to avoid TOOBIG errors (#72)
 
 ### 2.1.2 (2022-08-02)
