@@ -631,8 +631,8 @@ function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
                     }
                 } else {
                     // other error
-                    for (let ii = 0; ii < pCTX.chunks[cc].ids.length; ii++) {
-                        adapter.setState(pCTX.chunks[cc].ids[ii], {val: null, ack: true, q:0x44} ); // device reports error
+                    for (let ii = 0; ii < pCTX.chunks[pIdx].ids.length; ii++) {
+                        adapter.setState(pCTX.chunks[pIdx].ids[ii], {val: null, ack: true, q:0x44} ); // device reports error
                     }
                     if (!pCTX.inactive || !pCTX.initialized) {
                         adapter.log.error('[' + id + '] session.get: ' + err.toString());
