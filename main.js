@@ -536,7 +536,7 @@ function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
                  }
             else {
                 valStr = null;
-                adapter.log.error('[' + pId + '] ' + pCTX.ids[pIdx] + ' cannot convert opaque data ' + JSON.stringify(pVarbind));
+                adapter.log.error('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert opaque data ' + JSON.stringify(pVarbind));
             }
             break;
         }
@@ -631,8 +631,8 @@ function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
                     }
                 } else {
                     // other error
-                    for (let ii = 0; ii < pCTX.ids.length; ii++) {
-                        adapter.setState(pCTX.chunks[cc].ids[ii], {val: null, ack: true, q:0x44} ); // device reports error
+                    for (let ii = 0; ii < pCTX.chunks[pIdx].ids.length; ii++) {
+                        adapter.setState(pCTX.chunks[pIdx].ids[ii], {val: null, ack: true, q:0x44} ); // device reports error
                     }
                     if (!pCTX.inactive || !pCTX.initialized) {
                         adapter.log.error('[' + id + '] session.get: ' + err.toString());
@@ -948,7 +948,7 @@ function setupContices() {
         CTXs[jj].session = null;    // snmp session
         CTXs[jj].inactive = true;   // connection status of device
 
-        let cIdx = -1;              // chunk index
+        let cIdx = -1;    // chunk index
         let cCnt = 0;     // chunk element count
 
         for (let oo = 0; oo < adapter.config.oids.length; oo++) {
@@ -959,7 +959,7 @@ function setupContices() {
             if (dev.devOidGroup != oid.oidGroup) continue;
 
             let id = CTXs[jj].id + '.' + name2id(oid.oidName);
-            if (cCnt <=0 )
+            if (cCnt <= 0 )
             {
                 cIdx++;
                 CTXs[jj].chunks.push([]);
