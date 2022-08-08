@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "snmp",
-    "version": "2.1.3",
+    "version": "2.1.4",
     "news": {
+      "2.1.4": {
+        "en": "HOTFIX - A system crash at SNMP v1 errors has been fixed (#145)",
+        "de": "HOTFIX - Ein Systemabsturz bei SNMP v1 Fehlern wurde behoben (#145)",
+        "ru": "HOTFIX - Исправлена сбой системы при ошибках SNMP v1 (#145)",
+        "pt": "HOTFIX - Um acidente de sistema em erros SNMP v1 foi corrigido (#145)",
+        "nl": "HOTFIX, een systeemcrash bij SNMP V1 fouten is gemaakt (145)",
+        "fr": "HOTFIX - Un plantage système sur les erreurs SNMP v1 a été corrigé (#145)",
+        "it": "HOTFIX - È stato fissato un crash di sistema a errori SNMP v1 (#145)",
+        "es": "HOTFIX - Se ha fijado un fallo del sistema en los errores SNMP v1 (#145)",
+        "pl": "HOTFIX – wypadek systemowy w SNMP v1 został ustalony (#145)",
+        "zh-cn": "已经确定(第145号)"
+      },
       "2.1.3": {
         "en": "A new option to control the number of OIDs within a single request has been added to avoid TOOBIG errors (#72)",
         "de": "Um TOOBIG Fehler zu vermeiden, wurde eine neue Option zur Steuerung der Anzahl der OIDs innerhalb einer einzigen Anfrage hinzugefügt (#72)",
@@ -74,18 +86,6 @@
         "es": "* IMPORTANTE: ¡Esta versión cambiará las estructuras de configuración!\nPor favor, respalde su configuración antes de iniciar la instalación.\nLa instalación intentará convertir la antigua configuración - pero no está garantizada a tener éxito en todos los casos.\n* Muchas partes del código han sido reescribidas\n* El adaptador ahora utiliza la interfaz admin5\n* Los valores del temporizador se pueden configurar de forma diferente por dispositivo (#105)\n* Cambiar el orden de las entradas de configuración ya no destruye datos (#15)\n* Los objetivos de los dispositivos pueden ser nombrados ahora. El comportamiento antiguo está disponible como opción.\n* Restricción conocida: actualmente sólo se admite SNMP V1.\n* Restricción conocida: Atributos OID opcionales y escribibles todavía no se implementan.",
         "pl": "* IMPORTANT: Wydanie zmieni strukturę konfiguracji!\nPozwólcie na tył przed rozpoczęciem instalacji.\nInstalacja będzie starała się przekształcić starą konfigurację, ale nie jest zagwarantowana w żadnych przypadkach.\n* Wiele fragmentów kodu zostało przepisanych\n* Administrator korzysta z interfejsu admin5\nWartość * Timer może być ustawiona w różny sposób (#105)\n* Zmianowanie kolejności konfiguracyjnych nie niszcza danych (#15)\n* Narządy dla urządzeń mogą być obecnie nazywane. Stare zachowanie jest dostępne jako opcja.\n* Znana restrykcja: obecnie tylko SNMP V1.\n* Znana restrykcja: Atrybuty opcjonalne i piśmienne nie są jeszcze wdrożone.",
         "zh-cn": "* IMPORTANT:这一释放将改变结构!\n请在开始安装之前支持你的配置。.\n乱葬将设法改变旧的格局,但不能保证在所有情况下取得成功。.\n* A/64/50。 守则的许多部分已经改写。\n* A/64/50。 适应者现在使用了特明5个接口。\n* 时间数值现在可按不同类型确定(第105号)。\n* 更改组合物品的顺序不再销毁数据(第15号)。\n* 目前可以指定国家对装置的控制。 旧的行为可以作为一种选择。.\n* Known限制:目前只有SNMP V1得到支持。.\n* Known限制: 未执行裁研所的任择和可写性。."
-      },
-      "1.0.0": {
-        "en": "IMPORTANT: This release will change the object structures!!\nreduce latency for update of info.connection \navoid excessive error logs if target is unreachable, optimize logging\nadd additional online at ip base to indicate target is reachable\noutput warning if OIDs specify different communities for one device\nAdd Sentry for crash reporting",
-        "de": "WICHTIG: Diese Version wird die Objektstrukturen ändern!!\nLatenzreduzierung für die Aktualisierung von info.connection\nVermeidung von übermäßigen Fehlerprotokollen, falls das Ziel nicht erreichbar ist und Protokollierungoptimierung\nOnline Status der IP-Adresse zur Anzeige der Erreichbarkeit hinzugefügt\nAusgabe einer Warnung, wenn OIDs unterschiedlicher Communities für ein Gerät angeben werden\nSentry für Absturzberichte hinzugefügt",
-        "ru": "ВАЖНО: В этом релизе будут изменены структуры объектов!!\nуменьшить задержку для обновления info.connection\nизбегайте избыточных журналов ошибок, если цель недоступна, оптимизируйте ведение журнала\nдобавить дополнительный онлайн на базе ip, чтобы указать, что цель достижима\nвывод предупреждения, если OID указывают разные сообщества для одного устройства\nДобавьте Sentry для отчетов о сбоях",
-        "pt": "IMPORTANTE: Esta versão irá alterar as estruturas dos objetos!!\nreduzir a latência para atualização de info.connection\nevite logs de erros excessivos se o destino estiver inacessível, otimize o log\nadicione on-line adicional na base do ip para indicar que o destino é alcançável\naviso de saída se os OIDs especificarem comunidades diferentes para um dispositivo\nAdicionar Sentinela para relatórios de falhas",
-        "nl": "BELANGRIJK: Deze release zal de objectstructuren veranderen!!\nverminder latentie voor update van info.connection\nvermijd overmatige foutenlogboeken als het doel onbereikbaar is, optimaliseer de logboekregistratie\nvoeg extra online toe op ip-basis om aan te geven dat het doel bereikbaar is\nuitvoerwaarschuwing als OID's verschillende gemeenschappen specificeren voor één apparaat\nSentry toevoegen voor crashrapportage",
-        "fr": "IMPORTANT : Cette version modifiera les structures d'objets !\nréduire la latence pour la mise à jour d'info.connection\néviter les journaux d'erreurs excessifs si la cible est inaccessible, optimiser la journalisation\najouter en ligne supplémentaire à la base IP pour indiquer que la cible est accessible\navertissement de sortie si les OID spécifient différentes communautés pour un appareil\nAjouter Sentry pour les rapports de plantage",
-        "it": "IMPORTANTE: questa versione cambierà le strutture degli oggetti!!\nridurre la latenza per l'aggiornamento di info.connection\nevitare log di errori eccessivi se la destinazione non è raggiungibile, ottimizzare la registrazione\naggiungere ulteriore online alla base IP per indicare che l'obiettivo è raggiungibile\navviso di output se gli OID specificano comunità diverse per un dispositivo\nAggiungi Sentinella per la segnalazione degli arresti anomali",
-        "es": "IMPORTANTE: ¡Esta versión cambiará las estructuras de los objetos!\nreducir la latencia para la actualización de info.connection\nevitar registros de errores excesivos si el objetivo no es alcanzable, optimizar el registro\nagregue más en línea en la base de ip para indicar que se puede alcanzar el objetivo\nadvertencia de salida si los OID especifican diferentes comunidades para un dispositivo\nAgregar Sentry para informes de fallas",
-        "pl": "WAŻNE: Ta wersja zmieni strukturę obiektów!!\nskrócić czas oczekiwania na aktualizację info.connection\nunikaj nadmiernych rejestrów błędów, jeśli cel jest nieosiągalny, zoptymalizuj rejestrowanie\ndodaj dodatkowe online w bazie IP, aby wskazać, że cel jest osiągalny\nostrzeżenie wyjściowe, jeśli OID określają różne społeczności dla jednego urządzenia\nDodaj Sentry do zgłaszania awarii",
-        "zh-cn": "重要提示：此版本将更改对象结构！！\n减少更新 info.connection 的延迟\n如果目标不可达，避免过多的错误日志，优化日志记录\n在 ip base 添加额外的在线以指示目标是可达的\n如果 OID 为一台设备指定不同的社区，则输出警告\n添加 Sentry 以进行崩溃报告"
       }
     },
     "title": "SNMP",

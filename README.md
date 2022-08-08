@@ -20,7 +20,7 @@ This adapter can be used to poll information from devices like printers, network
 <!--
 ## __WORK IN PROGRESS__
 -->
-### __WORK IN PROGRESS__
+### 2.1.4 (2022-08-08)
 * (McM1957) HOTFIX - A system crash at SNMP v1 errors has been fixed (#145)
 
 ### 2.1.3 (2022-08-07)
