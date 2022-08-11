@@ -655,7 +655,7 @@ function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
                 for (let ii = 0; ii < varbinds.length; ii++) {
                     if (snmp.isVarbindError(varbinds[ii])) {
                     if ( ! pCTX.chunks[pIdx].OIDs[ii].oidOptional || 
-                            ! snmp.varbindError(varbinds[ii]).startsWith("NoSuchObject:") ) {
+                            ! snmp.varbindError(varbinds[ii]).startsWith("NoSuchInstance:") ) {
                                 adapter.log.error('[' + id + '] session.get: ' + snmp.varbindError(varbinds[ii]));               
                         }                   
                         adapter.setState(pCTX.chunks[pIdx].ids[ii], { val: null, ack: true, q: 0x84}); // sensor reports error
