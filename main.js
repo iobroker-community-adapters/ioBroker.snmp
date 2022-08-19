@@ -614,65 +614,71 @@ function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
         const oids = pCTX.chunks[pIdx].oids;
         const ids = pCTX.chunks[pIdx].ids;
 
-        session.get(oids, (err, varbinds) => {
-            adapter.log.debug('[' + id + '] session.get completed for chunk index ' + pIdx );
-            if (err) {
-                // error occured
-                adapter.log.debug('[' + id + '] session.get: ' + err.toString());
-                if (err.toString() === 'RequestTimedOutError: Request timed out') {
-                    // timeout error
-                    for (let ii = 0; ii < pCTX.chunks[pIdx].ids.length; ii++) {
-                        adapter.setState(pCTX.chunks[pIdx].ids[ii], {q:0x02} ); // connection problem
+        if (! session) {
+            // issue #151 - the session object might get deleted during prosessing of get loop
+            adapter.log.debug( 'session vanished, skipping get oparation');
+            resolve();
+        } else {
+            session.get(oids, (err, varbinds) => {
+                adapter.log.debug('[' + id + '] session.get completed for chunk index ' + pIdx );
+                if (err) {
+                    // error occured
+                    adapter.log.debug('[' + id + '] session.get: ' + err.toString());
+                    if (err.toString() === 'RequestTimedOutError: Request timed out') {
+                        // timeout error
+                        for (let ii = 0; ii < pCTX.chunks[pIdx].ids.length; ii++) {
+                            adapter.setState(pCTX.chunks[pIdx].ids[ii], {q:0x02} ); // connection problem
+                        }
+                        if (!pCTX.inactive || !pCTX.initialized) {
+                            adapter.log.info('[' + id + '] device disconnected - request timout');
+                            pCTX.inactive = true;
+                            setImmediate(handleConnectionInfo);
+                        }
+                    } else {
+                        // other error
+                        for (let ii = 0; ii < pCTX.chunks[pIdx].ids.length; ii++) {
+                            adapter.setState(pCTX.chunks[pIdx].ids[ii], {val: null, ack: true, q:0x44} ); // device reports error
+                        }
+                        if (!pCTX.inactive || !pCTX.initialized) {
+                            adapter.log.error('[' + id + '] session.get: ' + err.toString());
+                            adapter.log.info('[' + id + '] device disconnected');
+                            pCTX.inactive = true;
+                            setImmediate(handleConnectionInfo);
+                        }
                     }
-                    if (!pCTX.inactive || !pCTX.initialized) {
-                        adapter.log.info('[' + id + '] device disconnected - request timout');
-                        pCTX.inactive = true;
-                        setImmediate(handleConnectionInfo);
-                    }
+                    adapter.setState(id + '.online', false, true);
                 } else {
-                    // other error
-                    for (let ii = 0; ii < pCTX.chunks[pIdx].ids.length; ii++) {
-                        adapter.setState(pCTX.chunks[pIdx].ids[ii], {val: null, ack: true, q:0x44} ); // device reports error
-                    }
-                    if (!pCTX.inactive || !pCTX.initialized) {
-                        adapter.log.error('[' + id + '] session.get: ' + err.toString());
-                        adapter.log.info('[' + id + '] device disconnected');
-                        pCTX.inactive = true;
+                    // success
+                    if (pCTX.inactive) {
+                        adapter.log.info('[' + id + '] device (re)connected');
+                        pCTX.inactive = false;
                         setImmediate(handleConnectionInfo);
+                    }
+                    adapter.setState(id + '.online', true, true);
+
+                    // process returned values
+                    for (let ii = 0; ii < varbinds.length; ii++) {
+                        if (snmp.isVarbindError(varbinds[ii])) {
+                        if ( ! pCTX.chunks[pIdx].OIDs[ii].oidOptional || 
+                                ! snmp.varbindError(varbinds[ii]).startsWith("NoSuchInstance:") ) {
+                                    adapter.log.error('[' + id + '] session.get: ' + snmp.varbindError(varbinds[ii]));               
+                            }                   
+                            adapter.setState(pCTX.chunks[pIdx].ids[ii], { val: null, ack: true, q: 0x84}); // sensor reports error
+                        } else {
+                            //adapter.log.debug('[' + id + '] update ' + pCTX.ids[ii] + ': ' + varbinds[ii].value.toString());
+                            //adapter.setState(pCTX.ids[ii], varbinds[ii].value.toString(), true); // data OK
+                            processVarbind(pCTX, pIdx, id, ii, varbinds[ii]);
+                        }
                     }
                 }
-                adapter.setState(id + '.online', false, true);
-            } else {
-                // success
-                if (pCTX.inactive) {
-                    adapter.log.info('[' + id + '] device (re)connected');
-                    pCTX.inactive = false;
+
+                if (!pCTX.initialized) {
+                    pCTX.initialized = true;
                     setImmediate(handleConnectionInfo);
                 }
-                adapter.setState(id + '.online', true, true);
-
-                // process returned values
-                for (let ii = 0; ii < varbinds.length; ii++) {
-                    if (snmp.isVarbindError(varbinds[ii])) {
-                    if ( ! pCTX.chunks[pIdx].OIDs[ii].oidOptional || 
-                            ! snmp.varbindError(varbinds[ii]).startsWith("NoSuchInstance:") ) {
-                                adapter.log.error('[' + id + '] session.get: ' + snmp.varbindError(varbinds[ii]));               
-                        }                   
-                        adapter.setState(pCTX.chunks[pIdx].ids[ii], { val: null, ack: true, q: 0x84}); // sensor reports error
-                    } else {
-                        //adapter.log.debug('[' + id + '] update ' + pCTX.ids[ii] + ': ' + varbinds[ii].value.toString());
-                        //adapter.setState(pCTX.ids[ii], varbinds[ii].value.toString(), true); // data OK
-                        processVarbind(pCTX, pIdx, id, ii, varbinds[ii]);
-                    }
-                }
-            }
-
-            if (!pCTX.initialized) {
-                pCTX.initialized = true;
-                setImmediate(handleConnectionInfo);
-            }
-            resolve();
-        });
+                resolve();
+            });
+        };
     });
 }
 
