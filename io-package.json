@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "snmp",
-    "version": "2.1.5",
+    "version": "2.1.6",
     "news": {
+      "2.1.6": {
+        "en": "Some issues reported by sentry have been fixed (#151, #152)",
+        "de": "Einige Probleme, die von Sentry gemeldet wurden, wurden behoben (#151, #152)",
+        "ru": "Были исправлены некоторые вопросы, которые сообщили в отправке (#151, #152)",
+        "pt": "Algumas questões relatadas por sentinela foram corrigidas (#151, #152)",
+        "nl": "Sommige problemen zijn gemeld door sentimenten zijn gerepareerd",
+        "fr": "Certaines questions signalées par la sentinelle ont été corrigées (#151, #152)",
+        "it": "Alcuni problemi segnalati dalla sentinella sono stati risolti (#151, #152)",
+        "es": "Algunos problemas reportados por el centinela han sido fijos (#151, #152)",
+        "pl": "Niektóre z nich zostały ustalone (#151, #152)",
+        "zh-cn": "发出的一些问题已经确定(第151号,第24号)。"
+      },
       "2.1.5": {
         "en": "The functionality of option \"optional\" has been restored. (#147)",
         "de": "Die Funktionalität der Option optional wurde wiederhergestellt. (#147)",
@@ -74,18 +86,6 @@
         "es": "net-snmp ha sido actualizado a la versión 3.8.2\nSe ha añadido soporte para SNMP v2c (#116)\nEl marcador de calidad de los stateobjects se utilizará en caso de error o timeout\nSe ha implementado el marcador OID Opcional. Este marcador suprime errores para OIDs que no siempre están disponibles. (#116)\nSe ha añadido apoyo a los OID de Counter64. (#57)\nLos datos devueltos por snmp communication se registrarán con más detalles ahora.\nSe ha habilitado el modo compacto. (#20)\nRestricción conocida: actualmente solo se admiten SNMP V1 y SNMP V2c.\nRestricción conocida: Atributo OID escribible todavía no se implementa.",
         "pl": "wersja 3.8.2 została zmodernizowana do wersji 3.8.2\nWsparcie dla SNMP v2c zostało dodane (#116)\nZnak jakości obiektów będzie używany w przypadku błędu lub czasu\nZaimplementowany został znak OID. Ten znak niszczy błędy OID, które nie zawsze są dostępne. (#116)\nDodano wsparcie dla Counter64 OID. (#57)\nDane zwrócone przez komunikację snmp będą obecnie wpisane z większą liczbą szczegółów.\nDostępny jest tryb kompaktowy. (#20)\nWspiera się tylko SNMP V1 i SNMP V2c.\nZnamy ograniczenia: Atrybutu OID nie został jeszcze zrealizowany.",
         "zh-cn": "净经验已升级为3.8.2。\n添加了对SNMP v2c的支持(第116号)\n在错误或时间推断的情况下,将使用国家目标的质量标志。\n裁研所的标志已经实施。 这名标示了不总是可供使用的裁研所的错误。 (第116号)\n此外,还增加了对反64名裁研所的支助。 (第57号)\n流速通信所交的数据现在将更详细。.\n合同模式得以实现。 (单位:千美元)\nKnown限制:目前只有SNMP V1和SNMP V2c得到支持。.\nKnown限制: 未执行可证明的裁研所。."
-      },
-      "2.0.1": {
-        "en": "Faulty handling of compatibility mode flag has been corrected (#135)\nLogging of errors for invalid OIDs corrected (#134)",
-        "de": "Fehlerhafte Handhabung des Kompatibilitätsmodus-Flags wurde korrigiert (#135)\nProtokollierung von Fehlern für ungültige OIDs korrigiert (#134)",
-        "ru": "Исправлена неисправная обработка флага режима совместимости (#135)\nЗапись ошибок для недействительных OID (#134)",
-        "pt": "O manuseio defeituoso da bandeira do modo de compatibilidade foi corrigido (#135)\nRegisto de erros para OIDs inválidos corrigido (#134)",
-        "nl": "Faulty Handling van compatibility mode vlag is gecorrigeerd (135)\nErnstige fouten voor invalide OIDs gecorrigeerd (134)",
-        "fr": "La manipulation par défaut du drapeau du mode de compatibilité a été corrigée (#135)\nDésignation d'erreurs pour des OID invalides corrigées (#134)",
-        "it": "È stata corretta la gestione della bandierina della modalità di compatibilità (#135)\nRegistrazione di errori per OID non validi corretti (#134)",
-        "es": "Se ha corregido el manejo predeterminado de la bandera del modo de compatibilidad (#135)\nRegistro de errores para los OID inválidos corregidos (#134)",
-        "pl": "Poprawiona flaga trybu kompatybilności została poprawiona (#135)\nUszkodzenie błędów w nieprawidłowości (pol.)",
-        "zh-cn": "对兼容方式旗帜的意外处理(第135号)进行了纠正。\n纠正无效的OIDs错误的赔偿(第134号)"
       }
     },
     "title": "SNMP",
