@@ -20,6 +20,10 @@ This adapter can be used to poll information from devices like printers, network
 <!--
 ## __WORK IN PROGRESS__
 -->
+
+### __WORK IN PROGRESS__
+* (McM1957) Documentation within README.md has been updated (#133)
+
 ### 2.1.6 (2022-08-19)
 * (McM1957) Some issues reported by sentry have been fixed (#151, #152)
 
@@ -99,8 +103,8 @@ Here you specify all oids to be queried by the adapter, one oid per line.
 | OID-Group     | text        | name of the OID group             | will used to assign group to device |
 | OID-Name      | text        | name assigned to the OID          | will used to name datapoint         |
 | OID           | text        | oid string (1.2.3.4.)             | oid string as specified by device vendor |
-| writeable     | boolean     | should be set to true if OID is writeable | reserved for future use             |
-| optional      | boolean     | should be set to true if OID is optional | reserved for future use             |
+| writeable     | boolean     | should be set to true if OID is writeable | reserved for future use     |
+| optional      | boolean     | should be set to true if OID is optional  | if set to true, no error will be raised if oid is unknown |
 
 ### __TAB Device__
 Here you specify which devices should be queried.
@@ -111,8 +115,8 @@ Here you specify which devices should be queried.
 | Name          | text        | name of the device                | will be used to create name of data points |
 | IP address    | text        | ip address (IPv4 or IPv6) with optional port number    | NOTE: currently only IPv4 is supported |
 | OID-Group     | text        | OID group specified at tab IOD Groups | A OID group can be assigned to more than one device |                   |
-| SNMP-Version  | select      | SNMP version to use               | NOTE: currently only SNMPv1 is supported     |
-| Community (v1, v2c) or Auth-ID (v3) | text | community for SNMP v1 or V2c, authorization group for SNMP v3 | NOTE: currently only SNMPv1 is supported |
+| SNMP-Version  | select      | SNMP version to use               | NOTE: SNMPv3 is not yet supported   |
+| Community (v1, v2c) or Auth-ID (v3) | text | community for SNMP v1 or V2c, authorization group for SNMP v3 | NOTE: SNMPv3 is not yet supported |
 | timeout (sec) | number      | processing timeout in seconds     |                                     |
 | retry (sec)   | number      | retry intervall in seconds        |                                     |
 | polling (sec) | number      | poll intervall in seconds         |                                     |
@@ -130,15 +134,15 @@ Here you specify some general options
 
 | Parameter     | Type        | Description                       | Comment                             |
 |---------------|-------------|-----------------------------------|-------------------------------------|
-| Packetsize    | integer     | myximum number of OIDs sent within a single request   | reduce this value in case of TOOBIG errors |
-| Compatibility mode | boolean | if this option is activeted, datapoint names are based on ip address | |
+| Packetsize    | integer     | maximum number of OIDs sent within a single request | reduce this value in case of TOOBIG errors |
+| Compatibility mode | boolean | if this option is activated, datapoint names are based on ip address | NOTE: outdated - do not use any longer. This flag will not work with IPv6 addresses. Might be removed in future releases. |
 
 
 
 ## __License__
 The MIT License (MIT)
 
-Copyright (c) 2017-2022 Marcolotti <info@ct-j.de>, ioBroker Community Developers 
+Copyright (c) 2017-2022 Marcolotti <info@ct-j.de>, McM1957 <mcm57@gmx.at>, ioBroker Community Developers 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
