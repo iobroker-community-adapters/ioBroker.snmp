@@ -20,6 +20,10 @@ This adapter can be used to poll information from devices like printers, network
 <!--
 ## __WORK IN PROGRESS__
 -->
+### __WORK IN PROGRESS__
+* (McM1957) Support for (IPv4) domainnames has been readded (#165)
+* (McM1957) external packages have been updated by dependabot
+
 ### 2.1.7 (2022-08-27)
 * (McM1957) Documentation within README.md has been updated (#133)
 

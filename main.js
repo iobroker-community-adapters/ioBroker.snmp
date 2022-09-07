@@ -841,6 +841,8 @@ function validateConfig() {
 
         if (/^\d+\.\d+\.\d+\.\d+(\:\d+)?$/.test(dev.devIpAddr)) {
             /* might be ipv4 - to be checked further */
+        } else if (/^[a-zA-Z0-9\.\-]+(\:\d+)?$/.test(dev.devIpAddr)) {
+            /* might be domain name, must be checked at latest */
         } else {
             adapter.log.error('ip address "' + dev.devIpAddr + '" has invalid format, please correct configuration.');
             ok = false;
