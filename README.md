@@ -24,6 +24,9 @@ This adapter can be used to poll information from devices like printers, network
 * (McM1957) Support for (IPv4) domainnames has been readded (#165)
 * (McM1957) external packages have been updated by dependabot
 
+### 2.1.8 (2022-09-08)
+* (McM1957) HOTFIX: Parameter "community" has not been migrated when updating to version v2.x.x from previous releases. (#163)
+
 ### 2.1.7 (2022-08-27)
 * (McM1957) Documentation within README.md has been updated (#133)
 
