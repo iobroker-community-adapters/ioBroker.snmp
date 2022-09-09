@@ -884,10 +884,12 @@ function validateConfig() {
         if (dev.devTimeout > 600) { // must be less than 0x7fffffff / 1000
             adapter.log.warn('device "' + dev.devName + '" - device timeout (' + dev.devTimeout + ') must be less than 600 seconds, please correct configuration.');
             dev.devTimeout = 600;
+            adapter.log.warn('device "' + dev.devName + '" - device timeout set to 600 seconds.');
         }
         if (dev.devTimeout < 1) {
             adapter.log.warn('device "' + dev.devName + '" - device timeout (' + dev.devTimeout + ') must be at least 1 second, please correct configuration.');
             dev.devTimeout = 1;
+            adapter.log.warn('device "' + dev.devName + '" - device timeout set to 1 second.');
         }
 
         if (!/^\d+$/.test(dev.devRetryIntvl)) {
@@ -898,10 +900,12 @@ function validateConfig() {
         if (dev.devRetryIntvl > 3600) { // must be less than 0x7fffffff / 1000
             adapter.log.warn('device "' + dev.devName + '" - retry intervall (' + dev.devRetryIntvl + ') must be less than 3600 seconds, please correct configuration.');
             dev.devRetryIntvl = 3600;
+            adapter.log.warn('device "' + dev.devName + '" - retry intervall set to 3600 seconds.');
         }
         if (dev.devRetryIntvl < 1) {
             adapter.log.warn('device "' + dev.devName + '" - retry intervall (' + dev.devRetryIntvl + ') must be at least 1 second, please correct configuration.');
             dev.devRetryIntvl = 1;
+            adapter.log.warn('device "' + dev.devName + '" - retry intervall set to 1 second.');
         }
 
         if (!/^\d+$/.test(dev.devPollIntvl)) {
@@ -912,14 +916,17 @@ function validateConfig() {
         if (dev.devPollIntvl > 3600) { // must be less than 0x7fffffff / 1000
             adapter.log.warn('device "' + dev.devName + '" - poll intervall (' + dev.devPollIntvl + ') must be less than 3600 seconds, please correct configuration.');
             dev.devPollIntvl = 3600;
+            adapter.log.warn('device "' + dev.devName + '" - poll intervall set to 3600 seconds.');
         }
         if (dev.devPollIntvl < 5) {
             adapter.log.warn('device "' + dev.devName + '" - poll intervall (' + dev.devPollIntvl + ') must be at least 5 seconds, please correct configuration.');
             dev.devPollIntvl = 5;
+            adapter.log.warn('device "' + dev.devName + '" - poll intervall set to 5 seconds.');
         }
         if (dev.devPollIntvl <= dev.devTimeout) {
             adapter.log.warn('device "' + dev.devName + '" - poll intervall (' + dev.devPollIntvl + ') must be larger than device timeout (' + dev.devTimeout + '), please correct configuration.');
             dev.devPollIntvl = dev.devTimeout + 1;
+            adapter.log.warn('device "' + dev.devName + '" - poll intervall set to ' + dev.devPollIntvl + ' seconds.');
         }
     };
 
