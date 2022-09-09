@@ -917,9 +917,9 @@ function validateConfig() {
             adapter.log.warn('device "' + dev.devName + '" - poll intervall (' + dev.devPollIntvl + ') must be at least 5 seconds, please correct configuration.');
             dev.devPollIntvl = 5;
         }
-        if (dev.devPollIntvl >= dev.timeout) {
-            adapter.log.warn('device "' + dev.devName + '" - poll intervall (' + dev.devPollIntvl + ') must be larger than device timeout (' + dev.devtimeout + '), please correct configuration.');
-            dev.devPollIntvl = dev.timeout + 1;
+        if (dev.devPollIntvl >= dev.devTimeout) {
+            adapter.log.warn('device "' + dev.devName + '" - poll intervall (' + dev.devPollIntvl + ') must be larger than device timeout (' + dev.devTimeout + '), please correct configuration.');
+            dev.devPollIntvl = dev.devTimeout + 1;
         }
     };
 
