@@ -121,7 +121,7 @@ let adapter;    // adapter instance - @type {ioBroker.Adapter}
 const CTXs = [];		    // see description at header of file
 let g_isConnected = false; 	// local copy of info.connection state 
 let g_connUpdateTimer = null;
-let g_chunkSize = 3;         // mximum number of OIDs per request
+let g_chunkSize = 3;         // maximum number of OIDs per request
 
 /**
  * Start the adapter instance
@@ -862,8 +862,8 @@ function validateConfig() {
         };
 
         if (dev.devOidGroup && dev.devOidGroup != '' && !oidSets[dev.devOidGroup]) {
-            adapter.log.error('device ' + dev.devName + ' (' + dev.devIpAddr + ') references unknown or completly inactive oid group ' + dev.devOidGroup + '. Please correct configuration.');
-            ok = false;
+            adapter.log.warning('device ' + dev.devName + ' (' + dev.devIpAddr + ') references unknown or completly inactive oid group ' + dev.devOidGroup + '. Please correct configuration.');
+            //ok = false;
         };
 
         if (dev.devSnmpVers == SNMP_V3 && dev.authId == '') {
