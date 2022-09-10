@@ -967,7 +967,7 @@ function setupContices() {
         };
 
         adapter.log.debug('adding device "' + dev.devIpAddr + '" (' + dev.devName + ') , snmp id: ' + dev.devSnmpVers);
-        adapter.log.debug('timing parameter: timeout ' + dev.devTimeout + 's , retry ' + dev.devRetryIntvl + 's, polling ' + dev.pollIntvl + 's');
+        adapter.log.debug('timing parameter: timeout ' + dev.devTimeout + 's , retry ' + dev.devRetryIntvl + 's, polling ' + dev.devPollIntvl + 's');
 
         // TODO: ipV6 support
         const tmp = dev.devIpAddr.split(':');
