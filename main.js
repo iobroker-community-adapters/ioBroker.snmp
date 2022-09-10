@@ -862,7 +862,7 @@ function validateConfig() {
         };
 
         if (dev.devOidGroup && dev.devOidGroup != '' && !oidSets[dev.devOidGroup]) {
-            adapter.log.warning('device ' + dev.devName + ' (' + dev.devIpAddr + ') references unknown or completly inactive oid group ' + dev.devOidGroup + '. Please correct configuration.');
+            adapter.log.warn('device ' + dev.devName + ' (' + dev.devIpAddr + ') references unknown or completly inactive oid group ' + dev.devOidGroup + '. Please correct configuration.');
             //ok = false;
         };
 
