@@ -22,7 +22,9 @@ This adapter can be used to poll information from devices like printers, network
 -->
 ### __WORK IN PROGRESS__
 * (McM1957) Support for (IPv4) domainnames has been readded (#165)
+* (McM1957) Devices without any active oid do no longer cause an fatal error but only log a warning (#155)
 * (McM1957) Timervalues are now validated more strictly (#156, #164)
+* (McM1957) Some crashes reported by sentry have been fixed (#167)
 * (McM1957) external packages have been updated by dependabot
 
 ### 2.1.8 (2022-09-08)

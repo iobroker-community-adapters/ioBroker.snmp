@@ -764,9 +764,9 @@ function validateConfig() {
 
         if (!oid.oidAct) continue;
 
-        oid.oidGroup = oid.oidGroup.trim();
-        oid.oidName = oid.oidName.trim();
-        oid.oidOid = oid.oidOid.trim().replace(/^\./, '');
+        oid.oidGroup = (oid.oidGroup||'').trim();
+        oid.oidName = (oid.oidName||'').trim();
+        oid.oidOid = (oid.oidOid||'').trim().replace(/^\./, '');
 
         let oidGroup = oid.oidGroup;
 
@@ -838,10 +838,10 @@ function validateConfig() {
 
         if (!dev.devAct) continue;
 
-        dev.devName = dev.devName.trim();
-        dev.devIpAddr = dev.devIpAddr.trim();
-        dev.devOidGroup = dev.devOidGroup.trim();
-        dev.devAuthId = dev.devAuthId.trim();
+        dev.devName = (dev.devName||'').trim();
+        dev.devIpAddr = (dev.devIpAddr||'').trim();
+        dev.devOidGroup = (dev.devOidGroup||'').trim();
+        dev.devAuthId = (dev.devAuthId||'').trim();
         //dev.devTimeout = dev.devTimeout;
         //dev.devRetryIntvl = dev.devRetryIntvl;
         //dev.devPollIntvl = dev.devPollIntvl;
