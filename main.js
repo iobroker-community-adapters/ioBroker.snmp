@@ -41,6 +41,13 @@
  *     SYNTAX Opaque (SIZE (7))
  * 
  */
+
+/*
+ * Some general REMINDERS for further development
+ *
+ * - Ensure that every timer value is less than 0x7fffffff - otherwise the time will fire immidiatly
+ * 
+ */
  
 /*
  * description if major internal objects
@@ -114,7 +121,7 @@ let adapter;    // adapter instance - @type {ioBroker.Adapter}
 const CTXs = [];		    // see description at header of file
 let g_isConnected = false; 	// local copy of info.connection state 
 let g_connUpdateTimer = null;
-let g_chunkSize = 3;         // mximum number of OIDs per request
+let g_chunkSize = 3;         // maximum number of OIDs per request
 
 /**
  * Start the adapter instance
@@ -757,9 +764,9 @@ function validateConfig() {
 
         if (!oid.oidAct) continue;
 
-        oid.oidGroup = oid.oidGroup.trim();
-        oid.oidName = oid.oidName.trim();
-        oid.oidOid = oid.oidOid.trim().replace(/^\./, '');
+        oid.oidGroup = (oid.oidGroup||'').trim();
+        oid.oidName = (oid.oidName||'').trim();
+        oid.oidOid = (oid.oidOid||'').trim().replace(/^\./, '');
 
         let oidGroup = oid.oidGroup;
 
@@ -831,38 +838,41 @@ function validateConfig() {
 
         if (!dev.devAct) continue;
 
-        dev.devName = dev.devName.trim();
-        dev.devIpAddr = dev.devIpAddr.trim();
-        dev.devOidGroup = dev.devOidGroup.trim();
-        dev.devAuthId = dev.devAuthId.trim();
-        dev.devTimeout = dev.devTimeout;
-        dev.devRetryIntvl = dev.devRetryIntvl;
-        dev.devPollIntvl = dev.devPollIntvl;
+        dev.devName = (dev.devName||'').trim();
+        dev.devIpAddr = (dev.devIpAddr||'').trim();
+        dev.devOidGroup = (dev.devOidGroup||'').trim();
+        dev.devAuthId = (dev.devAuthId||'').trim();
+        //dev.devTimeout = dev.devTimeout;
+        //dev.devRetryIntvl = dev.devRetryIntvl;
+        //dev.devPollIntvl = dev.devPollIntvl;
 
+        // IP addr might be an IPv4 address, and IPv6 address or a dsn name
         if (/^\d+\.\d+\.\d+\.\d+(\:\d+)?$/.test(dev.devIpAddr)) {
-            /* might be ipv4 - to be checked further */
+            /* ipv4 - to be checked further */
+        } else if (/^[a-zA-Z0-9\.\-]+(\:\d+)?$/.test(dev.devIpAddr)) {
+            /* domain name */
         } else {
             adapter.log.error('ip address "' + dev.devIpAddr + '" has invalid format, please correct configuration.');
             ok = false;
         }
 
         if (!dev.devOidGroup || dev.devOidGroup == '') {
-            adapter.log.error('device ' + dev.devName + ' (' + dev.devIpAddr + ') does not specify a oid group. Please correct configuration.');
+            adapter.log.error('device "' + dev.devName + '" (' + dev.devIpAddr + ') does not specify a oid group. Please correct configuration.');
             ok = false;
         };
 
         if (dev.devOidGroup && dev.devOidGroup != '' && !oidSets[dev.devOidGroup]) {
-            adapter.log.error('device ' + dev.devName + ' (' + dev.devIpAddr + ') references unknown or completly inactive oid group ' + dev.devOidGroup + '. Please correct configuration.');
-            ok = false;
+            adapter.log.warn('device "' + dev.devName + '" (' + dev.devIpAddr + ') references unknown or completly inactive oid group ' + dev.devOidGroup + '. Please correct configuration.');
+            //ok = false;
         };
 
         if (dev.devSnmpVers == SNMP_V3 && dev.authId == '') {
-            adapter.log.error('device ' + dev.devName + ' (' + dev.devIpAddr + ') requires valid authorization id. Please correct configuration.');
+            adapter.log.error('device "' + dev.devName + '" (' + dev.devIpAddr + ') requires valid authorization id. Please correct configuration.');
             ok = false;
         };
 
         if (dev.devSnmpVers == SNMP_V3 && dev.devAuthId != '' && !oidSets[dev.devAuthId]) {
-            adapter.log.error('device ' + dev.devName + ' (' + dev.devIpAddr + ') references unknown authorization group ' + dev.devAuthId + '. Please correct configuration.');
+            adapter.log.error('device "' + dev.devName + '" (' + dev.devIpAddr + ') references unknown authorization group ' + dev.devAuthId + '. Please correct configuration.');
             ok = false;
         };
 
@@ -871,22 +881,52 @@ function validateConfig() {
             ok = false;
         };
         dev.devTimeout = parseInt(dev.devTimeout, 10) || 5;
+        if (dev.devTimeout > 600) { // must be less than 0x7fffffff / 1000
+            adapter.log.warn('device "' + dev.devName + '" - device timeout (' + dev.devTimeout + ') must be less than 600 seconds, please correct configuration.');
+            dev.devTimeout = 600;
+            adapter.log.warn('device "' + dev.devName + '" - device timeout set to 600 seconds.');
+        }
+        if (dev.devTimeout < 1) {
+            adapter.log.warn('device "' + dev.devName + '" - device timeout (' + dev.devTimeout + ') must be at least 1 second, please correct configuration.');
+            dev.devTimeout = 1;
+            adapter.log.warn('device "' + dev.devName + '" - device timeout set to 1 second.');
+        }
 
         if (!/^\d+$/.test(dev.devRetryIntvl)) {
             adapter.log.error('device "' + dev.devName + '" - retry intervall (' + dev.devRetryIntvl + ') must be numeric, please correct configuration.');
             ok = false;
         };
         dev.devRetryIntvl = parseInt(dev.devRetryIntvl, 10) || 5;
+        if (dev.devRetryIntvl > 3600) { // must be less than 0x7fffffff / 1000
+            adapter.log.warn('device "' + dev.devName + '" - retry intervall (' + dev.devRetryIntvl + ') must be less than 3600 seconds, please correct configuration.');
+            dev.devRetryIntvl = 3600;
+            adapter.log.warn('device "' + dev.devName + '" - retry intervall set to 3600 seconds.');
+        }
+        if (dev.devRetryIntvl < 1) {
+            adapter.log.warn('device "' + dev.devName + '" - retry intervall (' + dev.devRetryIntvl + ') must be at least 1 second, please correct configuration.');
+            dev.devRetryIntvl = 1;
+            adapter.log.warn('device "' + dev.devName + '" - retry intervall set to 1 second.');
+        }
 
         if (!/^\d+$/.test(dev.devPollIntvl)) {
             adapter.log.error('device "' + dev.devName + '" - poll intervall (' + dev.devPollIntvl + ') must be numeric, please correct configuration.');
             ok = false;
         };
         dev.devPollIntvl = parseInt(dev.devPollIntvl, 10) || 30;
-
+        if (dev.devPollIntvl > 3600) { // must be less than 0x7fffffff / 1000
+            adapter.log.warn('device "' + dev.devName + '" - poll intervall (' + dev.devPollIntvl + ') must be less than 3600 seconds, please correct configuration.');
+            dev.devPollIntvl = 3600;
+            adapter.log.warn('device "' + dev.devName + '" - poll intervall set to 3600 seconds.');
+        }
         if (dev.devPollIntvl < 5) {
             adapter.log.warn('device "' + dev.devName + '" - poll intervall (' + dev.devPollIntvl + ') must be at least 5 seconds, please correct configuration.');
             dev.devPollIntvl = 5;
+            adapter.log.warn('device "' + dev.devName + '" - poll intervall set to 5 seconds.');
+        }
+        if (dev.devPollIntvl <= dev.devTimeout) {
+            adapter.log.warn('device "' + dev.devName + '" - poll intervall (' + dev.devPollIntvl + ') must be larger than device timeout (' + dev.devTimeout + '), please correct configuration.');
+            dev.devPollIntvl = dev.devTimeout + 1;
+            adapter.log.warn('device "' + dev.devName + '" - poll intervall set to ' + dev.devPollIntvl + ' seconds.');
         }
     };
 
@@ -926,7 +966,8 @@ function setupContices() {
             continue;
         };
 
-        adapter.log.debug('adding device "' + dev.devIpAddr + '" (' + dev.devName + ')');
+        adapter.log.debug('adding device "' + dev.devIpAddr + '" (' + dev.devName + ') , snmp id: ' + dev.devSnmpVers);
+        adapter.log.debug('timing parameter: timeout ' + dev.devTimeout + 's , retry ' + dev.devRetryIntvl + 's, polling ' + dev.devPollIntvl + 's');
 
         // TODO: ipV6 support
         const tmp = dev.devIpAddr.split(':');
@@ -940,16 +981,16 @@ function setupContices() {
         CTXs[jj].id = adapter.config.optUseName ? ip2ipStr(CTXs[jj].ipAddr) : dev.devName; // optUseName is UNSET if name should be used
                                 //TODO: IPv6 might require changes
         CTXs[jj].isIPv6 = false;
-        CTXs[jj].timeout = dev.devTimeout * 1000;      //s -> ms
-        CTXs[jj].retryIntvl = dev.devRetryIntvl * 1000;    //s -> ms
-        CTXs[jj].pollIntvl = dev.devPollIntvl * 1000;     //s -> ms
+        CTXs[jj].timeout = dev.devTimeout * 1000;       //s -> ms must be less than 0x7fffffff 
+        CTXs[jj].retryIntvl = dev.devRetryIntvl * 1000; //s -> ms must be less than 0x7fffffff
+        CTXs[jj].pollIntvl = dev.devPollIntvl * 1000;   //s -> ms must be less than 0x7fffffff
         CTXs[jj].snmpVers = dev.devSnmpVers;
         CTXs[jj].authId = dev.devAuthId;
 //        CTXs[jj].OIDs = [];
 //        CTXs[jj].oids = [];
 //        CTXs[jj].ids = [];
         CTXs[jj].chunks = [];
-
+        
         CTXs[jj].pollTimer = null;  // poll intervall timer
         CTXs[jj].session = null;    // snmp session
         CTXs[jj].inactive = true;   // connection status of device
