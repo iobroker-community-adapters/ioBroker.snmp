@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "snmp",
-    "version": "2.1.8",
+    "version": "2.1.9",
     "news": {
+      "2.1.9": {
+        "en": "Support for (IPv4) domainnames has been readded (#165)\nDevices without any active oid do no longer cause an fatal error but only log a warning (#155)\nTimervalues are now validated more strictly (#156, #164)\nSome crashes reported by sentry have been fixed (#167)\nexternal packages have been updated by dependabot",
+        "de": "Unterstützung für (IPv4) Domainnamen wurde wieder hinzugefügt (#165)\nGeräte ohne aktive OIDs verursachen keinen fatalen Fehler mehr, sondern protokollieren nur eine Warnung (#155)\nTimervalues werden nun strenger validiert (#156, #164)\nEinige Abstürze, die von Sentry gemeldet wurden, wurden behoben (#167)\nexterne Pakete wurden aktualisiert",
+        "ru": "Добавлена поддержка (IPv4) доменных имен (#165)\nУстройства без какого-либо активного не допуска больше не вызывают смертельной ошибки, но только регистрируют предупреждение (#155)\nTimervalues теперь действует более строго (#156, #164)\nНекоторые сбои, сообщаемые судоходством, были зафиксированы (#167)\nвнешние пакеты были обновлены в зависимости от",
+        "pt": "Suporte para (IPv4) nomes de domínio foi adicionado (#165)\nDispositivos sem qualquer oide ativo não causam mais um erro fatal, mas apenas registram um aviso (#155)\nValores de tempo são agora validados mais estritamente (#156, #164)\nAlgumas falhas relatadas por sentinela foram corrigidas (#167)\npacotes externos foram atualizados por dependeabot",
+        "nl": "Vertaling:\nVerdedigingen zonder actieve leegte veroorzaken geen fatale fouten meer, maar alleen een waarschuwing inloggen\nTimervalues zijn nu meer strikt (156, #164)\nSommige crashes gemeld door sentimenten zijn gerepareerd\nvertaling:",
+        "fr": "Support pour (IPv4) noms de domaine a été lue (#165)\nLes appareils sans oid actif ne provoquent plus une erreur fatale mais ne enregistrent qu'un avertissement (#155)\nLes valeurs temporelles sont maintenant validées plus strictement (#156, #164)\nCertains accidents signalés par la sentinelle ont été corrigés (#167)\ndes paquets externes ont été mis à jour par dependabot",
+        "it": "Supporto per (IPv4) nomi di dominio è stato letto (#165)\nI dispositivi senza oid attivo non causano più un errore fatale ma registrano solo un avviso (#155)\nI valori temporali sono ora convalidati più rigorosamente (#156, #164)\nAlcuni crash segnalati dalla sentinella sono stati fissati (#167)\npacchetti esterni sono stati aggiornati da dipendeabot",
+        "es": "Se ha leído el soporte para (IPv4) nombres de dominio (#165)\nLos dispositivos sin oid activo ya no causan un error mortal, pero solo registran una advertencia (#155)\nLos valores temporales se validan más estrictamente (#156, #164)\nAlgunos accidentes reportados por centinela han sido fijos (#167)\npaquetes externos han sido actualizados por dependabot",
+        "pl": "Wsparcie (IPv4) zostało odczytane (#165)\nUrządzenia bez żadnej aktywnej oidy nie powodują już błędu, ale tylko ocenił ostrzeżenie (#155)\nWartość Timeru jest teraz prawidłowa (#156, #164)\nCzęść z nich została ustalona (#167)\npakiety zewnętrzne zostały zaktualizowane w zależności od bota",
+        "zh-cn": "对(IPv4)域名的支助(第165号)\n无任何积极无效的人不再造成致命错误,只是警告(第155号)\n时间价值现在更严格(第156号,第164号)\n一些发货人的事故已经确定(第167号)\n外部包件经过依赖性更新。"
+      },
       "2.1.8": {
         "en": "HOTFIX: Parameter \"community\" has not been migrated when updating to version v2.x.x from previous releases. (#163)",
         "de": "HOTFIX: Der Parameter \"community\" wurde bei der Aktualisierung der Version v2.x.x aus früheren Versionen nicht migriert. (#163)",

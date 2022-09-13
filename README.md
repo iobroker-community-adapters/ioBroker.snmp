@@ -20,7 +20,7 @@ This adapter can be used to poll information from devices like printers, network
 <!--
 ## __WORK IN PROGRESS__
 -->
-### __WORK IN PROGRESS__
+### 2.1.9 (2022-09-13)
 * (McM1957) Support for (IPv4) domainnames has been readded (#165)
 * (McM1957) Devices without any active oid do no longer cause an fatal error but only log a warning (#155)
 * (McM1957) Timervalues are now validated more strictly (#156, #164)
