@@ -29,7 +29,7 @@
     "url": "git+https://github.com/iobroker-community-adapters/ioBroker.snmp.git"
   },
   "dependencies": {
-    "@iobroker/adapter-core": "^2.6.0",
+    "@iobroker/adapter-core": "^2.6.5",
     "net-snmp": "^3.8.2"
   },
   "devDependencies": {
