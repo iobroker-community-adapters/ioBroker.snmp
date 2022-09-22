@@ -780,6 +780,17 @@ function validateConfig() {
             ok = false;
         };
 
+        // as ids must not end with a dot, the name must not end with a dot too
+        // duplicate dots would result in empty folder names
+        if (oid.oidName.endsWith('.')) {
+            adapter.log.error('oid "' + oid.oidName + '"is invalid. Name must not end with ".". Please correct configuration.');
+            ok = false;
+        }
+        if (oid.oidName.includes('..')) {
+            adapter.log.error('oid "' + oid.oidName + '"is invalid. Name must not include consecutive dots. Please correct configuration.');
+            ok = false;
+        }
+
         if (!oid.oidOid) {
             adapter.log.error('oid must not be empty, please correct configuration.');
             ok = false;
@@ -845,6 +856,20 @@ function validateConfig() {
         //dev.devTimeout = dev.devTimeout;
         //dev.devRetryIntvl = dev.devRetryIntvl;
         //dev.devPollIntvl = dev.devPollIntvl;
+
+        // devicename is required, must not end with a dot or contain consecutive dots
+        if (!dev.devName) {
+            adapter.log.error('device name must not be empty, please correct configuration.');
+            ok = false;
+        };
+        if (dev.devName.endsWith('.')) {
+            adapter.log.error('devicename "' + dev.devName + '"is invalid. Name must not end with ".". Please correct configuration.');
+            ok = false;
+        }
+        if (dev.devName.includes('..')) {
+            adapter.log.error('devicename "' + dev.devName + '"is invalid. Name must not include consecutive dots. Please correct configuration.');
+            ok = false;
+        }
 
         // IP addr might be an IPv4 address, and IPv6 address or a dsn name
         if (/^\d+\.\d+\.\d+\.\d+(\:\d+)?$/.test(dev.devIpAddr)) {
