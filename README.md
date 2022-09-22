@@ -20,7 +20,7 @@ This adapter can be used to poll information from devices like printers, network
 <!--
 ## __WORK IN PROGRESS__
 -->
-### __WORK IN PROGRESS__
+### 2.1.10 (2022-09-22)
 * (McM1957) Validation of OID and device names has been enhanced, crash was reported by sentry (#169)
 
 ### 2.1.9 (2022-09-13)

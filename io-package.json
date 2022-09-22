@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "snmp",
-    "version": "2.1.9",
+    "version": "2.1.10",
     "news": {
+      "2.1.10": {
+        "en": "Validation of OID and device names has been enhanced, crash was reported by sentry (#169)",
+        "de": "Die Validierung von OID- und Gerätenamen wurde verbessert, der Crash wurde von Sentry gemeldet (#169)",
+        "ru": "Действие OID и названия устройств было улучшено, авария была сообщена отправкой (#169)",
+        "pt": "Validação de OID e nomes de dispositivos foram aprimorados, acidente foi relatado por remetente (#169)",
+        "nl": "Validatie van OID en apparatuur is verbeterd, crash is gemeld door sentiment (169)",
+        "fr": "La validation des noms d'ID et de périphériques a été améliorée, l'écrasement a été signalé par la sentinelle (#169)",
+        "it": "La convalida dei nomi OID e dei dispositivi è stata migliorata, l'incidente è stato segnalato dalla sentinella (#169)",
+        "es": "Se ha mejorado la validación de OID y los nombres de los dispositivos, el bloqueo fue reportado por centry (#169)",
+        "pl": "Obserwacje OID i nazwy urządzenie zostały poprawione przez przesyłkę (#169)",
+        "zh-cn": "已经加强了OID和装置名称的撤销,发送的事故报告(第169号)"
+      },
       "2.1.9": {
         "en": "Support for (IPv4) domainnames has been readded (#165)\nDevices without any active oid do no longer cause an fatal error but only log a warning (#155)\nTimervalues are now validated more strictly (#156, #164)\nSome crashes reported by sentry have been fixed (#167)\nexternal packages have been updated by dependabot",
         "de": "Unterstützung für (IPv4) Domainnamen wurde wieder hinzugefügt (#165)\nGeräte ohne aktive OIDs verursachen keinen fatalen Fehler mehr, sondern protokollieren nur eine Warnung (#155)\nTimervalues werden nun strenger validiert (#156, #164)\nEinige Abstürze, die von Sentry gemeldet wurden, wurden behoben (#167)\nexterne Pakete wurden aktualisiert",
@@ -74,78 +86,6 @@
         "es": "HOTFIX - Se ha fijado un fallo del sistema en los errores SNMP v1 (#145)",
         "pl": "HOTFIX – wypadek systemowy w SNMP v1 został ustalony (#145)",
         "zh-cn": "已经确定(第145号)"
-      },
-      "2.1.3": {
-        "en": "A new option to control the number of OIDs within a single request has been added to avoid TOOBIG errors (#72)",
-        "de": "Um TOOBIG Fehler zu vermeiden, wurde eine neue Option zur Steuerung der Anzahl der OIDs innerhalb einer einzigen Anfrage hinzugefügt (#72)",
-        "ru": "Добавлен новый вариант для контроля количества OID в рамках одного запроса, чтобы избежать ошибок TOOBIG (#72)",
-        "pt": "Uma nova opção para controlar o número de OIDs dentro de uma única solicitação foi adicionada para evitar erros TOOBIG (#72)",
-        "nl": "Een nieuwe optie om het aantal OID's binnen één verzoek te controleren is toegevoegd om te vermijden dat er teveel fouten zijn",
-        "fr": "Une nouvelle option pour contrôler le nombre d'IDO dans une seule demande a été ajoutée pour éviter les erreurs TOOBIG (#72)",
-        "it": "È stata aggiunta una nuova opzione per controllare il numero di OID all'interno di una singola richiesta per evitare errori TOOBIG (#72)",
-        "es": "Se ha añadido una nueva opción para controlar el número de OID dentro de una sola solicitud para evitar errores TOOBIG (#72)",
-        "pl": "Nowa opcja dotycząca liczby OID została dodana, aby uniknąć błędów TOOBIG (#72)",
-        "zh-cn": "添加了一种新的办法,在单一请求范围内控制裁研所的数目,以避免联机错误(第72号)"
-      },
-      "2.1.2": {
-        "en": "conversion of floatingpoint values has been corrected (#16)",
-        "de": "die umwandlung von floatingpoint-werten wurde korrigiert (#16)",
-        "ru": "исправлена конверсия значений плавающих точек (#16)",
-        "pt": "conversão de valores de ponto flutuante foi corrigida (#16)",
-        "nl": "de bekering van zwevende waarden is gecorrigeerd",
-        "fr": "la conversion des valeurs flottantes a été corrigée (#16)",
-        "it": "la conversione dei valori dei punti fluttuanti è stata corretta (#16)",
-        "es": "se ha corregido la conversión de valores de puntos flotantes (#16)",
-        "pl": "zmiana wartości zmiennoprzecinkowych została poprawiona (#16)",
-        "zh-cn": "改变浮标值(第16)"
-      },
-      "2.1.1": {
-        "en": "some external packages have been updated",
-        "de": "einige externe pakete wurden aktualisiert",
-        "ru": "некоторые внешние пакеты были обновлены",
-        "pt": "alguns pacotes externos foram atualizados",
-        "nl": "sommige externe pakketten zijn geüpload",
-        "fr": "certains paquets externes ont été mis à jour",
-        "it": "alcuni pacchetti esterni sono stati aggiornati",
-        "es": "algunos paquetes externos se han actualizado",
-        "pl": "niektóre zewnętrzne pakiety zostały zaktualizowane",
-        "zh-cn": "一些外部一揽子计划已经更新。"
-      },
-      "2.1.0": {
-        "en": "net-snmp has been upgraded to version 3.8.2\nSupport for SNMP v2c has been added (#116)\nThe quality marker of stateobjects will be used in case of error or timeout\nThe OID marker 'Optional' has been implemented. This marker suppresses errors for OIDs which are not always available. (#116)\nSupport for Counter64 OIDs has been added. (#57)\nThe data returned by snmp communication  will be logged with more details now.\nCompact mode has been enabled. (#20)\nKnown restriction: currently only SNMP V1 and SNMP V2c are supported.\nKnown restriction: OID attribute writeable is not yet implemented.",
-        "de": "net-snmp wurde auf version 3.8.2 aktualisiert\nUnterstützung für SNMP v2c wurde hinzugefügt (#116)\nDer Qualitätsmarker von Stateobjects wird bei Fehler oder Timeout verwendet\nDer OID-Marker Optional wurde implementiert. Dieser Marker unterdrückt Fehler für OIDs, die nicht immer verfügbar sind. (#116)\nUnterstützung für Counter64 OIDs wurde hinzugefügt. (#57)\nDie von der SNMP-Kommunikation zurückgegebenen Daten werden jetzt mit weiteren Details protokolliert.\nDer kompakte Modus wurde aktiviert. (#20)\nBekannte Einschränkung: Derzeit werden nur SNMP V1 und SNMP V2c unterstützt.\nBekannte Einschränkung: OID-Attribut Schreibbar ist noch nicht implementiert.",
-        "ru": "net-snmp был обновлен до версии 3.8.2\nДобавлена поддержка SNMP v2c (#116)\nКачественный маркер государственного объекта будет использоваться в случае ошибки или таймаут\nРеализован OID маркер Опционный. Этот маркер подавляет ошибки для OID, которые не всегда доступны. (#116)\nДобавлена поддержка Counter64 OID. (#57)\nДанные, возвращаемые связью snmp, будут сохранены с более подробной информацией сейчас.\nВключен компактный режим. (#20)\nПоддерживаются только SNMP V1 и SNMP V2c.\nИзвестное ограничение: Написание атрибута OID пока не реализовано.",
-        "pt": "net-snmp foi atualizado para a versão 3.8.2\nSuporte para SNMP v2c foi adicionado (#116)\nO marcador de qualidade dos objetos de estado será usado em caso de erro ou timeout\nO marcador OID Opcional foi implementado. Este marcador suprime erros para OIDs que nem sempre estão disponíveis. (#116)\nO suporte para o Counter64 OIDs foi adicionado. (#57)\nOs dados retornados pela comunicação snmp serão registrados com mais detalhes agora.\nO modo compacto foi ativado. (#20)\nLimitação conhecida: atualmente apenas SNMP V1 e SNMP V2c são suportados.\nLimitação conhecida: O atributo OID writeable ainda não é implementado.",
-        "nl": "net-snmp is geüpgradeerd tot versie 3,8,2\nSNMP V2c is toegevoegd\nDe kwaliteitsmarkt van de staatobjecten zal worden gebruikt in geval van fout of time-out\nDe OID marker Optional is ingevoerd. Deze marker onderdrukt fouten voor OID's die niet altijd beschikbaar zijn. (116)\nVersterking voor Contra64 OIDs is toegevoegd. (57)\nDe gegevens die teruggekeerd zijn door snuit communicatie zullen nu meer details hebben.\nCompact mode is in staat. (20)\nGekende beperking: alleen SNMP V1 en SNMP V2c zijn ondersteund.\nBekende beperking: OID is nog niet geschreven.",
-        "fr": "net-snmp a été amélioré à la version 3.8.2\nLe support pour SNMP v2c a été ajouté (#116)\nLe marqueur de qualité des Stateobjects sera utilisé en cas d'erreur ou de timeout\nLe marqueur OID Optional a été mis en œuvre. Ce marqueur supprime les erreurs pour les OID qui ne sont pas toujours disponibles. (#116)\nLe soutien aux OID de Counter64 a été ajouté. (#57)\nLes données retournées par snmp communication seront enregistrées avec plus de détails maintenant.\nLe mode compact a été activé. (#20)\nLimite connue: actuellement, seuls les SNMP V1 et SNMP V2c sont pris en charge.\nLimite connue: L'attribut OID écritable n'est pas encore mis en œuvre.",
-        "it": "net-snmp è stato aggiornato alla versione 3.8.2\nÈ stato aggiunto il supporto per SNMP v2c (#116)\nIl marcatore di qualità degli oggetti di stato verrà utilizzato in caso di errore o timeout\nIl marcatore OID opzionale è stato implementato. Questo marcatore sopprime gli errori per OID che non sono sempre disponibili. (#116)\nÈ stato aggiunto il supporto per gli OID Counter64. (#57)\nI dati resi dalla comunicazione snmp saranno registrati con ulteriori dettagli.\nLa modalità compatta è stata abilitata. (#20)\nLimite noto: attualmente sono supportati solo SNMP V1 e SNMP V2c.\nLimite noto: L'attributo OID scrivibile non è ancora implementato.",
-        "es": "net-snmp ha sido actualizado a la versión 3.8.2\nSe ha añadido soporte para SNMP v2c (#116)\nEl marcador de calidad de los stateobjects se utilizará en caso de error o timeout\nSe ha implementado el marcador OID Opcional. Este marcador suprime errores para OIDs que no siempre están disponibles. (#116)\nSe ha añadido apoyo a los OID de Counter64. (#57)\nLos datos devueltos por snmp communication se registrarán con más detalles ahora.\nSe ha habilitado el modo compacto. (#20)\nRestricción conocida: actualmente solo se admiten SNMP V1 y SNMP V2c.\nRestricción conocida: Atributo OID escribible todavía no se implementa.",
-        "pl": "wersja 3.8.2 została zmodernizowana do wersji 3.8.2\nWsparcie dla SNMP v2c zostało dodane (#116)\nZnak jakości obiektów będzie używany w przypadku błędu lub czasu\nZaimplementowany został znak OID. Ten znak niszczy błędy OID, które nie zawsze są dostępne. (#116)\nDodano wsparcie dla Counter64 OID. (#57)\nDane zwrócone przez komunikację snmp będą obecnie wpisane z większą liczbą szczegółów.\nDostępny jest tryb kompaktowy. (#20)\nWspiera się tylko SNMP V1 i SNMP V2c.\nZnamy ograniczenia: Atrybutu OID nie został jeszcze zrealizowany.",
-        "zh-cn": "净经验已升级为3.8.2。\n添加了对SNMP v2c的支持(第116号)\n在错误或时间推断的情况下,将使用国家目标的质量标志。\n裁研所的标志已经实施。 这名标示了不总是可供使用的裁研所的错误。 (第116号)\n此外,还增加了对反64名裁研所的支助。 (第57号)\n流速通信所交的数据现在将更详细。.\n合同模式得以实现。 (单位:千美元)\nKnown限制:目前只有SNMP V1和SNMP V2c得到支持。.\nKnown限制: 未执行可证明的裁研所。."
-      },
-      "2.0.1": {
-        "en": "Faulty handling of compatibility mode flag has been corrected (#135)\nLogging of errors for invalid OIDs corrected (#134)",
-        "de": "Fehlerhafte Handhabung des Kompatibilitätsmodus-Flags wurde korrigiert (#135)\nProtokollierung von Fehlern für ungültige OIDs korrigiert (#134)",
-        "ru": "Исправлена неисправная обработка флага режима совместимости (#135)\nЗапись ошибок для недействительных OID (#134)",
-        "pt": "O manuseio defeituoso da bandeira do modo de compatibilidade foi corrigido (#135)\nRegisto de erros para OIDs inválidos corrigido (#134)",
-        "nl": "Faulty Handling van compatibility mode vlag is gecorrigeerd (135)\nErnstige fouten voor invalide OIDs gecorrigeerd (134)",
-        "fr": "La manipulation par défaut du drapeau du mode de compatibilité a été corrigée (#135)\nDésignation d'erreurs pour des OID invalides corrigées (#134)",
-        "it": "È stata corretta la gestione della bandierina della modalità di compatibilità (#135)\nRegistrazione di errori per OID non validi corretti (#134)",
-        "es": "Se ha corregido el manejo predeterminado de la bandera del modo de compatibilidad (#135)\nRegistro de errores para los OID inválidos corregidos (#134)",
-        "pl": "Poprawiona flaga trybu kompatybilności została poprawiona (#135)\nUszkodzenie błędów w nieprawidłowości (pol.)",
-        "zh-cn": "对兼容方式旗帜的意外处理(第135号)进行了纠正。\n纠正无效的OIDs错误的赔偿(第134号)"
-      },
-      "2.0.0": {
-        "en": "* IMPORTANT: This release will change the configuration structures!\n  Please backup your configuration before starting the installation.\n  The Installation will try to convert the old configuration - but it is not guaranteed to succeed in all cases. \n* Many parts of the code have been rewriten\n* The adapter now uses the admin5 interface\n* Timer values can now be set differently per device (#105)\n* Changing the order of configuration entries does no longer destroy data (#15)\n* Stateobjects for devices can now be named. The old behavior is available as an option.\n* Known restriction: currently only SNMP V1 is supported.\n* Known restriction: OID attributes optional and writeable are not yet implemented.",
-        "de": "* WICHTIG: Diese Veröffentlichung wird die Konfigurationsstrukturen ändern!\nBitte sichern Sie Ihre Konfiguration, bevor Sie die Installation starten.\nDie Installation wird versuchen, die alte Konfiguration umzuwandeln - aber in allen Fällen ist es nicht garantiert, erfolgreich zu sein.\n* Viele Teile des Codes wurden neu geschrieben\n* Der Adapter nutzt nun die Admin5-Schnittstelle\n* Timer-Werte können nun je Gerät unterschiedlich eingestellt werden (#105)\n* Die Änderung der Reihenfolge der Konfigurationseinträge zerstört keine Daten mehr (#15)\n* Stateobjects für Geräte können jetzt benannt werden. Das alte Verhalten ist als Option verfügbar.\n* Bekannte Einschränkung: derzeit wird nur SNMP V1 unterstützt.\n* Bekannte Einschränkung: OID-Attribute optional und schreibbar sind noch nicht implementiert.",
-        "ru": "* ВАЖНО: Этот релиз изменит структуры конфигурации!\nПожалуйста, резервируйте конфигурацию перед запуском установки.\nУстановка попытается конвертировать старую конфигурацию - но она не гарантирована для достижения успеха во всех случаях.\n* Много частей кода были rewriten\n* Теперь адаптер использует интерфейс admin5\n* Значения таймера теперь могут быть установлены по-разному на устройство (#105)\n* Изменение порядка записи конфигурации больше не уничтожает данные (#15)\n* Stateobjects для устройств теперь можно назвать. Старое поведение доступно как вариант.\n* Известное ограничение: в настоящее время поддерживается только SNMP V1.\n* Известное ограничение: OID атрибуты необязательные и таблички еще не реализованы.",
-        "pt": "* IMPORTANTE: Esta versão irá alterar as estruturas de configuração!\nFaça backup da configuração antes de iniciar a instalação.\nA instalação tentará converter a configuração antiga - mas não é garantido para ter sucesso em todos os casos.\n* Muitas partes do código foram reescrevedas\n* O adaptador agora usa a interface admin5\n* Os valores do temporizador agora podem ser definidos de forma diferente por dispositivo (#105)\n* Alterar a ordem de entradas de configuração não destrói mais dados (#15)\n* Os objetos estatais para dispositivos podem agora ser nomeados. O comportamento antigo está disponível como opção.\n* Limitação conhecida: atualmente apenas SNMP V1 é suportado.\n* Limitação conhecida: Os atributos OID opcionais e escritíveis ainda não são implementados.",
-        "nl": "Deze vrijlating zal de zelfverzekeringsstructuur veranderen!\nVersterking voor de installatie.\nDe installatie zal proberen de oude zelfvertrouwen te bekeren, maar het is niet gegarandeerd te slagen in alle gevallen.\n♪ Veel delen van de code zijn herschreven\n♪ De adapter gebruikt nu de administratie interface\n♪ Timer waarden kunnen nu anders worden opgezet\n♪ Changing the order of configuration intries don't vernietigen data (15)\n♪ Stateobjects for apparatuur kan nu genoemd worden. Het oude gedrag is beschikbaar als een optie.\nOp dit moment is alleen SNMP V1 ondersteund.\n♪ Known beperking: OID geeft optie en schrijfbaarheid nog niet toe.",
-        "fr": "* IMPORTANT: Cette version changera les structures de configuration!\nVeuillez sauvegarder votre configuration avant de démarrer l'installation.\nL'Installation tentera de convertir l'ancienne configuration - mais il n'est pas garanti de réussir dans tous les cas.\n* De nombreuses parties du code ont été réécrites\n* L'adaptateur utilise maintenant l'interface admin5\n* Les valeurs temporelles peuvent maintenant être définies différemment selon le dispositif (#105)\n* Changer l'ordre des entrées de configuration ne détruit plus les données (#15)\n* Les objets d'état pour les appareils peuvent maintenant être nommés. L'ancien comportement est disponible en option.\n* Limite connue: actuellement seul SNMP V1 est supporté.\n* Limite connue: Les attributs OID en option et écriture ne sont pas encore implémentés.",
-        "it": "* IMPORTANTE: Questa versione cambierà le strutture di configurazione!\nSi prega di eseguire il backup della configurazione prima di avviare l'installazione.\nL'installazione cercherà di convertire la vecchia configurazione - ma non è garantito avere successo in tutti i casi.\n# Molte parti del codice sono state riscritte\n# L'adattatore ora utilizza l'interfaccia di admin5\n* I valori del timer possono ora essere impostati in modo diverso per dispositivo (#105)\n* Cambiare l'ordine delle voci di configurazione non distrugge più i dati (#15)\n* Gli oggetti di stato per i dispositivi possono ora essere nominati. Il vecchio comportamento è disponibile come opzione.\n* Limite noto: attualmente solo SNMP V1 è supportato.\n* Limite noto: Gli attributi OID facoltativi e scrivibili non sono ancora implementati.",
-        "es": "* IMPORTANTE: ¡Esta versión cambiará las estructuras de configuración!\nPor favor, respalde su configuración antes de iniciar la instalación.\nLa instalación intentará convertir la antigua configuración - pero no está garantizada a tener éxito en todos los casos.\n* Muchas partes del código han sido reescribidas\n* El adaptador ahora utiliza la interfaz admin5\n* Los valores del temporizador se pueden configurar de forma diferente por dispositivo (#105)\n* Cambiar el orden de las entradas de configuración ya no destruye datos (#15)\n* Los objetivos de los dispositivos pueden ser nombrados ahora. El comportamiento antiguo está disponible como opción.\n* Restricción conocida: actualmente sólo se admite SNMP V1.\n* Restricción conocida: Atributos OID opcionales y escribibles todavía no se implementan.",
-        "pl": "* IMPORTANT: Wydanie zmieni strukturę konfiguracji!\nPozwólcie na tył przed rozpoczęciem instalacji.\nInstalacja będzie starała się przekształcić starą konfigurację, ale nie jest zagwarantowana w żadnych przypadkach.\n* Wiele fragmentów kodu zostało przepisanych\n* Administrator korzysta z interfejsu admin5\nWartość * Timer może być ustawiona w różny sposób (#105)\n* Zmianowanie kolejności konfiguracyjnych nie niszcza danych (#15)\n* Narządy dla urządzeń mogą być obecnie nazywane. Stare zachowanie jest dostępne jako opcja.\n* Znana restrykcja: obecnie tylko SNMP V1.\n* Znana restrykcja: Atrybuty opcjonalne i piśmienne nie są jeszcze wdrożone.",
-        "zh-cn": "* IMPORTANT:这一释放将改变结构!\n请在开始安装之前支持你的配置。.\n乱葬将设法改变旧的格局,但不能保证在所有情况下取得成功。.\n* A/64/50。 守则的许多部分已经改写。\n* A/64/50。 适应者现在使用了特明5个接口。\n* 时间数值现在可按不同类型确定(第105号)。\n* 更改组合物品的顺序不再销毁数据(第15号)。\n* 目前可以指定国家对装置的控制。 旧的行为可以作为一种选择。.\n* Known限制:目前只有SNMP V1得到支持。.\n* Known限制: 未执行裁研所的任择和可写性。."
       }
     },
     "title": "SNMP",
