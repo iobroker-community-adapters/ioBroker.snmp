@@ -18,6 +18,7 @@
     "lblDevAct":        "active",
     "lblDevName":       "Name",
     "lblDevIpAddr":     "IP Address",
+    "lblDevIp6":        "IPv6",
     "lblDevOidGroup":   "OID group",
     "lblDevSnmpVers":   "SNMP version",
     "lblDevAuthId":     "Community (v1, v2c), Auth-ID (v3)",

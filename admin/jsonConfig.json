@@ -185,6 +185,15 @@
                             "default": "0.0.0.0"
                         },
                         {
+                            "type": "checkbox",
+                            "attr": "devIp6",
+                            "width": "5% ",
+                            "title": "lblDevIp6",
+                            "filter": false,
+                            "sort": false,
+                            "default": false
+                        },
+                        {
                             "type": "text",
                             "attr": "devOidGroup",
                             "width": "10% ",
