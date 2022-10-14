@@ -912,7 +912,7 @@ function validateConfig() {
             if (/^\d+\.\d+\.\d+\.\d+(:\d+)?$/.test(dev.devIpAddr)) {
                 adapter.log.debug('ip address "' + dev.devIpAddr + '" numeric notation detected');
                 const tmp = dev.devIpAddr.split(':');
-                if (! net.isIPv6( tmp[0] ) ) {
+                if (! net.isIPv4( tmp[0] ) ) {
                     adapter.log.error('ip address "' + dev.devIpAddr + '" is no valid ipv4 address, please correct configuration.');
                     ok = false;
                 } else {
