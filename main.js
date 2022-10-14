@@ -1047,11 +1047,11 @@ function setupContices() {
             // ffff:0:1234::8abc
             // [ffff:0:1234::8abc] or [ffff:0:1234::8abc]:123
             // mynode.test.com or mynode.test.com:123
-            const tmp = dev.devIpAddr.match(/^\[([0-9a-fA-F:.]+)\](:\d+)?$/);
+            const tmp = dev.devIpAddr.match(/^\[([0-9a-fA-F:.]+)\](:(\d+))?$/);
             if ( tmp ) {
                 // brackated ipv6 with optional port attached
                 ipAddr = tmp[1];
-                ipPort = tmp[2] || 161;
+                ipPort = tmp[3] || 161;
             } else if (/^[0-9a-fA-F:.]+$/.test(dev.devIpAddr)) {
                 // numeric ipv6 without port attached
                 ipAddr = dev.devIpAddr;
