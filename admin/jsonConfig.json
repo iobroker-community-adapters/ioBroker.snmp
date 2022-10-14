@@ -334,11 +334,12 @@
                             "default": "1"
                         },
                         {
-                            "type": "text",
+                            "type": "password",
                             "attr": "authAuthKey",
                             "width": "15% ",
                             "title": "lblAuthAuthKey",
 							"hidden": "data.authSecLvl<2",
+                            "visible": true,
                             "filter": false,
                             "sort": false,
                             "default": ""
@@ -360,11 +361,12 @@
                             "default": "1"
                         },
                         {
-                            "type": "text",
+                            "type": "password",
                             "attr": "authEncKey",
                             "width": "15% ",
                             "title": "lblAuthEncKey",
   							"hidden": "data.authSecLvl<3",
+                            "visible": true,
                             "filter": false,
                             "sort": false,
                             "default": ""
