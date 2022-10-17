@@ -805,6 +805,10 @@ function validateConfig() {
 
     adapter.log.debug('validateConfig - verifying oid-sets');
 
+    if ( adapter.config.optUseName ) {
+        adapter.log.warn('Option compatibility mode has been deprecated; please consider to adapt config.');
+    };
+
     // ensure that at least empty config exists
     adapter.config.oids = adapter.config.oids || [];
     adapter.config.authSets = adapter.config.authSets || [];
@@ -1130,8 +1134,14 @@ function setupContices() {
         CTXs[jj].name = dev.devName;
         CTXs[jj].ipAddr = ipAddr;
         CTXs[jj].ipPort = ipPort;
-        CTXs[jj].id = adapter.config.optUseName ? ip2ipStr(CTXs[jj].ipAddr) : dev.devName; // optUseName is UNSET if name should be used
-        //TODO: IPv6 might require changes
+        CTXs[jj].id = dev.devName;
+        if ( adapter.config.optUseName ) {
+            if ( dev.devIp6 ) {
+                adapter.log.warn('device "' + dev.devIpAddr + '" (' + dev.devName + ') requests ipv6. Option compatibility mode ignored.');
+            } else {
+                CTXs[jj].id = ip2ipStr(CTXs[jj].ipAddr);
+            }
+        }
         CTXs[jj].isIPv6 = dev.devIp6;
         CTXs[jj].timeout = dev.devTimeout * 1000;       //s -> ms must be less than 0x7fffffff
         CTXs[jj].retryIntvl = dev.devRetryIntvl * 1000; //s -> ms must be less than 0x7fffffff
