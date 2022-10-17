@@ -21,6 +21,8 @@ This adapter can be used to poll information from devices like printers, network
 ## __WORK IN PROGRESS__
 -->
 ### __WORK IN PROGRESS__
+* (McM1957) The compatibility flag is now deprecated and will be removed in future releases. Please adapt config if required.
+* (McM1957) SNMP V3 support has been added
 * (McM1957) Support for IPv6 has been added
 * (McM1957) Code has been cleaned as suggested by eslint 
 * (McM1957) Base modules have been upgrade to current versions

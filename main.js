@@ -457,8 +457,61 @@ async function createSession(pCTX) {
             backwardsGetNexts: true,
             idBitsSize: 32
         });
+
     } else if (pCTX.snmpVers == SNMP_V3) {
-        adapter.log.error('Sorry, SNMP V3 is not yet supported - device "' + pCTX.name + '" (' + pCTX.ip + ')');
+
+        let snmpSecurityLevel = 0;
+        if ( pCTX.authSecLvl == 1 ) {
+            snmpSecurityLevel = snmp.SecurityLevel.noAuthNoPriv; // no message authentication or encryption
+        } else if ( pCTX.authSecLvl == 2 ) {
+            snmpSecurityLevel = snmp.SecurityLevel.authNoPriv;  // message authentication and no encryption
+        } else if ( pCTX.authSecLvl == 3 ) {
+            snmpSecurityLevel = snmp.SecurityLevel.authPriv;    //for message authentication and encryption
+        }
+
+        let snmpAuthProtocol = 0;
+        if ( pCTX.authAuthProto == MD5 ) {
+            snmpAuthProtocol = snmp.AuthProtocols.md5;  // MD5 message authentication
+        } else if ( pCTX.authAuthProto == SHA )  {
+            snmpAuthProtocol = snmp.AuthProtocols.sha;   // SHA message authentication
+        }
+
+        let snmpPrivProtocol = 0;
+        if ( pCTX.authEncProto == DES ) {
+            snmpPrivProtocol = snmp.PrivProtocols.des; // DES encryption
+        } else if ( pCTX.authEncProto == AES ) {
+            snmpPrivProtocol = snmp.PrivProtocols.aes; // AES encryption
+        } else if ( pCTX.authEncProto == AES256B ) {
+            snmpPrivProtocol = snmp.PrivProtocols.SecLvlAES256B; // AES encryption
+        } else if ( pCTX.authEncProto == AES256R ) {
+            snmpPrivProtocol = snmp.PrivProtocols.AES256R; // AES encryption
+        }
+
+        const snmpUser = {
+            name: pCTX.authUser,
+            level: snmpSecurityLevel,
+            authProtocol: snmpAuthProtocol,
+            authKey: pCTX.authAuthKey,
+            privProtocol: snmpPrivProtocol,
+            privKey: pCTX.authEncKey
+        };
+
+        const snmpTransport = pCTX.isIPv6 ? 'udp6' : 'udp4';
+        const snmpVersion = snmp.Version3;
+        // ??? engineID: "8000B98380XXXXXXXXXXXXXXXXXXXXXXXX", // where the X's are random hex digits
+
+        pCTX.session = snmp.createV3Session(pCTX.ipAddr, snmpUser, {
+            port: pCTX.ipPort,   // default:161
+            retries: 1,
+            timeout: pCTX.timeout,
+            backoff: 1.0,
+            transport: snmpTransport,
+            //trapPort: 162,
+            version: snmpVersion,
+            backwardsGetNexts: true,
+            idBitsSize: 32,
+            context: ''
+        });
     } else {
         adapter.log.error('unsupported snmp version code (' + pCTX.snmpVers + ') for device "' + pCTX.name + '" (' + pCTX.ip + ')');
     }
@@ -827,12 +880,12 @@ function validateConfig() {
             ok = false;
             continue;
         }
-        if (authSets[authSet]) {
+        if (authSets[authId]) {
             adapter.log.error('duplicate authorization id ' + authId + ' detected, please correct configuration.');
             ok = false;
             continue;
         }
-        authSets[authSet] = true;
+        authSets[authId] = true;
     }
 
     if (!ok) {
@@ -941,7 +994,7 @@ function validateConfig() {
             ok = false;
         }
 
-        if (dev.devSnmpVers == SNMP_V3 && dev.devAuthId != '' && !oidSets[dev.devAuthId]) {
+        if (dev.devSnmpVers == SNMP_V3 && dev.devAuthId != '' && !authSets[dev.devAuthId]) {
             adapter.log.error('device "' + dev.devName + '" (' + dev.devIpAddr + ') references unknown authorization group ' + dev.devAuthId + '. Please correct configuration.');
             ok = false;
         }
@@ -1039,7 +1092,6 @@ function setupContices() {
         adapter.log.debug('adding device "' + dev.devIpAddr + '" (' + dev.devName + ') , snmp id: ' + dev.devSnmpVers);
         adapter.log.debug('timing parameter: timeout ' + dev.devTimeout + 's , retry ' + dev.devRetryIntvl + 's, polling ' + dev.devPollIntvl + 's');
 
-        // TODO: ipV6 support
         let ipAddr = '';
         let ipPort = 161;
         if (dev.devIp6 ) {
@@ -1086,6 +1138,22 @@ function setupContices() {
         CTXs[jj].pollIntvl = dev.devPollIntvl * 1000;   //s -> ms must be less than 0x7fffffff
         CTXs[jj].snmpVers = dev.devSnmpVers;
         CTXs[jj].authId = dev.devAuthId;
+
+        if (dev.devSnmpVers == SNMP_V3 ) {
+            let authSet = [];
+            for (let ii = 0; ii < adapter.config.authSets.length; ii++) {
+                if ( adapter.config.authSets[ii].authId == dev.devAuthId ){
+                    authSet = adapter.config.authSets[ii];
+                }
+            }
+            CTXs[jj].authSecLvl = authSet.authSecLvl || 0;
+            CTXs[jj].authUser = (authSet.authUser || '').trim();
+            CTXs[jj].authAuthProto = authSet.authAuthProto || 0;
+            CTXs[jj].authAuthKey = (authSet.authAuthKey || '').trim();
+            CTXs[jj].authEncProto = authSet.authEncProto || 0;
+            CTXs[jj].authEncKey = (authSet.authEncKey || '' ).trim();
+        }
+
         //        CTXs[jj].OIDs = [];
         //        CTXs[jj].oids = [];
         //        CTXs[jj].ids = [];
