@@ -1,8 +1,21 @@
-{
+44{
   "common": {
     "name": "snmp",
-    "version": "2.1.10",
+    "version": "2.2.0",
     "news": {
+      "2.2.0": {
+        "en": "The compatibility flag is now deprecated and will be removed in future releases. Please adapt config if required.\nSNMP V3 support has been added (#71)\nSupport for IPv6 has been added (#138)\nCode has been cleaned as suggested by eslint \nBase modules have been upgraded to current versions\nDocumentation  has been updates (en, de, ru)",
+        "de": "Das Kompatibilitäts-Flag wird nunmehr abgekündigtund in zukünftigen Versionen entfernt. Bitte passen Sie die Konfiguration bei Bedarf an.\nSNMP V3 Unterstützung wurde hinzugefügt (#71)\nUnterstützung für IPv6 wurde hinzugefügt (#138)\nCode wurde wie von eslint vorgeschlagen bereinigt\nBasismodule wurden auf aktuelle Versionen aktualisiert\nDie Dokumentation wurde aktualisiert (de, de, ru)",
+        "ru": "Флаг совместимости теперь устарел и будет удален в будущих выпусках. Пожалуйста, при необходимости адаптируйте конфиг.\nДобавлена поддержка SNMP V3 (#71)\nДобавлена поддержка IPv6 (#138)\nКод был очищен как предложил eslint\nБазовые модули были обновлены до текущих версий\nDocumentaion был обновлен (ru, de, ru)",
+        "pt": "A bandeira de compatibilidade é agora desprezada e será removida em versões futuras. Por favor, adapte a configuração se necessário.\nSuporte SNMP V3 foi adicionado (#71)\nSuporte para IPv6 foi adicionado (#138)\nCódigo foi limpo como sugerido por eslint\nMódulos base foram atualizados para as versões atuais\nDocumentação tem sido atualizações (en, de, ru)",
+        "nl": "De compatibiliteits vlag is nu gedegradeerd en zal worden verwijderd in toekomstige vrijlating. Gelieve zich aan te passen als het nodig is.\nSNMP V3 steun is toegevoegd\nIPV6 is toegevoegd\nCode is gereinigd zoals voorgesteld door eslint\nBasismodules zijn geüpgradeerd tot huidige versies\nDocumentaion is bijgepraat",
+        "fr": "Le drapeau de compatibilité est maintenant déprécié et sera retiré dans les versions futures. Veuillez adapter la configuration si nécessaire.\nLe support SNMP V3 a été ajouté (#71)\nLe support pour IPv6 a été ajouté (#138)\nLe code a été nettoyé comme le suggère Eslint\nLes modules de base ont été mis à niveau aux versions actuelles\nDocumentaion a été mise à jour (en, de, ru)",
+        "it": "La bandierina di compatibilità è ora deprecata e verrà rimossa nelle versioni future. Si prega di adattare config se necessario.\nIl supporto SNMP V3 è stato aggiunto (#71)\nÈ stato aggiunto il supporto per IPv6 (#138)\nIl codice è stato pulito come suggerito da eslint\nI moduli di base sono stati aggiornati alle versioni attuali\nDocumentaion è stato aggiornato (it, de, ru)",
+        "es": "La bandera de compatibilidad está ahora deprecatada y será eliminada en futuras versiones. Por favor, adapte el config si es necesario.\nSe ha añadido soporte SNMP V3 (#71)\nSe ha añadido soporte para IPv6 (#138)\nEl código se ha limpiado según lo sugerido por eslint\nLos módulos de base se han actualizado a las versiones actuales\nDocumentaion has been updates (en, de, ru)",
+        "pl": "Flaga kompatybilności jest obecnie odrzucana i zostanie usunięta w przyszłych wydaniach. Dostosowuje się do konfigu.\nWsparcie SNMP V3 zostało dodane (#71)\nDodano wsparcie dla IPv6 (#138)\nKod został oczyszczony przez eslinta\nModuł bazy został zmodernizowany do obecnych wersji\nDokumentacja jest aktualizowana (de, ru)",
+        "uk": "Відхилено прапор сумісності і буде видалено в майбутньому релізах. Будь ласка, перевірте налаштування.\nДодано підтримку SNMP V3 (#71)\nДодано підтримку IPv6 (#138)\nКод був очищений, як пропонується eslint\nБазові модулі модернізовані до поточних версій\nДокументація було оновлено (en, de, ru)",
+        "zh-cn": "兼容的旗帜现在被取消,今后将被取消。 请在必要时作修改。.\nSNMP V3 支持(第71号)\n增加了对IPv6的支助(第138号)。\n正如林特建议的那样,守则已经清理。\n基地单元已升级到现有版本。\n文件的更新(en, de,ru)"
+      },
       "2.1.10": {
         "en": "Validation of OID and device names has been enhanced, crash was reported by sentry (#169)",
         "de": "Die Validierung von OID- und Gerätenamen wurde verbessert, der Crash wurde von Sentry gemeldet (#169)",
