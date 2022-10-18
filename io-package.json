@@ -1,10 +1,10 @@
-44{
+{
   "common": {
     "name": "snmp",
     "version": "2.2.0",
     "news": {
       "2.2.0": {
-        "en": "The compatibility flag is now deprecated and will be removed in future releases. Please adapt config if required.\nSNMP V3 support has been added (#71)\nSupport for IPv6 has been added (#138)\nCode has been cleaned as suggested by eslint \nBase modules have been upgraded to current versions\nDocumentation  has been updates (en, de, ru)",
+        "en": "The compatibility flag is now deprecated and will be removed in future releases. Please adapt config if required.\nSNMP V3 support has been added (#71)\nSupport for IPv6 has been added (#138)\nCode has been cleaned as suggested by eslint \nBase modules have been upgraded to current versions\nDocumentation has been updates (en, de, ru)",
         "de": "Das Kompatibilitäts-Flag wird nunmehr abgekündigtund in zukünftigen Versionen entfernt. Bitte passen Sie die Konfiguration bei Bedarf an.\nSNMP V3 Unterstützung wurde hinzugefügt (#71)\nUnterstützung für IPv6 wurde hinzugefügt (#138)\nCode wurde wie von eslint vorgeschlagen bereinigt\nBasismodule wurden auf aktuelle Versionen aktualisiert\nDie Dokumentation wurde aktualisiert (de, de, ru)",
         "ru": "Флаг совместимости теперь устарел и будет удален в будущих выпусках. Пожалуйста, при необходимости адаптируйте конфиг.\nДобавлена поддержка SNMP V3 (#71)\nДобавлена поддержка IPv6 (#138)\nКод был очищен как предложил eslint\nБазовые модули были обновлены до текущих версий\nDocumentaion был обновлен (ru, de, ru)",
         "pt": "A bandeira de compatibilidade é agora desprezada e será removida em versões futuras. Por favor, adapte a configuração se necessário.\nSuporte SNMP V3 foi adicionado (#71)\nSuporte para IPv6 foi adicionado (#138)\nCódigo foi limpo como sugerido por eslint\nMódulos base foram atualizados para as versões atuais\nDocumentação tem sido atualizações (en, de, ru)",
