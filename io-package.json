@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "snmp",
-    "version": "2.2.0",
+    "version": "2.2.1",
     "news": {
+      "2.2.1": {
+        "en": "Fixed an error within io-package.json.",
+        "de": "Es wurde ein Fehler innerhalb von io-Package behoben. Json.",
+        "ru": "Исправлена ошибка в io-package. Джсон.",
+        "pt": "Corrigido um erro no io-package. O que foi.",
+        "nl": "Ik heb een fout gemaakt in io-package. Json.",
+        "fr": "Correction d'une erreur dans io-package. json.",
+        "it": "Risolto un errore all'interno del pacchetto io. J.",
+        "es": "Arregló un error dentro de io-paquete. json.",
+        "pl": "Okazało się, że błąd wewnątrz io-package. json.",
+        "uk": "Виправлено помилку в io-package. свінгери.",
+        "zh-cn": "在碘剂内有错误。 json."
+      },
       "2.2.0": {
         "en": "The compatibility flag is now deprecated and will be removed in future releases. Please adapt config if required.\nSNMP V3 support has been added (#71)\nSupport for IPv6 has been added (#138)\nCode has been cleaned as suggested by eslint \nBase modules have been upgraded to current versions\nDocumentation has been updates (en, de, ru)",
         "de": "Das Kompatibilitäts-Flag wird nunmehr abgekündigtund in zukünftigen Versionen entfernt. Bitte passen Sie die Konfiguration bei Bedarf an.\nSNMP V3 Unterstützung wurde hinzugefügt (#71)\nUnterstützung für IPv6 wurde hinzugefügt (#138)\nCode wurde wie von eslint vorgeschlagen bereinigt\nBasismodule wurden auf aktuelle Versionen aktualisiert\nDie Dokumentation wurde aktualisiert (de, de, ru)",

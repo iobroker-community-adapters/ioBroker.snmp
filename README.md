@@ -20,7 +20,7 @@ This adapter can be used to poll information from devices like printers, network
 <!--
 ## __WORK IN PROGRESS__
 -->
-### __WORK IN PROGRESS__
+### 2.2.1 (2022-10-18)
 * (McM1957) Fixed an error within io-package.json.
 
 ### 2.2.0 (2022-10-18)
