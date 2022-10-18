@@ -17,6 +17,7 @@
     "lblDevAct": "actief",
     "lblDevName": "Naam",
     "lblDevIpAddr": "IP adres",
+    "lblDevIp6": "IPv6",
     "lblDevOidGroup": "OID-groep",
     "lblDevSnmpVers": "SNMP-versie",
     "lblDevAuthId": "Community (v1, v2c), Auth-ID (v3)",
@@ -38,10 +39,10 @@
     "lblAuthEncProto": "encryptie",
     "lblAuthEncKey": "encryptiesleutel",
     "lblOptions": "Opties",
-    "lblOptUseIp": "Compatibiliteitsmodus - gebruik ip-adres voor status-ID's",
-    "ttOptUseIp": "markeren om ip-adres te gebruiken voor staats-ID's",
-    "hlpOptUseIp": "Als u deze optie selecteert, wordt het ip-adres gebruikt voor status-ID's zoals in eerdere releases.",
     "lblOptChunkSize": "Pakketgrootte",
     "ttOptChunkSize": "Maximaal aantal oids binnen één verzoek",
-    "hlpOptChunkSize": "Deze parameter specificeert het maximale aantal oids binnen één aanvraag. "
+    "hlpOptChunkSize": "Deze parameter specificeert het maximale aantal oids binnen één aanvraag.",
+    "lblOptUseIp": "Compatibiliteitsmodus - gebruik ip-adres voor status-ID's",
+    "ttOptUseIp": "markeren om ip-adres te gebruiken voor staats-ID's",
+    "hlpOptUseIp": "Als u deze optie selecteert, wordt het ip-adres gebruikt voor status-ID's zoals in eerdere releases."
 }

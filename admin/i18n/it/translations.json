@@ -17,6 +17,7 @@
     "lblDevAct": "attivo",
     "lblDevName": "Nome",
     "lblDevIpAddr": "Indirizzo IP",
+    "lblDevIp6": "IPv6",
     "lblDevOidGroup": "Gruppo OID",
     "lblDevSnmpVers": "Versione SNMP",
     "lblDevAuthId": "Comunità (v1, v2c), Auth-ID (v3)",
@@ -38,10 +39,10 @@
     "lblAuthEncProto": "crittografia",
     "lblAuthEncKey": "chiave di codifica",
     "lblOptions": "Opzioni",
-    "lblOptUseIp": "Modalità di compatibilità: usa l'indirizzo IP per gli ID di stato",
-    "ttOptUseIp": "mark per utilizzare l'indirizzo IP per gli ID di stato",
-    "hlpOptUseIp": "Selezionando questa opzione, l'indirizzo IP viene utilizzato per gli ID di stato come nelle versioni precedenti.",
     "lblOptChunkSize": "Dimensione del pacchetto",
     "ttOptChunkSize": "Numero massimo di oid all'interno di una richiesta",
-    "hlpOptChunkSize": "Questo parametro specifica il numero massimo di oid all'interno di una richiesta. "
+    "hlpOptChunkSize": "Questo parametro specifica il numero massimo di oid all'interno di una richiesta.",
+    "lblOptUseIp": "Modalità di compatibilità: usa l'indirizzo IP per gli ID di stato",
+    "ttOptUseIp": "mark per utilizzare l'indirizzo IP per gli ID di stato",
+    "hlpOptUseIp": "Selezionando questa opzione, l'indirizzo IP viene utilizzato per gli ID di stato come nelle versioni precedenti."
 }

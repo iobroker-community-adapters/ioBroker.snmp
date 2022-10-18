@@ -185,6 +185,15 @@
                             "default": "0.0.0.0"
                         },
                         {
+                            "type": "checkbox",
+                            "attr": "devIp6",
+                            "width": "5% ",
+                            "title": "lblDevIp6",
+                            "filter": false,
+                            "sort": false,
+                            "default": false
+                        },
+                        {
                             "type": "text",
                             "attr": "devOidGroup",
                             "width": "10% ",
@@ -200,7 +209,8 @@
                             "title": "lblDevSnmpVers",
                             "options": [
                                 { "label": "SNMP v1", "value": 1},
-                                { "label": "SNMP v2c", "value": 2}
+                                { "label": "SNMP v2c", "value": 2},
+                                { "label": "SNMP v3", "value": 3}
                             ],
                             "filter": false,
                             "sort": false,
@@ -325,11 +335,12 @@
                             "default": "1"
                         },
                         {
-                            "type": "text",
+                            "type": "password",
                             "attr": "authAuthKey",
                             "width": "15% ",
                             "title": "lblAuthAuthKey",
 							"hidden": "data.authSecLvl<2",
+                            "visible": true,
                             "filter": false,
                             "sort": false,
                             "default": ""
@@ -351,11 +362,12 @@
                             "default": "1"
                         },
                         {
-                            "type": "text",
+                            "type": "password",
                             "attr": "authEncKey",
                             "width": "15% ",
                             "title": "lblAuthEncKey",
   							"hidden": "data.authSecLvl<3",
+                            "visible": true,
                             "filter": false,
                             "sort": false,
                             "default": ""
