@@ -555,7 +555,11 @@ function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
         }
         case snmp.ObjectType.OctetString:{
             valTypeStr = 'OctetString';
-            valStr = pVarbind.value.toString();
+            if (isValidUTF8Buffer(pVarbind.value)) {
+                valStr = pVarbind.value.toString();
+            } else {
+                valStr = JSON.stringify(pVarbind.value);
+          	}
             break;
         }
         case snmp.ObjectType.Null:{
@@ -789,6 +793,11 @@ function handleConnectionInfo() {
         adapter.setState('info.connection', g_isConnected, true);
     }
 }
+
+function isValidUTF8Buffer(buf){
+    return Buffer.compare(new Buffer(buf.toString(),'utf8') , buf) === 0;
+}
+
 
 /**
  * validateConfig - scan and validate config data
