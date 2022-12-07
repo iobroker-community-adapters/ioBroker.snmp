@@ -380,7 +380,7 @@ async function initOidObjects(pId, pOid, pOID) {
             type: 'state',
             common: {
                 name: pId,
-                //					write: !!OID.write, //## TODO
+                write: !!pOID.oidWriteable, //## TODO
                 read: true,
                 type: oidFormat2StateType(pOID.oidFormat),
                 role: 'value'
@@ -1092,7 +1092,7 @@ async function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
         type: 'state',
         common: {
             name: pId,
-            //					write: !!OID.write, //## TODO
+            write: !!OID.oidWriteable, //## TODO
             read: true,
             type: oidFormat2StateType(pCTX.chunks[pChunkIdx].OIDs[pIdx].oidFormat),
             role: 'value'
