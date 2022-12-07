@@ -1101,7 +1101,7 @@ async function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
         }
     });
     adapter.setState(pCTX.chunks[pChunkIdx].ids[pIdx], val, true);
-    adapter.setState(pCTX.chunks[pChunkIdx].ids[pIdx]+'-type', pVarbind.type + ': '+valTypeStr + ' ('+, true);
+    adapter.setState(pCTX.chunks[pChunkIdx].ids[pIdx]+'-type', pVarbind.type + ': '+valTypeStr, true);
     if (adapter.config.optRawStates){
         adapter.setState(pCTX.chunks[pChunkIdx].ids[pIdx]+'-raw', JSON.stringify(pVarbind), true);
     }
