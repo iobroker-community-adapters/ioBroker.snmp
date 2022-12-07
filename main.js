@@ -396,7 +396,7 @@ async function initOidObjects(pId, pOid, pOID) {
                 name: pId+'-type',
                 write: false,
                 read: true,
-                type: 'number',
+                type: 'string',
                 role: 'type.encoding'
             },
             native: {
@@ -1101,7 +1101,7 @@ async function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
         }
     });
     adapter.setState(pCTX.chunks[pChunkIdx].ids[pIdx], val, true);
-    adapter.setState(pCTX.chunks[pChunkIdx].ids[pIdx]+'-type', pVarbind.type, true);
+    adapter.setState(pCTX.chunks[pChunkIdx].ids[pIdx]+'-type', pVarbind.type + ': '+valTypeStr + ' ('+, true);
     if (adapter.config.optRawStates){
         adapter.setState(pCTX.chunks[pChunkIdx].ids[pIdx]+'-raw', JSON.stringify(pVarbind), true);
     }
