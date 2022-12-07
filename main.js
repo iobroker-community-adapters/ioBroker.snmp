@@ -277,6 +277,7 @@ async function initObject(pObj) {
 
     if (pObj.type === 'state') {
         if (typeof (STATEs[pObj._id]) === 'undefined' ) {
+            adapter.log.debug('extending obj "' + pObj._id + '" with '+ JSON.stringify(pObj));
             await adapter.extendObjectAsync(pObj._id, pObj);
             STATEs[ pObj._id ] = {
                 value: null,
