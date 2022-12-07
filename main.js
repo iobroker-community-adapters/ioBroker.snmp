@@ -1027,7 +1027,7 @@ async function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
                     break;
                 }
                 case F_BOOLEAN /* 2 */: {
-                    val = !!value;
+                    val = value!=0;
                     break;
                 }
                 case F_JSON /* 3 */: {
@@ -1720,7 +1720,7 @@ async function onReady() {
     await adapter.setStateAsync('info.connection', false, true);
 
     // validate config
-    if (!validateConfig(adapter.config)) {
+    if (!validateConfig()) {
         adapter.log.error('invalid config, cannot continue');
         adapter.disable();
         return;
