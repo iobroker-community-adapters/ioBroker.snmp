@@ -277,11 +277,11 @@ async function initObject(pObj) {
 
     if (pObj.type === 'state') {
         if (typeof (STATEs[pObj._id]) === 'undefined' ) {
-            const state= await adapter.getObjectAsync(pObj._id);
+            await adapter.extendObjectAsync(pObj._id, pObj);
             STATEs[ pObj._id ] = {
                 value: null,
                 oidType: null,
-                type: state.common.type
+                type: pObj.common.type
             };
         }
 
