@@ -106,9 +106,24 @@
                             "default": ""
                         },
                         {
+                            "type": "select",
+                            "attr": "oidFormat",
+                            "width": "10% ",
+                            "title": "lblOidFormat",
+                            "filter": false,
+                            "sort": false,
+                            "options": [
+                                { "label": "lblString", "value": 0}, 
+                                { "label": "lblNumber", "value": 1},
+                                { "label": "lblBoolean", "value": 2},
+                                { "label": "lblJson", "value": 3}
+                            ],
+                            "default": 0
+                        },
+                        {
                             "type": "checkbox",
                             "attr": "oidWriteable",
-                            "width": "10% ",
+                            "width": "5% ",
                             "title": "lblOidWriteable",
                             "filter": false,
                             "sort": false,
@@ -117,13 +132,13 @@
                         {
                             "type": "checkbox",
                             "attr": "oidOptional",
-                            "width": "10% ",
+                            "width": "5% ",
                             "title": "lblOidOptional",
                             "filter": false,
                             "sort": false,
                             "default": false
-                        }						
-					]
+                        }
+                    ]
 				}
 			}
 		},
@@ -400,6 +415,14 @@
                     "default": false,
                     "tooltip": "ttOptUseIp",
                     "help": "hlpOptUseIp"
+                },
+				"optRawStates": 	{
+                    "type": "checkbox",
+                    "label": "lblOptRawStates",
+					"newLine": true,
+                    "default": false,
+                    "tooltip": "ttOptRawStates",
+                    "help": "hlpOptRawStates"
                 }
             }
 		}        
