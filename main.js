@@ -461,11 +461,11 @@ async function initAllObjects() {
 async function onSessionClose(pCTX) {
     adapter.log.debug('onSessionClose - device ' + pCTX.name + ' (' + pCTX.ipAddr + ')');
 
-    clearInterval(pCTX.pollTimer);
+    adapter.clearInterval(pCTX.pollTimer);
     pCTX.pollTimer = null;
     pCTX.session = null;
 
-    pCTX.retryTimer = setTimeout((pCTX) => {
+    pCTX.retryTimer = adapter.setTimeout((pCTX) => {
         pCTX.retryTimer = null;
         createSession(pCTX);
     }, pCTX.retryIntvl, pCTX);
@@ -511,12 +511,12 @@ async function createSession(pCTX) {
 
     // close old session if one exists
     if (pCTX.retryTimer) {
-        clearTimeout(pCTX.retryTimer);
+        adapter.clearTimeout(pCTX.retryTimer);
         pCTX.retryTimer = null;
     }
 
     if (pCTX.pollTimer) {
-        clearInterval(pCTX.pollTimer);
+        adapter.clearInterval(pCTX.pollTimer);
         pCTX.pollTimer = null;
     }
 
@@ -611,7 +611,7 @@ async function createSession(pCTX) {
     if (pCTX.session) {
         pCTX.session.on('close', () => { onSessionClose(pCTX); });
         pCTX.session.on('error', (err) => { onSessionError(pCTX, err); });
-        pCTX.pollTimer = setInterval(readOids, pCTX.pollIntvl, pCTX);
+        pCTX.pollTimer = adapter.setInterval(readOids, pCTX.pollIntvl, pCTX);
 
         // read one time immediately
         readOids(pCTX);
@@ -1748,7 +1748,7 @@ async function onReady() {
 
     // start connection info updater
     adapter.log.debug('startconnection info updater');
-    g_connUpdateTimer = setInterval(handleConnectionInfo, 15000);
+    g_connUpdateTimer = adapter.setInterval(handleConnectionInfo, 15000);
 
     adapter.log.debug('startup completed');
 
@@ -1775,7 +1775,7 @@ function onUnload(callback) {
         // close session if one exists
         if (CTX.pollTimer) {
             try {
-                clearInterval(CTX.pollTimer);
+                adapter.clearInterval(CTX.pollTimer);
             } catch (e) { /* */ }
             CTX.pollTimer = null;
         }
@@ -1792,7 +1792,7 @@ function onUnload(callback) {
 
     if (g_connUpdateTimer) {
         try {
-            clearInterval(g_connUpdateTimer);
+            adapter.clearInterval(g_connUpdateTimer);
         } catch (e) { /* */ }
         g_connUpdateTimer = null;
     }
