@@ -27,13 +27,13 @@ Hier geben Sie alle OIDs an, die vom Adapter abgefragt werden sollen, eine OID p
 <p align=center><img src="img/snmp_tab_oids.jpg" width="600" /></p>
 
 | Parameter | Typ | Beschreibung | Kommentar |
-|----------|-------------|------ ----------------|-------------------------------- ----|
-| aktiv | boolesch | wenn auf true gesetzt, wird diese OID verwendet | kann verwendet werden, um eine einzelne OID zu deaktivieren
-| OID-Gruppe | Text | Name der OID-Gruppe | wird verwendet, um die Gruppe dem Gerät zuzuweisen
-| OID-Name | Text | Name, der der OID zugeordnet ist | wird verwendet, um den Datenpunkt zu benennen
+|-----------|-------------|------ ----------------|-------------------------------- ----|
+| aktiv | boolesch | wenn auf true gesetzt, wird diese OID verwendet | kann verwendet werden, um eine einzelne OID zu deaktivieren |
+| OID-Gruppe | Text | Name der OID-Gruppe | wird verwendet, um die Gruppe dem Gerät zuzuweisen |
+| OID-Name | Text | Name, der der OID zugeordnet ist | wird verwendet, um den Datenpunkt zu benennen |
 | OID | Text | oid-Zeichenfolge (1.2.3.4.) | oid-Zeichenfolge, wie vom Gerätehersteller angegeben |
 | beschreibbar | boolesch | sollte auf true gesetzt werden, wenn OID beschreibbar ist | reserviert für zukünftige Verwendung |
-| optional | boolesch | sollte auf true gesetzt werden, wenn OID optional ist | wenn auf true gesetzt, wird kein Fehler ausgelöst, wenn oid unbekannt ist (Funktionalität nicht verfügbar mit snmp V1) |
+| optional | boolesch | sollte auf true gesetzt werden, wenn OID optional ist | wenn auf true gesetzt, wird kein Fehler ausgelöst wenn oid unbekannt ist (Funktionalität nicht verfügbar mit snmp V1) |
 
 
 Sie können einfach jede OID aktivieren/deaktivieren, indem Sie das aktive Flag setzen. Beachten Sie, dass die ID des ioBroker-Zustands zum Speichern der gelesenen Daten
