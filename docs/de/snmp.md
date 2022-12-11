@@ -27,13 +27,13 @@ Hier geben Sie alle OIDs an, die vom Adapter abgefragt werden sollen, eine OID p
 <p align=center><img src="img/snmp_tab_oids.jpg" width="600" /></p>
 
 | Parameter | Typ | Beschreibung | Kommentar |
-|----------|-------------|------ ----------------|-------------------------------- ----|
-| aktiv | boolesch | wenn auf true gesetzt, wird diese OID verwendet | kann verwendet werden, um eine einzelne OID zu deaktivieren
-| OID-Gruppe | Text | Name der OID-Gruppe | wird verwendet, um die Gruppe dem Gerät zuzuweisen
-| OID-Name | Text | Name, der der OID zugeordnet ist | wird verwendet, um den Datenpunkt zu benennen
+|-----------|-------------|----------------------|------------------------------------|
+| aktiv | boolesch | wenn auf true gesetzt, wird diese OID verwendet | kann verwendet werden, um eine einzelne OID zu deaktivieren |
+| OID-Gruppe | Text | Name der OID-Gruppe | wird verwendet, um die Gruppe dem Gerät zuzuweisen |
+| OID-Name | Text | Name, der der OID zugeordnet ist | wird verwendet, um den Datenpunkt zu benennen |
 | OID | Text | oid-Zeichenfolge (1.2.3.4.) | oid-Zeichenfolge, wie vom Gerätehersteller angegeben |
 | beschreibbar | boolesch | sollte auf true gesetzt werden, wenn OID beschreibbar ist | reserviert für zukünftige Verwendung |
-| optional | boolesch | sollte auf true gesetzt werden, wenn OID optional ist | wenn auf true gesetzt, wird kein Fehler ausgelöst, wenn oid unbekannt ist (Funktionalität nicht verfügbar mit snmp V1) |
+| optional | boolesch | sollte auf true gesetzt werden, wenn OID optional ist | wenn auf true gesetzt, wird kein Fehler ausgelöst wenn oid unbekannt ist (Funktionalität nicht verfügbar mit snmp V1) |
 
 
 Sie können einfach jede OID aktivieren/deaktivieren, indem Sie das aktive Flag setzen. Beachten Sie, dass die ID des ioBroker-Zustands zum Speichern der gelesenen Daten
@@ -49,7 +49,7 @@ Hier legen Sie fest, welche Geräte abgefragt werden sollen.
 <p align=center><img src="img/snmp_tab_devices.jpg" width="600" /></p>
 
 | Parameter | Typ | Beschreibung | Kommentar |
-|----------|-------------|------ ----------------|-------------------------------- ----|
+|----------|-------------|----------------------|------------------------------------|
 | aktiv | boolesch | wenn auf true gesetzt, wird das Gerät verwendet | kann verwendet werden, um ein einzelnes Gerät zu deaktivieren |[2001:abcd::30ff]
 | Name | Text | Name des Geräts | wird verwendet, um Namen von Datenpunkten zu erstellen |
 | IP-Adresse | Text | IP-Adresse (IPv4 oder IPv6) oder Domänenname mit optionaler Portnummer | IPv4 1.2.3.4 oder 1.2.3.4:161, IPv6 2001:abcd::30ff, IPv6 [2001:abcd::30ff] oder [2001:abcd::30ff]:161, Domäne myhost.domain.org oder myhost.domain .org:161 |
@@ -67,7 +67,7 @@ Diese Registerkarte enthält SNMP V3-Autorisierungsinformationen.
 <p align=center><img src="img/snmp_tab_authorization.jpg" width="600" /></p>
 
 | Parameter | Typ | Beschreibung | Kommentar |
-|-------------------|-------------|--------------- --------------------|------------------------------------- --------|
+|-------------------|-------------|-----------------------------------|---------------------------------------------|
 | Name (ID) | Text | ID der Berechtigungsdaten | muss mit Auth-Id bei Tab-Geräten übereinstimmen |
 | Sicherheitsstufe | Auswahl | gewünschte Sicherheitsmethode | siehe Beschreibung |
 | Benutzername | Text | Benutzername zur Authentifizierung | |
@@ -95,7 +95,7 @@ Hier legen Sie einige allgemeine Optionen fest
 <p align=center><img src="img/snmp_tab_options.jpg" width="600" /></p>
 
 | Parameter | Typ | Beschreibung | Kommentar |
-|----------|-------------|------ ----------------|-------------------------------- ----|
+|----------|-------------|----------------------|------------------------------------|
 | Paketgröße | Ganzzahl | maximale Anzahl von OIDs, die innerhalb einer einzigen Anfrage gesendet werden | reduzieren Sie diesen Wert bei TOOBIG-Fehlern |
 | Kompatibilitätsmodus | boolesch | wenn diese Option aktiviert ist, basieren die Datenpunktnamen auf der IP-Adresse | HINWEIS: veraltet - nicht mehr verwenden. Dieses Flag funktioniert nicht mit IPv6-Adressen. Kann in zukünftigen Versionen entfernt werden. |
 
