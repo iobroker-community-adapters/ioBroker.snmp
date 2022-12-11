@@ -268,7 +268,7 @@ async function initObject(pObj) {
 
     if (typeof(STATEs[pObj._id]) === 'undefined') {
         try {
-            adapter.log.debug('creating obj "' + pObj._id + '" with state-type '+pObj.common.type);
+            adapter.log.debug('creating obj "' + pObj._id + '" with type ' + pObj.type);
             await adapter.setObjectNotExistsAsync(pObj._id, pObj);
         } catch (e) {
             adapter.log.error('error initializing obj "' + pObj._id + '" ' + e.message);
