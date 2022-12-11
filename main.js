@@ -675,7 +675,7 @@ async function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
                     break;
                 }
                 case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value, 10) == 1;
+                    val = parseInt(pVarbind.value, 10) !== 0;
                     break;
                 }
                 case F_JSON /* 3 */: {
@@ -701,7 +701,7 @@ async function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
                     break;
                 }
                 case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value.toString, 10) == 1;
+                    val = parseInt(pVarbind.value.toString, 10) !== 0;
                     break;
                 }
                 case F_JSON /* 3 */: {
@@ -719,15 +719,18 @@ async function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
             valTypeStr = 'Null';
             switch (oidFormat) {
                 case F_TEXT /* 0 */: {
-                    val = pVarbind.value.toString();
+                    val = null;
+                    adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert data of type null to text ' + JSON.stringify(pVarbind));
                     break;
                 }
                 case F_NUMERIC /* 1 */: {
-                    val = parseInt(pVarbind.value.toString, 10);
+                    val = null;
+                    adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert data of type null to numeric ' + JSON.stringify(pVarbind));
                     break;
                 }
                 case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value.toString, 10) == 1;
+                    val = null;
+                    adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert data of type null to boolean ' + JSON.stringify(pVarbind));
                     break;
                 }
                 case F_JSON /* 3 */: {
@@ -735,7 +738,7 @@ async function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
                     break;
                 }
                 default:{
-                    val = pVarbind.value.toString();
+                    val = null;
                     break;
                 }
             }
@@ -749,11 +752,13 @@ async function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
                     break;
                 }
                 case F_NUMERIC /* 1 */: {
-                    val = parseInt(pVarbind.value.toString, 10);
+                    val = null;
+                    adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert data of type OID to numeric ' + JSON.stringify(pVarbind));
                     break;
                 }
                 case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value.toString, 10) == 1;
+                    val = null;
+                    adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert data of type OID to boolean ' + JSON.stringify(pVarbind));
                     break;
                 }
                 case F_JSON /* 3 */: {
@@ -775,11 +780,13 @@ async function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
                     break;
                 }
                 case F_NUMERIC /* 1 */: {
-                    val = parseInt(pVarbind.value.toString, 10);
+                    val = null;
+                    adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert data of type ipaddress to numeric ' + JSON.stringify(pVarbind));
                     break;
                 }
                 case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value.toString, 10) == 1;
+                    val = null;
+                    adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert data of type ipaddress to boolean ' + JSON.stringify(pVarbind));
                     break;
                 }
                 case F_JSON /* 3 */: {
@@ -805,7 +812,7 @@ async function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
                     break;
                 }
                 case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value.toString, 10) == 1;
+                    val = parseInt(pVarbind.value.toString, 10) !== 0;
                     break;
                 }
                 case F_JSON /* 3 */: {
@@ -831,7 +838,7 @@ async function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
                     break;
                 }
                 case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value.toString, 10) == 1;
+                    val = parseInt(pVarbind.value.toString, 10) !== 0;
                     break;
                 }
                 case F_JSON /* 3 */: {
@@ -857,7 +864,7 @@ async function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
                     break;
                 }
                 case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value.toString, 10) == 1;
+                    val = parseInt(pVarbind.value.toString, 10) !== 0;
                     break;
                 }
                 case F_JSON /* 3 */: {
@@ -888,7 +895,7 @@ async function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
                         break;
                     }
                     case F_BOOLEAN /* 2 */: {
-                        val = !!value;
+                        val = value !== 0;
                         break;
                     }
                     case F_JSON /* 3 */: {
@@ -902,8 +909,32 @@ async function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
                 }
             }
             else {
-                val = null;
-                adapter.log.error('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert opaque data ' + JSON.stringify(pVarbind));
+                switch (oidFormat) {
+                    case F_TEXT /* 0 */: {
+                        val = null;
+                        adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert opaque data to text ' + JSON.stringify(pVarbind));
+                        break;
+                    }
+                    case F_NUMERIC /* 1 */: {
+                        val = null;
+                        adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert opaque data to number ' + JSON.stringify(pVarbind));
+                        break;
+                    }
+                    case F_BOOLEAN /* 2 */: {
+                        val = null;
+                        adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert opaque data to boolean ' + JSON.stringify(pVarbind));
+                        break;
+                    }
+                    case F_JSON /* 3 */: {
+                        val = JSON.stringify(pVarbind.value);
+                        break;
+                    }
+                    default:{
+                        val = null;
+                        adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert opaque data ' + JSON.stringify(pVarbind));
+                        break;
+                    }
+                }
             }
             break;
         }
@@ -919,7 +950,7 @@ async function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
                     break;
                 }
                 case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value.toString, 10) == 1;
+                    val = parseInt(pVarbind.value.toString, 10) !== 0;
                     break;
                 }
                 case F_JSON /* 3 */: {
@@ -945,7 +976,7 @@ async function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
                     break;
                 }
                 case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value.toString, 10) == 1;
+                    val = parseInt(pVarbind.value.toString, 10) !== 0;
                     break;
                 }
                 case F_JSON /* 3 */: {
@@ -971,7 +1002,7 @@ async function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
                     break;
                 }
                 case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value.toString, 10) == 1;
+                    val = parseInt(pVarbind.value.toString, 10) !== 0;
                     break;
                 }
                 case F_JSON /* 3 */: {
@@ -997,7 +1028,7 @@ async function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
                     break;
                 }
                 case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value.toString, 10) == 1;
+                    val = parseInt(pVarbind.value.toString, 10) !== 0;
                     break;
                 }
                 case F_JSON /* 3 */: {
@@ -1028,7 +1059,7 @@ async function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
                     break;
                 }
                 case F_BOOLEAN /* 2 */: {
-                    val = value!=0;
+                    val = value !== 0;
                     break;
                 }
                 case F_JSON /* 3 */: {
@@ -1058,22 +1089,24 @@ async function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
             break;
         }
         default:{
-            valTypeStr = 'Unknown';
+            valTypeStr = 'Unknown (' + pVarbind.type.toString + ')';
             switch (oidFormat) {
                 case F_TEXT /* 0 */: {
                     val = pVarbind.value.toString();
                     break;
                 }
                 case F_NUMERIC /* 1 */: {
-                    val = parseInt(pVarbind.value.toString, 10);
+                    val = null;
+                    adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert unknown data to numeric ' + JSON.stringify(pVarbind));
                     break;
                 }
                 case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value.toString, 10) == 1;
+                    val = null;
+                    adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert unknown data to boolean ' + JSON.stringify(pVarbind));
                     break;
                 }
                 case F_JSON /* 3 */: {
-                    val = JSON.stringify(pVarbind.value);
+                    val = null;
                     break;
                 }
                 default:{
