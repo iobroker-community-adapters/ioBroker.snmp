@@ -1336,6 +1336,10 @@ function validateConfig() {
             adapter.log.error('oid "' + oid.oidName + '"is invalid. Name must not include consecutive dots. Please correct configuration.');
             ok = false;
         }
+        if (oid.oidName === 'online') {
+            adapter.log.error('oid "' + oid.oidName + '"is invalid. Name "online" is reserved. Please correct configuration.');
+            ok = false;
+        }
 
         if (!oid.oidOid) {
             adapter.log.error('oid must not be empty, please correct configuration.');
