@@ -20,8 +20,7 @@ This adapter can be used to poll information from devices like printers, network
 <!--
 ## __WORK IN PROGRESS__
 -->
-
-### __WORK IN PROGRESS__
+### 2.3.0 (2022-12-13)
 * (McM1957) Add support for using native datatypes for states. (#143)
 * (McM1957) Support has been added to store binary oid data as json. (#188)
 * (McM1957) Incorrect setting of write mode has been fixed. (#191)
