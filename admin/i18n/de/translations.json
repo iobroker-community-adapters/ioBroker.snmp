@@ -46,11 +46,11 @@
     "lblOidWriteable": "beschreibbar",
     "lblOptChunkSize": "Paketgröße",
     "lblOptRawStates": "Rohzustände hinzufügen",
-    "lblOptUseIp": "Kompatibilitätsmodus - Verwenden Sie die IP-Adresse für Status-IDs",
+    "lblOptUseIp": "Kompatibilitätsmodus - Verwenden Sie die IP-Adresse für Zustands-IDs",
     "lblOptions": "Optionen",
     "lblString": "Text",
     "ttOptChunkSize": "Maximale OID-Anzahl innerhalb einer Anfrage",
-    "ttOptRawStates": "Erstellen Sie Zustände, die Rohdaten enthalten, die als json codiert sind.",
-    "ttOptUseIp": "Markieren, um die IP-Adresse für Status-IDs zu verwenden",
+    "ttOptRawStates": "Zustände mit im Json Format kodierten Rohdaten erstellen.",
+    "ttOptUseIp": "Markieren, um die IP-Adresse für Zustand-IDs zu verwenden",
     "warnAuthUnused": "Hinweis: Die Konfiguration in diesem Bereich wird derzeit nicht verwendet, da kein Gerät das SNMPv3-Protokoll verwendet."
 }
