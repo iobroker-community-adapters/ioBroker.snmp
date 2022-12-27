@@ -23,7 +23,7 @@
     "lblDevAct": "aktiv",
     "lblDevAuthId": "Community (v1, v2c), Auth-ID (v3)",
     "lblDevIp6": "IPv6",
-    "lblDevIpAddr": "IP Adresse",
+    "lblDevIpAddr": "IP-Adresse",
     "lblDevName": "Name",
     "lblDevOidGroup": "OID-Gruppe",
     "lblDevPollIntvl": "Abfrage (Sek.)",
