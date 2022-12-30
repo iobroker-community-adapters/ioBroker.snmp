@@ -111,11 +111,14 @@ const AES256R = 4;
 // you need to create an adapter
 const utils = require('@iobroker/adapter-core');
 const { EXIT_CODES } = require('@iobroker/js-controller-common');
+const adapterName = require('./package.json').name.split('.').pop();
+
 const InstallUtils = require('./lib/installUtils');
 
 // Load modules required by adapter
 const snmp = require('net-snmp');
 const net = require('net');
+// const { toUnicode } = require('punycode');
 
 // init installation marker
 let doInstall = false;
@@ -125,7 +128,7 @@ let didInstall = false;
 let adapter;    // adapter instance - @type {ioBroker.Adapter}
 
 const CTXs = [];		    // see description at header of file
-const STATEs = [];          // states cache
+const STATEs = [];          // states cache, index by full id
 let g_isConnected = false; 	// local copy of info.connection state
 let g_connUpdateTimer = null;
 let g_chunkSize = 3;         // maximum number of OIDs per request
@@ -158,15 +161,7 @@ function startAdapter(options) {
         // },
 
         // stateChange is called if a subscribed state changes
-        // stateChange: (id, state) => {
-        //	if (state) {
-        //		// The state was changed
-        //		adapter.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
-        //	} else {
-        //		// The state was deleted
-        //		adapter.log.info(`state ${id} deleted`);
-        //	}
-        //},
+        stateChange: onStateChange,
 
         // If you need to accept messages in your adapter, uncomment the following block.
         // /**
@@ -266,7 +261,8 @@ function oidFormat2StateType(pOidFormat){
 async function initObject(pObj) {
     adapter.log.debug('initobject ' + pObj._id);
 
-    if (typeof(STATEs[pObj._id]) === 'undefined') {
+    const fullId = `${adapterName}.${adapter.instance}.${pObj._id}`;
+    if (typeof(STATEs[fullId]) === 'undefined') {
         try {
             adapter.log.debug('creating obj "' + pObj._id + '" with type ' + pObj.type);
             await adapter.setObjectNotExistsAsync(pObj._id, pObj);
@@ -276,21 +272,21 @@ async function initObject(pObj) {
     }
 
     if (pObj.type === 'state') {
-        if (typeof (STATEs[pObj._id]) === 'undefined' ) {
+        if (typeof (STATEs[fullId]) === 'undefined' ) {
             adapter.log.debug('extending obj "' + pObj._id + '" with '+ JSON.stringify(pObj));
             await adapter.extendObjectAsync(pObj._id, pObj);
-            STATEs[ pObj._id ] = {
+            STATEs[fullId] = {
                 value: null,
                 oidType: null,
                 type: pObj.common.type
             };
         }
 
-        if ( STATEs[pObj._id].type !== pObj.common.type ) {
+        if ( STATEs[fullId].type !== pObj.common.type ) {
             try {
-                adapter.log.info('reinitializing obj "' + pObj._id + '" state-type change '+STATEs[pObj._id].type+' -> '+pObj.common.type);
+                adapter.log.info('reinitializing obj "' + pObj._id + '" state-type change '+STATEs[fullId].type+' -> '+pObj.common.type);
                 await adapter.extendObjectAsync(pObj._id, {common: { type: pObj.common.type }});
-                STATEs[pObj._id].type = pObj.common.type;
+                STATEs[fullId].type = pObj.common.type;
             } catch (e) {
                 adapter.log.error('error reinitializing obj "' + pObj._id + '" ' + e.message);
             }
@@ -381,7 +377,7 @@ async function initOidObjects(pId, pOid, pOID) {
             type: 'state',
             common: {
                 name: pId,
-                write: !!pOID.oidWriteable, //## TODO
+                write: !!pOID.oidWriteable,
                 read: true,
                 type: oidFormat2StateType(pOID.oidFormat),
                 role: 'value'
@@ -389,6 +385,12 @@ async function initOidObjects(pId, pOid, pOID) {
             native: {
             }
         });
+
+        if (pOID.oidWriteable) {
+            const fullId = `${adapterName}.${adapter.instance}.${pId}`;
+            adapter.log.debug ( `subscribing state ${fullId}` );
+            await adapter.subscribeStatesAsync( fullId );
+        }
 
         await initObject({
             _id: pId+'-type',
@@ -447,6 +449,347 @@ async function initAllObjects() {
 }
 
 
+// #################### varbind convert functions ####################
+/**
+ * oidObjType2Text - translate oid object type into textual string
+ *
+ * @param   {integer}   pOidObjType    oid object type
+ * @return  {string}    textual representation of object type
+ *
+ */
+function oidObjType2Text( pOidObjType ) {
+    adapter.log.debug('oidObjType2Text - stringify oid object type');
+
+    const OBJECT_TYPE ={
+        [snmp.ObjectType.Boolean]       : 'Boolean',
+        [snmp.ObjectType.Integer]       : 'Integer',
+        [snmp.ObjectType.OctetString]   : 'OctetString',
+        [snmp.ObjectType.Null]          : 'Null',
+        [snmp.ObjectType.OID]           : 'OID',
+        [snmp.ObjectType.IpAddress]     : 'IpAddress',
+        [snmp.ObjectType.Counter]       : 'Counter',
+        [snmp.ObjectType.Gauge]         : 'Gauge',
+        [snmp.ObjectType.TimeTicks]     : 'TimeTicks',
+        [snmp.ObjectType.Opaque]        : 'Opaque',
+        [snmp.ObjectType.Integer32]     : 'Integer32',
+        [snmp.ObjectType.Counter32]     : 'Counter32',
+        [snmp.ObjectType.Gauge32]       : 'Gauge32',
+        [snmp.ObjectType.Unsigned32]    : 'Unsigned32',
+        [snmp.ObjectType.Counter64]     : 'Counter64',
+        [snmp.ObjectType.NoSuchObject]  : 'NoSuchObject',
+        [snmp.ObjectType.NoSuchInstance]: 'NoSuchInstance',
+        [snmp.ObjectType.EndOfMibView]  : 'EndOfMibView',
+    };
+
+    return OBJECT_TYPE[pOidObjType] || `Unknown (${pOidObjType})`;
+}
+
+/**
+ * varbindDecode - convert varbind data to native data
+ *
+ * @param   {object}    pVarbind    varbind to decode
+ * @param   {integer}   pFormat     format constant
+ * @param   {string}    pDevId      id of device
+ * @param   {string}    pStateId    id of state
+ * @return  {object}    state object containing val, tyoestr and qual values
+ *
+ */
+function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
+    adapter.log.debug('varbindDeode - decode varbind');
+
+    // taken from https://github.com/markabrahams/node-net-snmp#oid-strings--varbinds
+    // varbind data is encoded based on snmp.ObjectType object.
+    //
+    // The JavaScript true and false keywords are used for the values of varbinds with type Boolean.
+    //
+    // All integer based types are specified as expected (this includes Integer, Counter, Gauge, TimeTicks, Integer32,
+    // Counter32, Gauge32, and Unsigned32), e.g. -128 or 100.
+    //
+    // Since JavaScript does not offer full 64 bit integer support objects with type Counter64 cannot be supported in the same way
+    // as other integer types, instead Node.js Buffer objects are used. Users are responsible for producing (i.e. for set() requests)
+    // and consuming (i.e. the varbinds passed to callback functions) Buffer objects. That is, this module does not work with
+    // 64 bit integers, it simply treats them as opaque Buffer objects.
+    //
+    // Dotted decimal strings are used for the values of varbinds with type OID, e.g. 1.3.6.1.2.1.1.5.0.
+    //
+    // Dotted quad formatted strings are used for the values of varbinds with type IpAddress, e.g. 192.168.1.1.
+    //
+    // Node.js Buffer objects are used for the values of varbinds with type Opaque and OctetString. For varbinds with type
+    // OctetString this module will accept JavaScript strings, but will always give back Buffer objects.
+    //
+    // The NoSuchObject, NoSuchInstance and EndOfMibView types are used to indicate an error condition. Currently there is
+    // no reason for users of this module to to build varbinds using these types.
+    //
+
+    const retval = {
+        val:        null,
+        typeStr:    oidObjType2Text(pVarbind.type),
+        qual:       0x00, // assume OK
+    };
+    //
+
+    switch (pVarbind.type) {
+    // The JavaScript true and false keywords are used for the values of varbinds with type Boolean.
+        case snmp.ObjectType.Boolean: {
+            switch (pFormat) {
+                case F_TEXT /* 0 */:
+                default:
+                    retval.val = pVarbind.value.toString();
+                    break;
+                case F_NUMERIC /* 1 */:
+                    retval.val = pVarbind.value?1:0;
+                    break;
+                case F_BOOLEAN /* 2 */:
+                    retval.val = pVarbind.value;
+                    break;
+                case F_JSON /* 3 */:
+                    retval.val = JSON.stringify(pVarbind.value);
+                    break;
+            }
+            break;
+        }
+
+        // All integer based types are specified as expected
+        case snmp.ObjectType.Integer:
+        case snmp.ObjectType.Counter:
+        case snmp.ObjectType.Gauge:
+        case snmp.ObjectType.TimeTicks:
+        case snmp.ObjectType.Integer32:
+        case snmp.ObjectType.Counter32:
+        case snmp.ObjectType.Gauge32:
+        case snmp.ObjectType.Unsigned32: {
+            switch (pFormat) {
+                case F_TEXT /* 0 */:
+                default:
+                    retval.val = pVarbind.value.toString();
+                    break;
+                case F_NUMERIC /* 1 */:
+                    retval.val = parseInt(pVarbind.value.toString(), 10);
+                    if (isNaN(retval.val)) retval.qual=0x01; // general error
+                    break;
+                case F_BOOLEAN /* 2 */: {
+                    const valint = parseInt(pVarbind.value.toString(), 10);
+                    retval.val = valint !== 0;
+                    if (isNaN (valint)) retval.qual=0x01; // general error
+                    break;
+                }
+                case F_JSON /* 3 */:
+                    retval.val = JSON.stringify(pVarbind.value);
+                    break;
+            }
+            break;
+        }
+
+        // Since JavaScript does not offer full 64 bit integer support objects with type Counter64 cannot be supported in the same way
+        // as other integer types, instead Node.js Buffer objects are used. Users are responsible for producing (i.e. for set() requests)
+        // and consuming (i.e. the varbinds passed to callback functions) Buffer objects.
+        case snmp.ObjectType.Counter64:{
+            // convert buffer to string using bigin
+            let value = BigInt(0); //bigint constant
+            for (let ii= 0; ii<pVarbind.value.length; ii++){
+                value=value*BigInt(256) + BigInt(pVarbind.value[ii]);
+            }
+            switch (pFormat) {
+                case F_TEXT /* 0 */:
+                default:
+                    retval.val = value.toString();
+                    break;
+                case F_NUMERIC /* 1 */:
+                    retval.val = parseInt(value.toString(), 10);
+                    if (isNaN(retval.val)) retval.qual=0x01; // general error
+                    break;
+                case F_BOOLEAN /* 2 */: {
+                    const valint = parseInt(value.toString(), 10);
+                    retval.val =  valint !== 0;
+                    if (isNaN (valint)) retval.qual=0x01; // general error
+                    break;
+                }
+                case F_JSON /* 3 */:
+                    retval.val = JSON.stringify(pVarbind.value);
+                    break;
+            }
+            break;
+        }
+
+        // Node.js Buffer objects are used for the values of varbinds with type Opaque and OctetString. For varbinds with type
+        // OctetString this module will accept JavaScript strings, but will always give back Buffer objects.
+        case snmp.ObjectType.OctetString: {
+            switch (pFormat) {
+                case F_TEXT /* 0 */:
+                default:
+                    retval.val = pVarbind.value.toString();
+                    break;
+                case F_NUMERIC /* 1 */:
+                    retval.val = parseInt(pVarbind.value.toString, 10);
+                    break;
+                case F_BOOLEAN /* 2 */:
+                    retval.val = parseInt(pVarbind.value.toString, 10) !== 0;
+                    break;
+                case F_JSON /* 3 */:
+                    retval.val = JSON.stringify(pVarbind.value);
+                    break;
+            }
+            break;
+        }
+
+        // no dcumentation for type null available
+        case snmp.ObjectType.Null: {
+            switch (pFormat) {
+                case F_TEXT /* 0 */:
+                default:
+                    retval.val = null;
+                    retval.qual = 0x1; // general error
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type null to text ` + JSON.stringify(pVarbind));
+                    break;
+                case F_NUMERIC /* 1 */:
+                    retval.val = null;
+                    retval.qual = 0x1; // general error
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type null to numeric ` + JSON.stringify(pVarbind));
+                    break;
+                case F_BOOLEAN /* 2 */:
+                    retval.val = null;
+                    retval.qual = 0x1; // general error
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type null to boolean ` + JSON.stringify(pVarbind));
+                    break;
+                case F_JSON /* 3 */:
+                    retval.val = JSON.stringify(pVarbind.value);
+                    break;
+            }
+            break;
+        }
+
+        // Dotted decimal strings are used for the values of varbinds with type OID, e.g. 1.3.6.1.2.1.1.5.0.
+        case snmp.ObjectType.OID: {
+            switch (pFormat) {
+                case F_TEXT /* 0 */:
+                default:
+                    retval.val = pVarbind.value.toString();
+                    break;
+                case F_NUMERIC /* 1 */:
+                    retval.val = null;
+                    retval.qual = 0x1; // general error
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type oid to numeric ` + JSON.stringify(pVarbind));
+                    break;
+                case F_BOOLEAN /* 2 */:
+                    retval.val = null;
+                    retval.qual = 0x1; // general error
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type oid to boolean ` + JSON.stringify(pVarbind));
+                    break;
+                case F_JSON /* 3 */:
+                    retval.val = JSON.stringify(pVarbind.value);
+                    break;
+            }
+            break;
+        }
+
+        // Dotted quad formatted strings are used for the values of varbinds with type IpAddress, e.g. 192.168.1.1.
+        case snmp.ObjectType.IpAddress:{
+            switch (pFormat) {
+                case F_TEXT /* 0 */:
+                default:
+                    retval.val = pVarbind.value.toString();
+                    break;
+                case F_NUMERIC /* 1 */:
+                    retval.val = null;
+                    retval.qual = 0x1; // general error
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type ipaddress to numeric ` + JSON.stringify(pVarbind));
+                    break;
+                case F_BOOLEAN /* 2 */:
+                    retval.val = null;
+                    retval.qual = 0x1; // general error
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type ipaddress to boolean ` + JSON.stringify(pVarbind));
+                    break;
+                case F_JSON /* 3 */:
+                    retval.val = JSON.stringify(pVarbind.value);
+                    break;
+            }
+            break;
+        }
+
+        // Node.js Buffer objects are used for the values of varbinds with type Opaque and OctetString. For varbinds with type
+        // OctetString this module will accept JavaScript strings, but will always give back Buffer objects.
+        // NOTE: currently only a heuristic implementation for floating point number is implemented for formats other than json.
+        case snmp.ObjectType.Opaque:{
+            if ( pVarbind.value.length === 7 &&
+                pVarbind.value[0] === 159 &&
+                pVarbind.value[1] === 120 &&
+                pVarbind.value[2] === 4 ) {
+                const value = pVarbind.value.readFloatBE(3);
+                switch (pFormat) {
+                    case F_TEXT /* 0 */:
+                    default:
+                        retval.val = value.toString();
+                        break;
+                    case F_NUMERIC /* 1 */:
+                        retval.val = value;
+                        break;
+                    case F_BOOLEAN /* 2 */:
+                        retval.val = value !== 0;
+                        break;
+                    case F_JSON /* 3 */:
+                        retval.val = JSON.stringify(pVarbind.value);
+                        break;
+                }
+            }
+            else {
+                switch (pFormat) {
+                    case F_TEXT /* 0 */:
+                    default:
+                        retval.val = null;
+                        retval.qual = 0x1; // general error
+                        adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert opaque data to text ` + JSON.stringify(pVarbind));
+                        break;
+                    case F_NUMERIC /* 1 */:
+                        retval.val = null;
+                        retval.qual = 0x1; // general error
+                        adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert opaque data to number ` + JSON.stringify(pVarbind));
+                        break;
+                    case F_BOOLEAN /* 2 */:
+                        retval.val = null;
+                        retval.qual = 0x1; // general error
+                        adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert opaque data to boolean ` + JSON.stringify(pVarbind));
+                        break;
+                    case F_JSON /* 3 */:
+                        retval.val = JSON.stringify(pVarbind.value);
+                        break;
+                }
+            }
+            break;
+        }
+
+        case snmp.ObjectType.NoSuchObject:
+        case snmp.ObjectType.NoSuchInstance:
+        case snmp.ObjectType.EndOfMibView:
+            retval.val = null;
+            retval.qual = 0x1; // general error
+            break;
+
+        default:{
+            switch (pFormat) {
+                case F_TEXT /* 0 */:
+                default:
+                    retval.val = pVarbind.value.toString();
+                    break;
+                case F_NUMERIC /* 1 */:
+                    retval.val = null;
+                    retval.qual = 0x1; // general error
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert unknown data to numeric ` + JSON.stringify(pVarbind));
+                    break;
+                case F_BOOLEAN /* 2 */:
+                    retval.val = null;
+                    retval.qual = 0x1; // general error
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert unknown data to boolean ` + JSON.stringify(pVarbind));
+                    break;
+                case F_JSON /* 3 */:
+                    retval.val = JSON.stringify(pVarbind.value);
+                    break;
+            }
+            break;
+        }
+    }
+
+    return retval;
+}
 
 // #################### snmp session handling functions ####################
 
@@ -628,516 +971,46 @@ async function createSession(pCTX) {
  * @return string
  *
  */
-async function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
-    adapter.log.debug('processVarbind - [' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx]);
+async function processVarbind(pCTX, pChunkIdx, pDevId, pIdx, pVarbind) {
+    adapter.log.debug('processVarbind - [' + pDevId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx]);
 
-    let val;
-    let valTypeStr;
     const OID = pCTX.chunks[pChunkIdx].OIDs[pIdx];
-    const oidFormat = OID.oidFormat;
+    const stateId = pCTX.chunks[pChunkIdx].ids[pIdx];
 
-    switch (pVarbind.type){
-        case snmp.ObjectType.Boolean:{
-            valTypeStr = 'Boolean';
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = pVarbind.value.toString();
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = JSON.parse(pVarbind.value)?1:0;
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = JSON.parse(pVarbind.value);
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = JSON.stringify(pVarbind.value);
-                    break;
-                }
-                default:{
-                    val = pVarbind.value.toString();
-                    break;
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.Integer:{
-            valTypeStr = 'Integer';
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = pVarbind.value.toString();
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = parseInt(pVarbind.value, 10);
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value, 10) !== 0;
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = JSON.stringify(pVarbind.value);
-                    break;
-                }
-                default:{
-                    val = pVarbind.value.toString();
-                    break;
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.OctetString:{
-            valTypeStr = 'OctetString';
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = pVarbind.value.toString();
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = parseInt(pVarbind.value.toString, 10);
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value.toString, 10) !== 0;
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = JSON.stringify(pVarbind.value);
-                    break;
-                }
-                default:{
-                    val = pVarbind.value.toString();
-                    break;
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.Null:{
-            valTypeStr = 'Null';
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = null;
-                    adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert data of type null to text ' + JSON.stringify(pVarbind));
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = null;
-                    adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert data of type null to numeric ' + JSON.stringify(pVarbind));
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = null;
-                    adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert data of type null to boolean ' + JSON.stringify(pVarbind));
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = JSON.stringify(pVarbind.value);
-                    break;
-                }
-                default:{
-                    val = null;
-                    break;
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.OID:{
-            valTypeStr = 'OID';
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = pVarbind.value.toString();
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = null;
-                    adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert data of type OID to numeric ' + JSON.stringify(pVarbind));
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = null;
-                    adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert data of type OID to boolean ' + JSON.stringify(pVarbind));
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = JSON.stringify(pVarbind.value);
-                    break;
-                }
-                default:{
-                    val = pVarbind.value.toString();
-                    break;
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.IpAddress:{
-            valTypeStr = 'IpAddress';
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = pVarbind.value.toString();
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = null;
-                    adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert data of type ipaddress to numeric ' + JSON.stringify(pVarbind));
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = null;
-                    adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert data of type ipaddress to boolean ' + JSON.stringify(pVarbind));
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = JSON.stringify(pVarbind.value);
-                    break;
-                }
-                default:{
-                    val = pVarbind.value.toString();
-                    break;
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.Counter:{
-            valTypeStr = 'Counter';
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = pVarbind.value.toString();
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = parseInt(pVarbind.value.toString, 10);
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value.toString, 10) !== 0;
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = JSON.stringify(pVarbind.value);
-                    break;
-                }
-                default:{
-                    val = pVarbind.value.toString();
-                    break;
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.Gauge:{
-            valTypeStr = 'Gauge';
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = pVarbind.value.toString();
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = parseInt(pVarbind.value.toString, 10);
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value.toString, 10) !== 0;
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = JSON.stringify(pVarbind.value);
-                    break;
-                }
-                default:{
-                    val = pVarbind.value.toString();
-                    break;
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.TimeTicks:{
-            valTypeStr = 'TimeTicks';
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = pVarbind.value.toString();
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = parseInt(pVarbind.value.toString, 10);
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value.toString, 10) !== 0;
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = JSON.stringify(pVarbind.value);
-                    break;
-                }
-                default:{
-                    val = pVarbind.value.toString();
-                    break;
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.Opaque:{
-            valTypeStr = 'Opaque';
-            if ( pVarbind.value.length === 7 &&
-                pVarbind.value[0] === 159 &&
-                pVarbind.value[1] === 120 &&
-                pVarbind.value[2] === 4 ) {
-                const value = pVarbind.value.readFloatBE(3);
-                switch (oidFormat) {
-                    case F_TEXT /* 0 */: {
-                        val = value.toString();
-                        break;
-                    }
-                    case F_NUMERIC /* 1 */: {
-                        val = value;
-                        break;
-                    }
-                    case F_BOOLEAN /* 2 */: {
-                        val = value !== 0;
-                        break;
-                    }
-                    case F_JSON /* 3 */: {
-                        val = JSON.stringify(pVarbind.value);
-                        break;
-                    }
-                    default:{
-                        val = value.toString();
-                        break;
-                    }
-                }
-            }
-            else {
-                switch (oidFormat) {
-                    case F_TEXT /* 0 */: {
-                        val = null;
-                        adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert opaque data to text ' + JSON.stringify(pVarbind));
-                        break;
-                    }
-                    case F_NUMERIC /* 1 */: {
-                        val = null;
-                        adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert opaque data to number ' + JSON.stringify(pVarbind));
-                        break;
-                    }
-                    case F_BOOLEAN /* 2 */: {
-                        val = null;
-                        adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert opaque data to boolean ' + JSON.stringify(pVarbind));
-                        break;
-                    }
-                    case F_JSON /* 3 */: {
-                        val = JSON.stringify(pVarbind.value);
-                        break;
-                    }
-                    default:{
-                        val = null;
-                        adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert opaque data ' + JSON.stringify(pVarbind));
-                        break;
-                    }
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.Integer32:{
-            valTypeStr = 'Integer32';
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = pVarbind.value.toString();
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = parseInt(pVarbind.value.toString, 10);
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value.toString, 10) !== 0;
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = JSON.stringify(pVarbind.value);
-                    break;
-                }
-                default:{
-                    val = pVarbind.value.toString();
-                    break;
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.Counter32:{
-            valTypeStr = 'Counter32';
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = pVarbind.value.toString();
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = parseInt(pVarbind.value.toString, 10);
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value.toString, 10) !== 0;
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = JSON.stringify(pVarbind.value);
-                    break;
-                }
-                default:{
-                    val = pVarbind.value.toString();
-                    break;
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.Gauge32:{
-            valTypeStr = 'Gauge32';
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = pVarbind.value.toString();
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = parseInt(pVarbind.value.toString, 10);
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value.toString, 10) !== 0;
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = JSON.stringify(pVarbind.value);
-                    break;
-                }
-                default:{
-                    val = pVarbind.value.toString();
-                    break;
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.Unsigned32:{
-            valTypeStr = 'Unsigned32';
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = pVarbind.value.toString();
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = parseInt(pVarbind.value.toString, 10);
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value.toString, 10) !== 0;
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = JSON.stringify(pVarbind.value);
-                    break;
-                }
-                default:{
-                    val = pVarbind.value.toString();
-                    break;
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.Counter64:{
-            valTypeStr = 'Counter64';
-            // convert buffer to string using bigin
-            let value = BigInt(0); //bigint constant
-            for (let ii= 0; ii<pVarbind.value.length; ii++){
-                value=value*BigInt(256) + BigInt(pVarbind.value[ii]);
-            }
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = value.toString();
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = value;
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = value !== 0;
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = JSON.stringify(pVarbind.value);
-                    break;
-                }
-                default:{
-                    val = value.toString();
-                    break;
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.NoSuchObject:{
-            valTypeStr = 'NoSuchObject';
-            val = null;
-            break;
-        }
-        case snmp.ObjectType.NoSuchInstance:{
-            valTypeStr = 'NoSuchInstance';
-            val = null;
-            break;
-        }
-        case snmp.ObjectType.EndOfMibView:{
-            valTypeStr = 'EndOfMibView';
-            val = null;
-            break;
-        }
-        default:{
-            valTypeStr = 'Unknown (' + pVarbind.type.toString + ')';
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = pVarbind.value.toString();
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = null;
-                    adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert unknown data to numeric ' + JSON.stringify(pVarbind));
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = null;
-                    adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert unknown data to boolean ' + JSON.stringify(pVarbind));
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = null;
-                    break;
-                }
-                default:{
-                    val = pVarbind.value.toString();
-                    break;
-                }
-            }
-            break;
-        }
-    }
-    adapter.log.debug('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + '(' + valTypeStr + ')' + JSON.stringify(pVarbind));
-    adapter.log.debug('[' + pId + '] update ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ': ' + val);
+    const state = varbindDecode(pVarbind, OID.oidFormat, pDevId, stateId);
+
+    adapter.log.debug(`[${pDevId}] ${stateId} (${state.typeStr})` + JSON.stringify(pVarbind));
+    adapter.log.debug(`[${pDevId}] update ${stateId}: ${state.val}`);
 
     // data OK
     await initObject({
-        _id: pCTX.chunks[pChunkIdx].ids[pIdx],
+        _id: stateId,
         type: 'state',
         common: {
-            name: pId,
-            write: !!OID.oidWriteable, //## TODO
+            name: pDevId,
+            write: !!OID.oidWriteable,
             read: true,
-            type: oidFormat2StateType(pCTX.chunks[pChunkIdx].OIDs[pIdx].oidFormat),
+            type: oidFormat2StateType(OID.oidFormat),
             role: 'value'
         },
         native: {
         }
     });
-    adapter.setState(pCTX.chunks[pChunkIdx].ids[pIdx], val, true);
-    adapter.setState(pCTX.chunks[pChunkIdx].ids[pIdx]+'-type', pVarbind.type + ': '+valTypeStr, true);
+
+    adapter.setState(stateId, state.val, true);
+    adapter.setState(stateId+'-type', pVarbind.type + ': '+state.typeStr, true);
     if (adapter.config.optRawStates){
-        adapter.setState(pCTX.chunks[pChunkIdx].ids[pIdx]+'-raw', JSON.stringify(pVarbind), true);
+        adapter.setState(stateId+'-raw', JSON.stringify(pVarbind), true);
+    }
+
+    const id = pCTX.chunks[pChunkIdx].ids[pIdx];
+    const fullId = `${adapterName}.${adapter.instance}.${id}`;
+    if ( ( OID.oidWriteable ) && (typeof(STATEs[fullId].varbind) === 'undefined') ) {
+        STATEs[fullId].varbind = {
+            oid: pVarbind.oid,
+            type: pVarbind.type,
+            value: null
+        };
     }
     return;
 }
@@ -1175,6 +1048,9 @@ async function readChunkOids(pCTX, pIdx) {
                         for (let ii = 0; ii < pCTX.chunks[pIdx].ids.length; ii++) {
                             adapter.setState(pCTX.chunks[pIdx].ids[ii], {q:0x02} ); // connection problem
                             adapter.setState(pCTX.chunks[pIdx].ids[ii]+'-type', {q:0x02} ); // connection problem
+                            if (adapter.config.optRawStates){
+                                adapter.setState(pCTX.chunks[pIdx].ids[ii]+'-raw', {q:0x02} ); // connection problem
+                            }
                         }
                         if (!pCTX.inactive || !pCTX.initialized) {
                             adapter.log.info('[' + id + '] device disconnected - request timout');
@@ -1186,6 +1062,9 @@ async function readChunkOids(pCTX, pIdx) {
                         for (let ii = 0; ii < pCTX.chunks[pIdx].ids.length; ii++) {
                             adapter.setState(pCTX.chunks[pIdx].ids[ii], {val: null, ack: true, q:0x44} ); // device reports error
                             adapter.setState(pCTX.chunks[pIdx].ids[ii]+'-type', {val: null, ack: true, q:0x44} ); // device reports error
+                            if (adapter.config.optRawStates){
+                                adapter.setState(pCTX.chunks[pIdx].ids[ii]+'-raw', {val: null, ack: true, q:0x44} ); // device reports error
+                            }
                         }
                         if (!pCTX.inactive || !pCTX.initialized) {
                             adapter.log.error('[' + id + '] session.get: ' + err.toString());
@@ -1213,6 +1092,9 @@ async function readChunkOids(pCTX, pIdx) {
                             }
                             adapter.setState(pCTX.chunks[pIdx].ids[ii], { val: null, ack: true, q: 0x84}); // sensor reports error
                             adapter.setState(pCTX.chunks[pIdx].ids[ii]+'-type', { val: null, ack: true, q: 0x84}); // sensor reports error
+                            if (adapter.config.optRawStates){
+                                adapter.setState(pCTX.chunks[pIdx].ids[ii]+'-raw', {val: null, ack: true, q:0x84} ); //sensor reports error
+                            }
                         } else {
                             //adapter.log.debug('[' + id + '] update ' + pCTX.ids[ii] + ': ' + varbinds[ii].value.toString());
                             //adapter.setState(pCTX.ids[ii], varbinds[ii].value.toString(), true); // data OK
@@ -1788,6 +1670,31 @@ async function onReady() {
     g_connUpdateTimer = adapter.setInterval(handleConnectionInfo, 15000);
 
     adapter.log.debug('startup completed');
+
+}
+
+/**
+ * onStateChange - called when any state changes
+ *
+ * @param   {string}    pId     id of device
+ * @param   {object}    pState  state object of device
+ * @return
+ *
+ */
+function onStateChange (pFullId, pState) {
+    adapter.log.debug(`onStateChange triggered - id ${pFullId}`);
+    if ( ! pState || pState.ack ) return;
+
+    adapter.log.debug(`onStateChange - state id ${pFullId} set to ${pState.val}`);
+
+    if ( (typeof(STATEs[pFullId]) === 'undefined') || (typeof(STATEs[pFullId].varbind) === 'undefined') ) {
+        adapter.log.warn(`cannot write to uninitialized state ${pFullId}`);
+        return;
+    }
+
+    // prepare varbind to be written
+    const varbind = STATEs[pFullId].varbind;
+    varbind.value = pState.val;
 
 }
 
