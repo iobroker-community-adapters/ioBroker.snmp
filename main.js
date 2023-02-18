@@ -258,15 +258,12 @@ function oidFormat2StateType(pOidFormat){
 async function delStates( pPattern ) {
     adapter.log.debug ( 'delStates ('+pPattern+')');
 
-    let flag=false;
-
     const objs = await adapter.getForeignObjectsAsync( `${adapterName}.${adapter.instance}.${pPattern}` );
     if (objs){
+        if ( Object.values(objs).length ) {
+            adapter.log.info(`removing states ${pPattern}...`);
+        }
         for (const obj of Object.values(objs)) {
-            if (!flag) {
-                adapter.log.info(`removing states ${pPattern}...`);
-                flag=true;
-            }
             adapter.log.debug(`removing object ${obj._id}...`);
             await adapter.delForeignObjectAsync( obj._id, {recursive: true} );
         }
@@ -283,13 +280,13 @@ async function cleanupStates() {
     adapter.log.debug('cleanupStates ');
 
     // delete -rap states if no lonager enabled
-    if ( ! adapter.config.optUseRawStates )
+    if ( ! adapter.config.optRawStates )
     {
         await delStates ( '*-raw' );
     }
 
     // delete -type states if no lonager enabled
-    if ( ! adapter.config.optUseTypeStates )
+    if ( ! adapter.config.optTypeStates )
     {
         await delStates ( '*-type' );
     }
