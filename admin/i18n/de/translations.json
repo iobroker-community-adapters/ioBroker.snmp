@@ -52,5 +52,8 @@
     "ttOptChunkSize": "Maximale OID-Anzahl innerhalb einer Anfrage",
     "ttOptRawStates": "Zustände mit im Json Format kodierten Rohdaten erstellen.",
     "ttOptUseIp": "Markieren, um die IP-Adresse für Zustand-IDs zu verwenden",
-    "warnAuthUnused": "Hinweis: Die Konfiguration in diesem Bereich wird derzeit nicht verwendet, da kein Gerät das SNMPv3-Protokoll verwendet."
+    "warnAuthUnused": "Hinweis: Die Konfiguration in diesem Bereich wird derzeit nicht verwendet, da kein Gerät das SNMPv3-Protokoll verwendet.",
+    "hlpOptTypeStates": "Die Auswahl dieser Option ermöglicht die Erstellung von Zuständen, die Typdaten enthalten.",
+    "lblOptTypeStates": "Typzustände hinzufügen",
+    "ttOptTypeStates": "Erstellen Sie Zustände, die Typdaten von OIDs enthalten."
 }

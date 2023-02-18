@@ -52,5 +52,8 @@
     "ttOptChunkSize": "一次请求中的最大 oid 计数",
     "ttOptRawStates": "创建包含原始数据编码为 json 的状态。",
     "ttOptUseIp": "标记为使用 ip 地址作为状态 ID",
-    "warnAuthUnused": "注意：当前不会使用此面板上的配置，因为没有设备使用 SNMPv3 协议。"
+    "warnAuthUnused": "注意：当前不会使用此面板上的配置，因为没有设备使用 SNMPv3 协议。",
+    "hlpOptTypeStates": "选择此选项可以创建包含类型数据的状态。",
+    "lblOptTypeStates": "添加类型状态",
+    "ttOptTypeStates": "创建包含 oid 类型数据的状态。"
 }

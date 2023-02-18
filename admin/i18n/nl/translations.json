@@ -52,5 +52,8 @@
     "ttOptChunkSize": "Maximaal aantal oids binnen één aanvraag",
     "ttOptRawStates": "Maak staten met onbewerkte gegevens die coderen als json.",
     "ttOptUseIp": "Markeer om IP-adres te gebruiken voor staat-ID's",
-    "warnAuthUnused": "Opmerking: configuratie op dit paneel wordt momenteel niet gebruikt omdat geen enkel apparaat het SNMPv3-protocol gebruikt."
+    "warnAuthUnused": "Opmerking: configuratie op dit paneel wordt momenteel niet gebruikt omdat geen enkel apparaat het SNMPv3-protocol gebruikt.",
+    "hlpOptTypeStates": "Als u deze optie selecteert, kunt u toestanden maken die typegegevens bevatten.",
+    "lblOptTypeStates": "Voeg typestatussen toe",
+    "ttOptTypeStates": "Maak staten met typegegevens van oids."
 }

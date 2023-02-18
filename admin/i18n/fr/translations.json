@@ -52,5 +52,8 @@
     "ttOptChunkSize": "Nombre maximal d'ID dans une requête",
     "ttOptRawStates": "Créez des états contenant des données brutes encodées en json.",
     "ttOptUseIp": "Marquer pour utiliser l'adresse IP pour les identifiants d'état",
-    "warnAuthUnused": "Remarque : La configuration de ce panneau ne sera pas utilisée actuellement car aucun appareil n'utilise le protocole SNMPv3."
+    "warnAuthUnused": "Remarque : La configuration de ce panneau ne sera pas utilisée actuellement car aucun appareil n'utilise le protocole SNMPv3.",
+    "hlpOptTypeStates": "La sélection de cette option active la création d'états contenant des données de type.",
+    "lblOptTypeStates": "Ajouter des états de type",
+    "ttOptTypeStates": "Créer des états contenant des données de type d'oids."
 }
