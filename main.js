@@ -6,7 +6,7 @@
  *
  */
 
-/*
+/*CTX
  * Remark related to REAL / FLOAT values returned:
  *
  * see http://www.net-snmp.org/docs/mibs/NET-SNMP-TC.txt
@@ -59,7 +59,7 @@
  *      name       string   name of the device
  *      ipAddr     string   ip address (without port number)
  *      ipPort     number   ip port number
- *      id         string   id of device, dereived from ip address or from name
+ *      devId      string   devId of device, dereived from ip address or from name
  *      isIPv6     bool     true if IPv6 to be used
  *      timeout    number   snmp connect timeout (ms)
  *      retryIntvl number   snmp retry intervall (ms)
@@ -248,6 +248,57 @@ function oidFormat2StateType(pOidFormat){
 // #################### object initialization functions ####################
 
 /**
+ * cleanupStates - cleanup unused states
+ *
+ * @param   {string}    pPattern    pattern to match state id
+ *
+ * @return  objects
+ *
+ */
+async function delStates( pPattern ) {
+    adapter.log.debug ( 'delStates ('+pPattern+')');
+
+    let flag=false;
+
+    const objs = await adapter.getForeignObjectsAsync( `${adapterName}.${adapter.instance}.${pPattern}` );
+    if (objs){
+        for (const obj of Object.values(objs)) {
+            if (!flag) {
+                adapter.log.info(`removing states ${pPattern}...`);
+                flag=true;
+            }
+            adapter.log.debug(`removing object ${obj._id}...`);
+            await adapter.delForeignObjectAsync( obj._id, {recursive: true} );
+        }
+    }
+}
+
+/**
+ * cleanupStates - cleanup unused states
+ *
+ * @return  nothing
+ *
+ */
+async function cleanupStates() {
+    adapter.log.debug('cleanupStates ');
+
+    // delete -rap states if no lonager enabled
+    if ( ! adapter.config.optUseRawStates )
+    {
+        await delStates ( '*-raw' );
+    }
+
+    // delete -type states if no lonager enabled
+    if ( ! adapter.config.optUseTypeStates )
+    {
+        await delStates ( '*-type' );
+    }
+
+}
+
+// #################### object initialization functions ####################
+
+/**
  * initObject - create or reconfigure single object
  *
  *		creates object if it does not exist
@@ -262,6 +313,7 @@ async function initObject(pObj) {
     adapter.log.debug('initobject ' + pObj._id);
 
     const fullId = `${adapterName}.${adapter.instance}.${pObj._id}`;
+
     if (typeof(STATEs[fullId]) === 'undefined') {
         try {
             adapter.log.debug('creating obj "' + pObj._id + '" with type ' + pObj.type);
@@ -269,24 +321,26 @@ async function initObject(pObj) {
         } catch (e) {
             adapter.log.error('error initializing obj "' + pObj._id + '" ' + e.message);
         }
+        STATEs[fullId] = {
+            type: pObj.type,
+            commonType: null,
+        };
     }
 
     if (pObj.type === 'state') {
-        if (typeof (STATEs[fullId]) === 'undefined' ) {
-            adapter.log.debug('extending obj "' + pObj._id + '" with '+ JSON.stringify(pObj));
-            await adapter.extendObjectAsync(pObj._id, pObj);
+        if ( (typeof (STATEs[fullId].commonType) === 'undefined' ) ||
+             (STATEs[fullId].commonType === null ) ) {
+            const obj = await adapter.getObjectAsync(pObj._id);
             STATEs[fullId] = {
-                value: null,
-                oidType: null,
-                type: pObj.common.type
+                commonType: obj.common.type
             };
         }
 
-        if ( STATEs[fullId].type !== pObj.common.type ) {
+        if ( STATEs[fullId].commonType !== pObj.common.type ) {
             try {
-                adapter.log.info('reinitializing obj "' + pObj._id + '" state-type change '+STATEs[fullId].type+' -> '+pObj.common.type);
+                adapter.log.info('reinitializing obj "' + pObj._id + '" state-type change '+STATEs[fullId].commonType+' -> '+pObj.common.type);
                 await adapter.extendObjectAsync(pObj._id, {common: { type: pObj.common.type }});
-                STATEs[fullId].type = pObj.common.type;
+                STATEs[fullId].commonType = pObj.common.type;
             } catch (e) {
                 adapter.log.error('error reinitializing obj "' + pObj._id + '" ' + e.message);
             }
@@ -491,7 +545,7 @@ function oidObjType2Text( pOidObjType ) {
  * @param   {integer}   pFormat     format constant
  * @param   {string}    pDevId      id of device
  * @param   {string}    pStateId    id of state
- * @return  {object}    state object containing val, tyoestr and qual values
+ * @return  {object}    state object containing val, typestr and qual values
  *
  */
 function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
@@ -595,11 +649,11 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
                     retval.val = value.toString();
                     break;
                 case F_NUMERIC /* 1 */:
-                    retval.val = parseInt(value.toString(), 10);
+                    retval.val = value.asIntN();
                     if (isNaN(retval.val)) retval.qual=0x01; // general error
                     break;
                 case F_BOOLEAN /* 2 */: {
-                    const valint = parseInt(value.toString(), 10);
+                    const valint = value.asIntN();
                     retval.val =  valint !== 0;
                     if (isNaN (valint)) retval.qual=0x01; // general error
                     break;
@@ -791,49 +845,262 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
     return retval;
 }
 
+/**
+ * varbindEncode - convert native data to varbind data
+ *
+ * @param   {object}    pVarbind    varbind template
+ * @param   {any}       pData       data to store in varbind
+ * @param   {string}    pDevId      id of device
+ * @param   {string}    pStateId    id of state
+ * @return  {object}    varbind object containing data
+ *
+ */
+function varbindEncode( pState, pData, _pDevId, _pStateId ) {
+    adapter.log.debug('varbindEncode - encode varbind');
+
+    const retval = {
+        oid:        pState.varbind.oid,
+        type:       pState.varbind.type,
+        value:      null
+    };
+
+    switch (pState.varbind.type) {
+        // The JavaScript true and false keywords are used for the values of varbinds with type Boolean.
+        case snmp.ObjectType.Boolean: {
+            switch (pState.format) {
+                case F_TEXT /* 0 */:
+                default:
+                    retval.value = pData.toString();
+                    break;
+                case F_NUMERIC /* 1 */:
+                    retval.value = pData?true:false;
+                    break;
+                case F_BOOLEAN /* 2 */:
+                    retval.value = pData?true:false;
+                    break;
+                case F_JSON /* 3 */:
+                    retval.value = JSON.stringify(pData.value);
+                    break;
+            }
+            break;
+        }
+
+        // All integer based types are specified as expected
+        case snmp.ObjectType.Integer:
+        case snmp.ObjectType.Counter:
+        case snmp.ObjectType.Gauge:
+        case snmp.ObjectType.TimeTicks:
+        case snmp.ObjectType.Integer32:
+        case snmp.ObjectType.Counter32:
+        case snmp.ObjectType.Gauge32:
+        case snmp.ObjectType.Unsigned32: {
+            switch (pState.format) {
+                case F_TEXT /* 0 */:
+                default:
+                    retval.value = pData.toString();
+                    break;
+                case F_NUMERIC /* 1 */:
+                    retval.value = parseInt(pData.value.toString(), 10);
+                    if (isNaN(retval.val)) retval.qual=0x01; // general error
+                    break;
+                case F_BOOLEAN /* 2 */: {
+                    const valint = parseInt(pData.value.toString(), 10);
+                    retval.value = valint !== 0;
+                    if (isNaN (valint)) retval.qual=0x01; // general error
+                    break;
+                }
+                case F_JSON /* 3 */:
+                    retval.value = JSON.stringify(pData.value);
+                    break;
+            }
+            break;
+        }
+
+        // Since JavaScript does not offer full 64 bit integer support objects with type Counter64 cannot be supported in the same way
+        // as other integer types, instead Node.js Buffer objects are used. Users are responsible for producing (i.e. for set() requests)
+        // and consuming (i.e. the varbinds passed to callback functions) Buffer objects.
+        case snmp.ObjectType.Counter64:{
+            // TODO
+            break;
+        }
+
+        // Node.js Buffer objects are used for the values of varbinds with type Opaque and OctetString. For varbinds with type
+        // OctetString this module will accept JavaScript strings, but will always give back Buffer objects.
+        case snmp.ObjectType.OctetString: {
+            switch (pState.format) {
+                case F_TEXT /* 0 */:
+                default:
+                    retval.value = pData;
+                    break;
+                case F_NUMERIC /* 1 */:
+                    retval.value = pData.toString;
+                    break;
+                case F_BOOLEAN /* 2 */:
+                    retval.value = pData.toString;
+                    break;
+                case F_JSON /* 3 */:
+                    retval.value = JSON.stringify(pData.value);
+                    break;
+            }
+            break;
+        }
+
+        // no dcumentation for type null available
+        case snmp.ObjectType.Null: {
+            switch (pState.format) {
+                case F_TEXT /* 0 */:
+                default:
+                    retval.value = null;
+                    //adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type null to text ` + JSON.stringify(pVarbind));
+                    break;
+                case F_NUMERIC /* 1 */:
+                    retval.value = null;
+                    //adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type null to numeric ` + JSON.stringify(pVarbind));
+                    break;
+                case F_BOOLEAN /* 2 */:
+                    retval.value = null;
+                    //adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type null to boolean ` + JSON.stringify(pVarbind));
+                    break;
+                case F_JSON /* 3 */:
+                    //retval.value = JSON.stringify(pVarbind.value);
+                    break;
+            }
+            break;
+        }
+
+        // Dotted decimal strings are used for the values of varbinds with type OID, e.g. 1.3.6.1.2.1.1.5.0.
+        case snmp.ObjectType.OID: {
+            switch (pState.format) {
+                case F_TEXT /* 0 */:
+                default:
+                    retval.value = pData.toString();
+                    break;
+                case F_NUMERIC /* 1 */:
+                    retval.value = null;
+                    //adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type oid to numeric ` + JSON.stringify(pVarbind));
+                    break;
+                case F_BOOLEAN /* 2 */:
+                    retval.val = null;
+                    //adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type oid to boolean ` + JSON.stringify(pVarbind));
+                    break;
+                case F_JSON /* 3 */:
+                    retval.value = JSON.stringify(pData.value);
+                    break;
+            }
+            break;
+        }
+
+        // Dotted quad formatted strings are used for the values of varbinds with type IpAddress, e.g. 192.168.1.1.
+        case snmp.ObjectType.IpAddress:{
+            switch (pState.format) {
+                case F_TEXT /* 0 */:
+                default:
+                    retval.value = pData.toString();
+                    break;
+                case F_NUMERIC /* 1 */:
+                    retval.value = null;
+                    //adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type ipaddress to numeric ` + JSON.stringify(pVarbind));
+                    break;
+                case F_BOOLEAN /* 2 */:
+                    retval.value = null;
+                    //adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type ipaddress to boolean ` + JSON.stringify(pVarbind));
+                    break;
+                case F_JSON /* 3 */:
+                    retval.value = JSON.stringify(pData.value);
+                    break;
+            }
+            break;
+        }
+
+        // Node.js Buffer objects are used for the values of varbinds with type Opaque and OctetString. For varbinds with type
+        // OctetString this module will accept JavaScript strings, but will always give back Buffer objects.
+        // NOTE: currently only a heuristic implementation for floating point number is implemented for formats other than json.
+        case snmp.ObjectType.Opaque:{
+            break;
+        }
+
+        case snmp.ObjectType.NoSuchObject:
+        case snmp.ObjectType.NoSuchInstance:
+        case snmp.ObjectType.EndOfMibView: {
+            retval.value = null;
+            break;
+        }
+
+        default:{
+            retval.value = null;
+            break;
+        }
+    }
+    return retval;
+}
+
 // #################### snmp session handling functions ####################
 
-
 /**
- * onSessionClose - callback called whenever a session is closed
+ * snmpSessionGetAsync - async version of snmp.session.get
  *
- * @param {CTX object}  pCTX    CTX object
- * @return
+ * @param   {object}    pSession    snmp session refernece
+ * @param   {object}    pOids       snmp oids array
+ *
+ * @return  {object}                object containing { error, varbinds } as returned by snmp.session.get
  *
  */
-async function onSessionClose(pCTX) {
-    adapter.log.debug('onSessionClose - device ' + pCTX.name + ' (' + pCTX.ipAddr + ')');
 
-    adapter.clearInterval(pCTX.pollTimer);
-    pCTX.pollTimer = null;
-    pCTX.session = null;
+async function snmpSessionGetAsync( pSession, pOids) {
+    return new Promise((resolve,_reject)=>{
+        const ret={
+            err: null,
+            varbinds: null
+        };
 
-    pCTX.retryTimer = adapter.setTimeout((pCTX) => {
-        pCTX.retryTimer = null;
-        createSession(pCTX);
-    }, pCTX.retryIntvl, pCTX);
+        if (! pSession) {
+            adapter.log.debug( 'session vanished, skipping get oparation');
+            resolve(ret);
+        } else {
+            pSession.get (pOids, function (error, varbinds) {
+                ret.err = error;
+                ret.varbinds = varbinds;
+                resolve(ret);
+            });
+        }
+    });
 }
 
 /**
- * onSessionError - callback called whenever a session encounters an error
+ * snmpSessionSetAsync - async version of snmp.session.set
  *
- * @param {CTX object} 	pCTX    CTX object
- * @param {object}      pErr    error object
- * @return
+ * @param   {object}    pSession    snmp session refernece
+ * @param   {object}    pVarbinds   snmp varbinds array
+ *
+ * @return  {object}                object containing { error, varbinds } as returned by snmp.session.set
  *
  */
-async function onSessionError(pCTX, pErr) {
-    adapter.log.debug('onSessionError - device ' + pCTX.name + ' (' + pCTX.ipAddr + ') - ' + pErr.toString);
+async function snmpSessionSetAsync( pSession, pVarbinds) {
+    return new Promise((resolve,_reject)=>{
+        const ret={
+            err: null,
+            varbinds: null
+        };
 
-    // ### to be implemented ###
+        if (! pSession) {
+            adapter.log.debug( 'session vanished, skipping set operation');
+            resolve(ret);
+        } else {
+            pSession.set (pVarbinds, function (error, varbinds) {
+                ret.err = error;
+                ret.varbinds = varbinds;
+                resolve(ret);
+            });
+        }
+    });
 }
 
 /**
-/**
- * createSession - initializes a snmp session to one device and starts reader thread
+ * createSession - initializes a snmp session
  *
  * @param   {CTX object}    pCTX    CTX object
- * @return
+ *
+ * @return  {object}                session
  *
 var options = {
     port: 161,
@@ -845,34 +1112,16 @@ var options = {
     version: snmp.Version1,
     backwardsGetNexts: true,
     idBitsSize: 32
-}; */
+};
+*/
 async function createSession(pCTX) {
     adapter.log.debug('createSession - device ' + pCTX.name + ' (' + pCTX.ipAddr + ')');
 
-    // (re)set device online status
-    adapter.setState(pCTX.id + '.online', false, true);
-
-    // close old session if one exists
-    if (pCTX.retryTimer) {
-        adapter.clearTimeout(pCTX.retryTimer);
-        pCTX.retryTimer = null;
-    }
-
-    if (pCTX.pollTimer) {
-        adapter.clearInterval(pCTX.pollTimer);
-        pCTX.pollTimer = null;
-    }
-
-    if (pCTX.session) {
-        try {
-            pCTX.session.on('error', null); // avoid nesting callbacks
-            pCTX.session.on('close', null); // avoid nesting callbacks
-            pCTX.session.close();
-        } catch (e) {
-            adapter.log.warn('cannot close session for device "' + pCTX.name + '" (' + pCTX.ip + '), ' + e);
-        }
-        pCTX.session = null;
-    }
+    const ret = {
+        session: null,
+        name: pCTX.name,
+        ipAddr: pCTX.ipAddr
+    };
 
     // create snmp session for device
     if (pCTX.snmpVers == SNMP_V1 ||
@@ -881,7 +1130,7 @@ async function createSession(pCTX) {
         const snmpTransport = pCTX.isIPv6 ? 'udp6' : 'udp4';
         const snmpVersion = (pCTX.snmpVers == SNMP_V1) ? snmp.Version1 : snmp.Version2c;
 
-        pCTX.session = snmp.createSession(pCTX.ipAddr, pCTX.authId, {
+        ret.session = snmp.createSession(pCTX.ipAddr, pCTX.authId, {
             port: pCTX.ipPort,   // default:161
             retries: 1,
             timeout: pCTX.timeout,
@@ -935,7 +1184,7 @@ async function createSession(pCTX) {
         const snmpVersion = snmp.Version3;
         // ??? engineID: "8000B98380XXXXXXXXXXXXXXXXXXXXXXXX", // where the X's are random hex digits
 
-        pCTX.session = snmp.createV3Session(pCTX.ipAddr, snmpUser, {
+        ret.session = snmp.createV3Session(pCTX.ipAddr, snmpUser, {
             port: pCTX.ipPort,   // default:161
             retries: 1,
             timeout: pCTX.timeout,
@@ -951,16 +1200,127 @@ async function createSession(pCTX) {
         adapter.log.error('unsupported snmp version code (' + pCTX.snmpVers + ') for device "' + pCTX.name + '" (' + pCTX.ip + ')');
     }
 
-    if (pCTX.session) {
-        pCTX.session.on('close', () => { onSessionClose(pCTX); });
-        pCTX.session.on('error', (err) => { onSessionError(pCTX, err); });
-        pCTX.pollTimer = adapter.setInterval(readOids, pCTX.pollIntvl, pCTX);
+    adapter.log.debug('session for device "' + pCTX.name + '" (' + pCTX.ipAddr + ')' + (ret.session ? '' : ' NOT') + ' created');
 
-        // read one time immediately
-        readOids(pCTX);
+    return ret;
+}
+
+/**
+/**
+ * closeSession - close a snmp session
+ *
+ * @param   {object}    pSessionCTX    session object
+ *
+ * @return  nothing
+ *
+ */
+async function closeSession(pSessionCtx ) {
+    adapter.log.debug(`closeSession - device ${pSessionCtx.name} (${pSessionCtx.ipAddr}`);
+
+    if (pSessionCtx.session) {
+        try {
+            pSessionCtx.session.on('error', null); // avoid nesting callbacks
+            pSessionCtx.session.on('close', null); // avoid nesting callbacks
+            pSessionCtx.session.close();
+        } catch (e) {
+            adapter.log.warn('cannot close session for device "' + pSessionCtx.name + '" (' + pSessionCtx.ip + '), ' + e);
+        }
+        pSessionCtx.session = null;
     }
 
-    adapter.log.debug('session for device "' + pCTX.name + '" (' + pCTX.ipAddr + ')' + (pCTX.session ? '' : ' NOT') + ' created');
+    return;
+}
+
+/**
+ * onReaderSessionClose - callback called whenever a reader session is closed
+ *
+ * @param {object}      pCTX    CTX object
+ * @return
+ *
+ */
+async function onReaderSessionClose(pCTX) {
+    adapter.log.debug('onReaderSessionClose - device ' + pCTX.name + ' (' + pCTX.ipAddr + ')');
+
+    adapter.clearInterval(pCTX.pollTimer);
+    pCTX.pollTimer = null;
+    pCTX.sessCtx.session = null;
+    pCTX.sessCtx.session = null;
+
+    pCTX.retryTimer = adapter.setTimeout((pCTX) => {
+        pCTX.retryTimer = null;
+        createReaderSession(pCTX);
+    }, pCTX.retryIntvl, pCTX);
+}
+
+/**
+ * onReaderSessionError - callback called whenever a reader session encounters an error
+ *
+ * @param {CTX object} 	pCTX    CTX object
+ * @param {object}      pErr    error object
+ * @return
+ *
+ */
+async function onReaderSessionError(pCTX, pErr) {
+    adapter.log.debug('onReaderSessionError - device ' + pCTX.name + ' (' + pCTX.ipAddr + ') - ' + pErr.toString);
+
+    adapter.log.warn(`device ${pCTX.name} (${pCTX.ipAddr}) reported error ${pErr.toString}`);
+
+    adapter.clearInterval(pCTX.pollTimer);
+    pCTX.pollTimer = null;
+    pCTX.sessCtx.session = null;
+    pCTX.sessCtx = null;
+
+    pCTX.retryTimer = adapter.setTimeout((pCTX) => {
+        pCTX.retryTimer = null;
+        createReaderSession(pCTX);
+    }, pCTX.retryIntvl, pCTX);
+
+}
+
+/**
+/**
+ * createReaderSession - initializes a snmp reader session for one device and starts the reader thread
+ *
+ * @param   {object}    pCTX    CTX object
+ * @return
+ *
+ */
+async function createReaderSession(pCTX) {
+    adapter.log.debug('createReaderSession - device ' + pCTX.name + ' (' + pCTX.ipAddr + ')');
+
+    // (re)set device online status
+    adapter.setState(pCTX.id + '.online', false, true);
+
+    // stop existing timers and close session if one exists
+    if (pCTX.retryTimer) {
+        adapter.clearTimeout(pCTX.retryTimer);
+        pCTX.retryTimer = null;
+    }
+
+    if (pCTX.pollTimer) {
+        adapter.clearInterval(pCTX.pollTimer);
+        pCTX.pollTimer = null;
+    }
+
+    closeSession(pCTX);
+
+    // create snmp session for device
+    pCTX.sessCtx = await createSession(pCTX);
+
+    if (pCTX.sessCtx && pCTX.sessCtx.session) {
+        pCTX.sessCtx.session.on('close', () => { onReaderSessionClose(pCTX); });
+        pCTX.sessCtx.session.on('error', (err) => { onReaderSessionError(pCTX, err); });
+
+        // read one time immediately
+        await readOids(pCTX);
+
+        // start recurrent reading
+        pCTX.pollTimer = adapter.setInterval(readOids, pCTX.pollIntvl, pCTX);
+    }
+
+    // TODO: if no session could be created some retry should be implemented
+
+    adapter.log.debug('session for device "' + pCTX.name + '" (' + pCTX.ipAddr + ')' + ((pCTX.sessCtx && pCTX.sessCtx.session) ? '' : ' NOT') + ' created');
 
 }
 
@@ -971,23 +1331,25 @@ async function createSession(pCTX) {
  * @return string
  *
  */
-async function processVarbind(pCTX, pChunkIdx, pDevId, pIdx, pVarbind) {
-    adapter.log.debug('processVarbind - [' + pDevId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx]);
+async function processVarbind(pCTX, pChunkIdx, pIdx, pVarbind) {
+    adapter.log.debug('processVarbind - [' + pCTX.id + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx]);
 
+    const devId = pCTX.id;
     const OID = pCTX.chunks[pChunkIdx].OIDs[pIdx];
     const stateId = pCTX.chunks[pChunkIdx].ids[pIdx];
+    const fullId = `${adapterName}.${adapter.instance}.${stateId}`;
 
-    const state = varbindDecode(pVarbind, OID.oidFormat, pDevId, stateId);
+    const state = varbindDecode(pVarbind, OID.oidFormat, devId, stateId);
 
-    adapter.log.debug(`[${pDevId}] ${stateId} (${state.typeStr})` + JSON.stringify(pVarbind));
-    adapter.log.debug(`[${pDevId}] update ${stateId}: ${state.val}`);
+    adapter.log.debug(`[${devId}] ${stateId} (${state.typeStr})` + JSON.stringify(pVarbind));
+    adapter.log.debug(`[${devId}] update ${stateId}: ${state.val}`);
 
     // data OK
     await initObject({
         _id: stateId,
         type: 'state',
         common: {
-            name: pDevId,
+            name: devId,
             write: !!OID.oidWriteable,
             read: true,
             type: oidFormat2StateType(OID.oidFormat),
@@ -1003,9 +1365,12 @@ async function processVarbind(pCTX, pChunkIdx, pDevId, pIdx, pVarbind) {
         adapter.setState(stateId+'-raw', JSON.stringify(pVarbind), true);
     }
 
-    const id = pCTX.chunks[pChunkIdx].ids[pIdx];
-    const fullId = `${adapterName}.${adapter.instance}.${id}`;
-    if ( ( OID.oidWriteable ) && (typeof(STATEs[fullId].varbind) === 'undefined') ) {
+    if ( OID.oidWriteable ) {
+        STATEs[fullId] = {
+            CTX: pCTX,
+            stateId: stateId,
+            format: OID.oidFormat
+        };
         STATEs[fullId].varbind = {
             oid: pVarbind.oid,
             type: pVarbind.type,
@@ -1027,9 +1392,87 @@ async function processVarbind(pCTX, pChunkIdx, pDevId, pIdx, pVarbind) {
 async function readChunkOids(pCTX, pIdx) {
     adapter.log.debug('readChunkOIDs - device "' + pCTX.name + '" (' + pCTX.ipAddr + '), chunk idx ' + pIdx);
 
+    const devId = pCTX.id;
+    const oids = pCTX.chunks[pIdx].oids;
+
+    const result = await snmpSessionGetAsync( pCTX.sessCtx.session, oids);
+    adapter.log.debug('[' + devId + '] session.get completed for chunk index ' + pIdx );
+    if (result.err) {
+        // error occured
+        adapter.log.debug('[' + devId + '] session.get: ' + result.err.toString());
+        if (result.err.toString() === 'RequestTimedOutError: Request timed out') {
+            // timeout error
+            for (let ii = 0; ii < pCTX.chunks[pIdx].ids.length; ii++) {
+                adapter.setState(pCTX.chunks[pIdx].ids[ii], {q:0x02} ); // connection problem
+                adapter.setState(pCTX.chunks[pIdx].ids[ii]+'-type', {q:0x02} ); // connection problem
+                if (adapter.config.optRawStates){
+                    adapter.setState(pCTX.chunks[pIdx].ids[ii]+'-raw', {q:0x02} ); // connection problem
+                }
+            }
+            if (!pCTX.inactive || !pCTX.initialized) {
+                adapter.log.info('[' + devId + '] device disconnected - request timout');
+                pCTX.inactive = true;
+                setImmediate(handleConnectionInfo);
+            }
+        } else {
+            // other error
+            for (let ii = 0; ii < pCTX.chunks[pIdx].ids.length; ii++) {
+                adapter.setState(pCTX.chunks[pIdx].ids[ii], {val: null, ack: true, q:0x44} ); // device reports error
+                adapter.setState(pCTX.chunks[pIdx].ids[ii]+'-type', {val: null, ack: true, q:0x44} ); // device reports error
+                if (adapter.config.optRawStates){
+                    adapter.setState(pCTX.chunks[pIdx].ids[ii]+'-raw', {val: null, ack: true, q:0x44} ); // device reports error
+                }
+            }
+            if (!pCTX.inactive || !pCTX.initialized) {
+                adapter.log.error('[' + devId + '] session.get: ' + result.err.toString());
+                adapter.log.info('[' + devId + '] device disconnected');
+                pCTX.inactive = true;
+                setImmediate(handleConnectionInfo);
+            }
+        }
+        adapter.setState(devId + '.online', false, true);
+    } else {
+        // success
+        if (pCTX.inactive) {
+            adapter.log.info('[' + devId + '] device (re)connected');
+            pCTX.inactive = false;
+            setImmediate(handleConnectionInfo);
+        }
+        adapter.setState(devId + '.online', true, true);
+
+        // process returned values
+        for (let ii = 0; ii < result.varbinds.length; ii++) {
+            if (snmp.isVarbindError(result.varbinds[ii])) {
+                if ( ! pCTX.chunks[pIdx].OIDs[ii].oidOptional ||
+                    ! snmp.varbindError(result.varbinds[ii]).startsWith('NoSuchInstance:') ) {
+                    adapter.log.error('[' + devId + '] session.get: ' + snmp.varbindError(result.varbinds[ii]));
+                }
+                adapter.setState(pCTX.chunks[pIdx].ids[ii], { val: null, ack: true, q: 0x84}); // sensor reports error
+                adapter.setState(pCTX.chunks[pIdx].ids[ii]+'-type', { val: null, ack: true, q: 0x84}); // sensor reports error
+                if (adapter.config.optRawStates){
+                    adapter.setState(pCTX.chunks[pIdx].ids[ii]+'-raw', {val: null, ack: true, q:0x84} ); //sensor reports error
+                }
+            } else {
+                //adapter.log.debug('[' + devId + '] update ' + pCTX.ids[ii] + ': ' + varbinds[ii].value.toString());
+                //adapter.setState(pCTX.ids[ii], varbinds[ii].value.toString(), true); // data OK
+                processVarbind(pCTX, pIdx, ii, result.varbinds[ii]);
+            }
+        }
+    }
+
+    if (!pCTX.initialized) {
+        pCTX.initialized = true;
+        setImmediate(handleConnectionInfo);
+    }
+}
+
+/*
+async function readChunkOids(pCTX, pIdx) {
+    adapter.log.debug('readChunkOIDs - device "' + pCTX.name + '" (' + pCTX.ipAddr + '), chunk idx ' + pIdx);
+
     return new Promise((resolve,_reject)=>{
-        const session = pCTX.session;
-        const id = pCTX.id;
+        const session = pCTX.sessCtx.session;
+        const devId = pCTX.id;
         const oids = pCTX.chunks[pIdx].oids;
         // const ids = pCTX.chunks[pIdx].ids;
 
@@ -1039,10 +1482,10 @@ async function readChunkOids(pCTX, pIdx) {
             resolve();
         } else {
             session.get(oids, (err, varbinds) => {
-                adapter.log.debug('[' + id + '] session.get completed for chunk index ' + pIdx );
+                adapter.log.debug('[' + devId + '] session.get completed for chunk index ' + pIdx );
                 if (err) {
                     // error occured
-                    adapter.log.debug('[' + id + '] session.get: ' + err.toString());
+                    adapter.log.debug('[' + devId + '] session.get: ' + err.toString());
                     if (err.toString() === 'RequestTimedOutError: Request timed out') {
                         // timeout error
                         for (let ii = 0; ii < pCTX.chunks[pIdx].ids.length; ii++) {
@@ -1053,7 +1496,7 @@ async function readChunkOids(pCTX, pIdx) {
                             }
                         }
                         if (!pCTX.inactive || !pCTX.initialized) {
-                            adapter.log.info('[' + id + '] device disconnected - request timout');
+                            adapter.log.info('[' + devId + '] device disconnected - request timout');
                             pCTX.inactive = true;
                             setImmediate(handleConnectionInfo);
                         }
@@ -1067,28 +1510,28 @@ async function readChunkOids(pCTX, pIdx) {
                             }
                         }
                         if (!pCTX.inactive || !pCTX.initialized) {
-                            adapter.log.error('[' + id + '] session.get: ' + err.toString());
-                            adapter.log.info('[' + id + '] device disconnected');
+                            adapter.log.error('[' + devId + '] session.get: ' + err.toString());
+                            adapter.log.info('[' + devId + '] device disconnected');
                             pCTX.inactive = true;
                             setImmediate(handleConnectionInfo);
                         }
                     }
-                    adapter.setState(id + '.online', false, true);
+                    adapter.setState(devId + '.online', false, true);
                 } else {
                     // success
                     if (pCTX.inactive) {
-                        adapter.log.info('[' + id + '] device (re)connected');
+                        adapter.log.info('[' + devId + '] device (re)connected');
                         pCTX.inactive = false;
                         setImmediate(handleConnectionInfo);
                     }
-                    adapter.setState(id + '.online', true, true);
+                    adapter.setState(devId + '.online', true, true);
 
                     // process returned values
                     for (let ii = 0; ii < varbinds.length; ii++) {
                         if (snmp.isVarbindError(varbinds[ii])) {
                             if ( ! pCTX.chunks[pIdx].OIDs[ii].oidOptional ||
                                 ! snmp.varbindError(varbinds[ii]).startsWith('NoSuchInstance:') ) {
-                                adapter.log.error('[' + id + '] session.get: ' + snmp.varbindError(varbinds[ii]));
+                                adapter.log.error('[' + devId + '] session.get: ' + snmp.varbindError(varbinds[ii]));
                             }
                             adapter.setState(pCTX.chunks[pIdx].ids[ii], { val: null, ack: true, q: 0x84}); // sensor reports error
                             adapter.setState(pCTX.chunks[pIdx].ids[ii]+'-type', { val: null, ack: true, q: 0x84}); // sensor reports error
@@ -1096,9 +1539,9 @@ async function readChunkOids(pCTX, pIdx) {
                                 adapter.setState(pCTX.chunks[pIdx].ids[ii]+'-raw', {val: null, ack: true, q:0x84} ); //sensor reports error
                             }
                         } else {
-                            //adapter.log.debug('[' + id + '] update ' + pCTX.ids[ii] + ': ' + varbinds[ii].value.toString());
+                            //adapter.log.debug('[' + devId + '] update ' + pCTX.ids[ii] + ': ' + varbinds[ii].value.toString());
                             //adapter.setState(pCTX.ids[ii], varbinds[ii].value.toString(), true); // data OK
-                            processVarbind(pCTX, pIdx, id, ii, varbinds[ii]);
+                            processVarbind(pCTX, pIdx, ii, varbinds[ii]);
                         }
                     }
                 }
@@ -1112,6 +1555,7 @@ async function readChunkOids(pCTX, pIdx) {
         }
     });
 }
+*/
 
 /**
  * readOids - read all oids from a specific target device
@@ -1124,14 +1568,15 @@ async function readOids(pCTX) {
     adapter.log.debug('readOIDs - device "' + pCTX.name + '" (' + pCTX.ipAddr + ')');
 
     //const session = pCTX.session;
-    const id = pCTX.id;
+    const devId = pCTX.id;
 
     for (let cc = 0; cc < pCTX.chunks.length; cc++) {
-        adapter.log.debug('[' + id + '] processing oid chunk index ' + cc );
+        adapter.log.debug('[' + devId + '] processing oid chunk index ' + cc );
         await readChunkOids( pCTX, cc);
-        adapter.log.debug('[' + id + '] processing oid chunk index ' + cc + ' completed' );
+        adapter.log.debug('[' + devId + '] processing oid chunk index ' + cc + ' completed' );
     }
 }
+
 
 // #################### general housekeeping functions ####################
 
@@ -1173,9 +1618,9 @@ function validateConfig() {
 
     adapter.log.debug('validateConfig - verifying oid-sets');
 
-    if ( adapter.config.optUseName ) {
-        adapter.log.warn('Option compatibility mode has been deprecated; please consider to adapt config.');
-    }
+    // if ( adapter.config.optUseName ) {
+    //    adapter.log.warn('Option compatibility mode has been deprecated; please consider to adapt config.');
+    // }
 
     // ensure that at least empty config exists
     adapter.config.oids = adapter.config.oids || [];
@@ -1450,7 +1895,7 @@ function validateConfig() {
  *		ipStr		string	ip address of target device with invalid chars removed
  *		OIDs		array of OID objects
  *		oids		array of oid strings (used for snmp call)
- *		ids			array of id strings (index syncet o oids array)
+ *		ids			array of iod id strings (index synced with oids array)
  * 		authId 	    string 	snmp community (snmp V1, V2 only)
  *		initialized	boolean	true if connection is initialized
  *		inactive	boolean	true if connection to device is active
@@ -1646,6 +2091,9 @@ async function onReady() {
         return;
     }
 
+    // cleanup states
+    await cleanupStates();
+
     // read global config
     g_chunkSize = adapter.config.optChunkSize || 20;
     adapter.log.info('adapter initializing, chunk size set to ' + g_chunkSize);
@@ -1662,7 +2110,7 @@ async function onReady() {
     adapter.log.debug('starting reader threads');
     for (let ii = 0; ii < CTXs.length; ii++) {
         const CTX = CTXs[ii];
-        createSession(CTX);
+        createReaderSession(CTX);
     }
 
     // start connection info updater
@@ -1681,8 +2129,9 @@ async function onReady() {
  * @return
  *
  */
-function onStateChange (pFullId, pState) {
+async function onStateChange (pFullId, pState) {
     adapter.log.debug(`onStateChange triggered - id ${pFullId}`);
+
     if ( ! pState || pState.ack ) return;
 
     adapter.log.debug(`onStateChange - state id ${pFullId} set to ${pState.val}`);
@@ -1692,11 +2141,34 @@ function onStateChange (pFullId, pState) {
         return;
     }
 
-    // prepare varbind to be written
-    const varbind = STATEs[pFullId].varbind;
-    varbind.value = pState.val;
+    const CTX = STATEs[pFullId].CTX;
+    const devId = CTX.id;
+    const stateId = STATEs[pFullId].stateId;
 
+    // TODO: if state is set but no connetion is possible, errors occure every x seconds ...
+    //       Read erroro trigger onStateChange with ACK-false - must be filtered somehow
+    //       Set state only if something hanges (incl. quality) ???
+
+    // prepare varbind to be written
+    const varbind = varbindEncode( STATEs[pFullId], pState.val, devId, stateId );
+
+    let sessCtx = await createSession(CTX);
+    const result = await snmpSessionSetAsync(sessCtx.session, [varbind]);
+    if (result.err) {
+        adapter.log.error('[' + devId + '] session.set: ' + result.err.toString());
+    } else {
+        adapter.log.debug('[' + devId + '] session.set: success');
+    }
+
+    // reread data of device
+    //adapter.clearInterval (CTX.pollTimer);
+    //readOids(CTX);
+    //CTX.pollTimer = adapter.setInterval(readOids, CTX.pollIntvl, CTX);
+
+    await closeSession (sessCtx);
+    sessCtx=null;
 }
+
 
 /**
  * onUnload - called when adapter shuts down
@@ -1724,13 +2196,14 @@ function onUnload(callback) {
             CTX.pollTimer = null;
         }
 
-        if (CTX.session) {
+        if (CTX.sessCtx && CTX.sessCtx.session) {
             try {
-                CTX.session.on('error', null); // avoid nesting callbacks
-                CTX.session.on('close', null); // avoid nesting callbacks
-                CTX.session.close();
+                CTX.sessCtx.session.on('error', null); // avoid nesting callbacks
+                CTX.sessCtx.session.on('close', null); // avoid nesting callbacks
+                CTX.sessCtx.session.close();
             } catch (e) { /* */ }
-            CTX.session = null;
+            CTX.sessCtx.session = null;
+            CTX.sessCtx = null;
         }
     }
 

@@ -423,6 +423,14 @@
                     "default": false,
                     "tooltip": "ttOptRawStates",
                     "help": "hlpOptRawStates"
+                },
+				"optTypeStates": 	{
+                    "type": "checkbox",
+                    "label": "lblOptTypeStates",
+					"newLine": true,
+                    "default": false,
+                    "tooltip": "ttOptTypeStates",
+                    "help": "hlpOptTypeStates"
                 }
             }
 		}        
