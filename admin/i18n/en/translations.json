@@ -20,6 +20,7 @@
     "lblAuthSecLvlOpt2": "authentication",
     "lblAuthSecLvlOpt3": "authentication + encryption",
     "lblAuthUser": "username",
+    "lblAutomatic": "Automatic",
     "lblBoolean": "Boolean",
     "lblDevAct": "active",
     "lblDevAuthId": "Community (v1, v2c), Auth-ID (v3)",

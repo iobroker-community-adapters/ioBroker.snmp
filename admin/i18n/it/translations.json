@@ -55,5 +55,6 @@
     "warnAuthUnused": "Nota: la configurazione in questo pannello non verrà attualmente utilizzata poiché nessun dispositivo utilizza il protocollo SNMPv3.",
     "hlpOptTypeStates": "La selezione di questa opzione consente la creazione di stati contenenti dati di tipo.",
     "lblOptTypeStates": "Aggiungi stati di tipo",
-    "ttOptTypeStates": "Crea stati contenenti dati di tipo di oids."
+    "ttOptTypeStates": "Crea stati contenenti dati di tipo di oids.",
+    "lblAutomatic": "Automatico"
 }

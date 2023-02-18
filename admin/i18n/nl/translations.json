@@ -55,5 +55,6 @@
     "warnAuthUnused": "Opmerking: configuratie op dit paneel wordt momenteel niet gebruikt omdat geen enkel apparaat het SNMPv3-protocol gebruikt.",
     "hlpOptTypeStates": "Als u deze optie selecteert, kunt u toestanden maken die typegegevens bevatten.",
     "lblOptTypeStates": "Voeg typestatussen toe",
-    "ttOptTypeStates": "Maak staten met typegegevens van oids."
+    "ttOptTypeStates": "Maak staten met typegegevens van oids.",
+    "lblAutomatic": "Automatisch"
 }

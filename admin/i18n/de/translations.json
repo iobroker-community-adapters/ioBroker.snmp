@@ -55,5 +55,6 @@
     "warnAuthUnused": "Hinweis: Die Konfiguration in diesem Bereich wird derzeit nicht verwendet, da kein Gerät das SNMPv3-Protokoll verwendet.",
     "hlpOptTypeStates": "Die Auswahl dieser Option ermöglicht die Erstellung von Zuständen, die Typdaten enthalten.",
     "lblOptTypeStates": "Typzustände hinzufügen",
-    "ttOptTypeStates": "Erstellen Sie Zustände, die Typdaten von OIDs enthalten."
+    "ttOptTypeStates": "Erstellen Sie Zustände, die Typdaten von OIDs enthalten.",
+    "lblAutomatic": "Automatisch"
 }

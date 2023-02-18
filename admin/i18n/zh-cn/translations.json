@@ -55,5 +55,6 @@
     "warnAuthUnused": "注意：当前不会使用此面板上的配置，因为没有设备使用 SNMPv3 协议。",
     "hlpOptTypeStates": "选择此选项可以创建包含类型数据的状态。",
     "lblOptTypeStates": "添加类型状态",
-    "ttOptTypeStates": "创建包含 oid 类型数据的状态。"
+    "ttOptTypeStates": "创建包含 oid 类型数据的状态。",
+    "lblAutomatic": "自动的"
 }
