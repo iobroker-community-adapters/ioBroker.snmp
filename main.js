@@ -444,19 +444,21 @@ async function initOidObjects(pId, pOid, pOID) {
             await adapter.subscribeStatesAsync( fullId );
         }
 
-        await initObject({
-            _id: pId+'-type',
-            type: 'state',
-            common: {
-                name: pId+'-type',
-                write: false,
-                read: true,
-                type: 'string',
-                role: 'type.encoding'
-            },
-            native: {
-            }
-        });
+        if (adapter.config.optTypeStates) {
+            await initObject({
+                _id: pId+'-type',
+                type: 'state',
+                common: {
+                    name: pId+'-type',
+                    write: false,
+                    read: true,
+                    type: 'string',
+                    role: 'type.encoding'
+                },
+                native: {
+                }
+            });
+        }
 
         // create OID state.raw objects
         if (adapter.config.optRawStates) {
@@ -1307,7 +1309,7 @@ async function createReaderSession(pCTX) {
     adapter.log.debug('createReaderSession - device ' + pCTX.name + ' (' + pCTX.ipAddr + ')');
 
     // (re)set device online status
-    adapter.setState(pCTX.id + '.online', false, true);
+    await adapter.setStateAsync(pCTX.id + '.online', false, true);
 
     // stop existing timers and close session if one exists
     if (pCTX.retryTimer) {
@@ -1346,6 +1348,31 @@ async function createReaderSession(pCTX) {
 }
 
 /**
+ * setStates - set states related to one oid
+ *
+ * @param {pVarbind} snmp varbind object
+ * @return string
+ *
+ */
+async function setStates (pStateId, pOptions, pValues ) {
+    adapter.log.debug('setStates - ' + pStateId);
+
+    const state = pOptions;
+
+    if (pValues) state.val = pValues.val;
+    await adapter.setStateAsync(pStateId, state);
+
+    if (adapter.config.optTypeStates){
+        if (pValues) state.val = pValues.type;
+        await adapter.setStateAsync(pStateId+'-type', state);
+    }
+    if (adapter.config.optRawStates){
+        if (pValues) state.val = pValues.json;
+        await adapter.setStateAsync(pStateId+'-raw', state);
+    }
+}
+
+/**
  * processVarbind - process single varbind
  *
  * @param {pVarbind} snmp varbind object
@@ -1381,11 +1408,18 @@ async function processVarbind(pCTX, pStateId, pFormat, pWriteable, pVarbind) {
         }
     });
 
-    adapter.setState(pStateId, state.val, true);
-    adapter.setState(pStateId+'-type', pVarbind.type + ': '+state.typeStr, true);
-    if (adapter.config.optRawStates){
-        adapter.setState(pStateId+'-raw', JSON.stringify(pVarbind), true);
+    await setStates( pStateId,{ ack: true, q:state.qual},
+        { val: state.val, type: pVarbind.type + ': '+state.typeSt, json: JSON.stringify(pVarbind) } );
+
+    /*
+    await adapter.setStateAsync(pStateId, state.val, true);
+    if (adapter.config.opttypeStates){
+        await adapter.setStateAsync(pStateId+'-type', pVarbind.type + ': '+state.typeStr, true);
     }
+    if (adapter.config.optRawStates){
+        await adapter.setStateAsync(pStateId+'-raw', JSON.stringify(pVarbind), true);
+    }
+    */
 
     if ( pWriteable ) {
         STATEs[fullId] = {
@@ -1425,11 +1459,16 @@ async function readChunkOids(pCTX, pIdx) {
         if (result.err.toString() === 'RequestTimedOutError: Request timed out') {
             // timeout error
             for (let ii = 0; ii < pCTX.chunks[pIdx].ids.length; ii++) {
-                adapter.setState(pCTX.chunks[pIdx].ids[ii], {q:0x02} ); // connection problem
-                adapter.setState(pCTX.chunks[pIdx].ids[ii]+'-type', {q:0x02} ); // connection problem
-                if (adapter.config.optRawStates){
-                    adapter.setState(pCTX.chunks[pIdx].ids[ii]+'-raw', {q:0x02} ); // connection problem
+                await setStates( pCTX.chunks[pIdx].ids[ii], {ack: true, q:0x02} ); // connection problem
+                /*
+                await adapter.setStateAsync(pCTX.chunks[pIdx].ids[ii], {q:0x02} ); // connection problem
+                if (adapter.config.optTypeStates){
+                    await adapter.setStateAsync(pCTX.chunks[pIdx].ids[ii]+'-type', {q:0x02} );
                 }
+                if (adapter.config.optRawStates){
+                    await adapter.setStateAsync(pCTX.chunks[pIdx].ids[ii]+'-raw', {q:0x02} ); // connection problem
+                }
+                */
             }
             if (!pCTX.inactive || !pCTX.initialized) {
                 adapter.log.info('[' + devId + '] device disconnected - request timout');
@@ -1439,11 +1478,16 @@ async function readChunkOids(pCTX, pIdx) {
         } else {
             // other error
             for (let ii = 0; ii < pCTX.chunks[pIdx].ids.length; ii++) {
-                adapter.setState(pCTX.chunks[pIdx].ids[ii], {val: null, ack: true, q:0x44} ); // device reports error
-                adapter.setState(pCTX.chunks[pIdx].ids[ii]+'-type', {val: null, ack: true, q:0x44} ); // device reports error
-                if (adapter.config.optRawStates){
-                    adapter.setState(pCTX.chunks[pIdx].ids[ii]+'-raw', {val: null, ack: true, q:0x44} ); // device reports error
+                await setStates(pCTX.chunks[pIdx].ids[ii], {val: null, ack: true, q:0x44} ); // device reports error
+                /*
+                await adapter.setStateAsync(pCTX.chunks[pIdx].ids[ii], {val: null, ack: true, q:0x44} ); // device reports error
+                if (adapter.config.optTypeStates){
+                    await adapter.setStateAsync(pCTX.chunks[pIdx].ids[ii]+'-type', {val: null, ack: true, q:0x44} ); // device reports error
                 }
+                if (adapter.config.optRawStates){
+                    await adapter.setStateAsync(pCTX.chunks[pIdx].ids[ii]+'-raw', {val: null, ack: true, q:0x44} ); // device reports error
+                }
+                */
             }
             if (!pCTX.inactive || !pCTX.initialized) {
                 adapter.log.error('[' + devId + '] session.get: ' + result.err.toString());
@@ -1452,7 +1496,7 @@ async function readChunkOids(pCTX, pIdx) {
                 setImmediate(handleConnectionInfo);
             }
         }
-        adapter.setState(devId + '.online', false, true);
+        await adapter.setStateAsync(devId + '.online', false, true);
     } else {
         // success
         if (pCTX.inactive) {
@@ -1460,7 +1504,7 @@ async function readChunkOids(pCTX, pIdx) {
             pCTX.inactive = false;
             setImmediate(handleConnectionInfo);
         }
-        adapter.setState(devId + '.online', true, true);
+        await adapter.setStateAsync(devId + '.online', true, true);
 
         // process returned values
         for (let ii = 0; ii < result.varbinds.length; ii++) {
@@ -1469,14 +1513,17 @@ async function readChunkOids(pCTX, pIdx) {
                     ! snmp.varbindError(result.varbinds[ii]).startsWith('NoSuchInstance:') ) {
                     adapter.log.error('[' + devId + '] session.get: ' + snmp.varbindError(result.varbinds[ii]));
                 }
-                adapter.setState(pCTX.chunks[pIdx].ids[ii], { val: null, ack: true, q: 0x84}); // sensor reports error
-                adapter.setState(pCTX.chunks[pIdx].ids[ii]+'-type', { val: null, ack: true, q: 0x84}); // sensor reports error
-                if (adapter.config.optRawStates){
-                    adapter.setState(pCTX.chunks[pIdx].ids[ii]+'-raw', {val: null, ack: true, q:0x84} ); //sensor reports error
+                await setStates(pCTX.chunks[pIdx].ids[ii], {val: null, ack: true, q:0x84} ); // sensor reports error
+                /*
+                await adapter.setStateAsync(pCTX.chunks[pIdx].ids[ii], { val: null, ack: true, q: 0x84}); // sensor reports error
+                if (adapter.config.optTypeStates){
+                    await adapter.setStateAsync(pCTX.chunks[pIdx].ids[ii]+'-type', { val: null, ack: true, q: 0x84}); // sensor reports error
                 }
+                if (adapter.config.optRawStates){
+                    await adapter.setStateAsync(pCTX.chunks[pIdx].ids[ii]+'-raw', {val: null, ack: true, q:0x84} ); //sensor reports error
+                }
+                */
             } else {
-                //adapter.log.debug('[' + devId + '] update ' + pCTX.ids[ii] + ': ' + varbinds[ii].value.toString());
-                //adapter.setState(pCTX.ids[ii], varbinds[ii].value.toString(), true); // data OK
                 const OID = pCTX.chunks[pIdx].OIDs[ii];
                 const stateId = pCTX.chunks[pIdx].ids[ii];
                 processVarbind(pCTX, stateId, OID.oidFormat, OID.oidWriteable, result.varbinds[ii]);
@@ -1513,7 +1560,7 @@ async function readOids(pCTX) {
 
 // #################### general housekeeping functions ####################
 
-function handleConnectionInfo() {
+async function handleConnectionInfo() {
     adapter.log.debug('handleConnectionInfo');
 
     let haveConnection = false;
@@ -1532,7 +1579,7 @@ function handleConnectionInfo() {
         g_isConnected = haveConnection;
 
         adapter.log.debug('info.connection set to ' + g_isConnected);
-        adapter.setState('info.connection', g_isConnected, true);
+        await adapter.setStateAsync('info.connection', g_isConnected, true);
     }
 }
 
@@ -2100,11 +2147,16 @@ async function onStateChange (pFullId, pState) {
         if (snmp.isVarbindError(resultGet.varbinds[0])) {
             adapter.log.error('[' + devId + '] session.get: ' + snmp.varbindError(resultGet.varbinds[0]));
 
-            adapter.setState(stateId, { val: null, ack: true, q: 0x84}); // sensor reports error
-            adapter.setState(stateId+'-type', { val: null, ack: true, q: 0x84}); // sensor reports error
-            if (adapter.config.optRawStates){
-                adapter.setState(stateId+'-raw', {val: null, ack: true, q:0x84} ); //sensor reports error
+            await setStates(stateId, {val: null, ack: true, q:0x84} ); // sensor reports error
+            /*
+            await adapter.setStateAsync(stateId, { val: null, ack: true, q: 0x84}); // sensor reports error
+            if (adapter.config.optTypeStates){
+                await adapter.setStateAsync(stateId+'-type', { val: null, ack: true, q: 0x84}); // sensor reports error
             }
+            if (adapter.config.optRawStates){
+                await adapter.setStateAsync(stateId+'-raw', {val: null, ack: true, q:0x84} ); //sensor reports error
+            }
+            */
         } else {
             processVarbind(CTX, stateId, format, true, resultGet.varbinds[0]);
         }
