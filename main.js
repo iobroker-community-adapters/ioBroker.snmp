@@ -1487,7 +1487,7 @@ async function readChunkOids(pCTX, pIdx) {
             for (let ii = 0; ii < pCTX.chunks[pIdx].ids.length; ii++) {
                 await setStates( pCTX.chunks[pIdx].ids[ii], {ack: true, q:0x02} ); // connection problem
             }
-            await setOnlineState( pCTX, false, '- request timeout', null); // log info only
+            await setOnlineState( pCTX, false, 'request timeout', null); // log info only
         } else {
             // other error
             for (let ii = 0; ii < pCTX.chunks[pIdx].ids.length; ii++) {
@@ -1559,7 +1559,7 @@ async function handleConnectionInfo() {
 
         adapter.log.debug('info.connection set to ' + g_isConnected);
     }
-    
+
     await adapter.setStateAsync('info.connection', g_isConnected, true);
 }
 
@@ -1948,7 +1948,8 @@ function setupContices() {
 
         CTXs[jj].pollTimer = null;  // poll intervall timer
         CTXs[jj].session = null;    // snmp session
-        CTXs[jj].inactive = true;   // connection status of device
+        CTXs[jj].initialized = false;   // connection initialization status of device
+        CTXs[jj].online = false;   // connection status of device
 
         let cIdx = -1;    // chunk index
         let cCnt = 0;     // chunk element count
