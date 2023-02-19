@@ -1309,7 +1309,7 @@ async function createReaderSession(pCTX) {
     adapter.log.debug('createReaderSession - device ' + pCTX.name + ' (' + pCTX.ipAddr + ')');
 
     // (re)set device online status
-    await adapter.setStateAsync(pCTX.id + '.online', false, true);
+    await adapter.setStateAsync(pCTX.id + '.online', {val: false, ack: true, q:0x00});
 
     // stop existing timers and close session if one exists
     if (pCTX.retryTimer) {
@@ -1437,6 +1437,25 @@ async function processVarbind(pCTX, pStateId, pFormat, pWriteable, pVarbind) {
 }
 
 /**
+ *
+ */
+async function setOnlineState (pCTX, pOnline, pMsg, pErr){
+
+    await adapter.setStateAsync(pCTX.devId + '.online', {val: pOnline, ack: true, q:0x00});
+
+    if (pCTX.initialized && (pCTX.online == pOnline) ) return;
+
+    if (pErr) adapter.log.error(`[${pCTX.devId}] ${pErr}`);
+
+    const msg = pOnline ? 'connected' : 'disconnected';
+    adapter.log.info(`[${pCTX.devId}] device ${msg} ${pMsg}`);
+
+    pCTX.initialized = true;
+    pCTX.online = pOnline;
+    setImmediate(handleConnectionInfo);
+}
+
+/**
  * readChunkOids - read all oids within one chunk from a specific target device
  *
  * @param {pCtx} specific context
@@ -1454,57 +1473,24 @@ async function readChunkOids(pCTX, pIdx) {
     const result = await snmpSessionGetAsync( pCTX.sessCtx.session, oids);
     adapter.log.debug('[' + devId + '] session.get completed for chunk index ' + pIdx );
     if (result.err) {
-        // error occured
+        // error
         adapter.log.debug('[' + devId + '] session.get: ' + result.err.toString());
         if (result.err.toString() === 'RequestTimedOutError: Request timed out') {
             // timeout error
             for (let ii = 0; ii < pCTX.chunks[pIdx].ids.length; ii++) {
                 await setStates( pCTX.chunks[pIdx].ids[ii], {ack: true, q:0x02} ); // connection problem
-                /*
-                await adapter.setStateAsync(pCTX.chunks[pIdx].ids[ii], {q:0x02} ); // connection problem
-                if (adapter.config.optTypeStates){
-                    await adapter.setStateAsync(pCTX.chunks[pIdx].ids[ii]+'-type', {q:0x02} );
-                }
-                if (adapter.config.optRawStates){
-                    await adapter.setStateAsync(pCTX.chunks[pIdx].ids[ii]+'-raw', {q:0x02} ); // connection problem
-                }
-                */
             }
-            if (!pCTX.inactive || !pCTX.initialized) {
-                adapter.log.info('[' + devId + '] device disconnected - request timout');
-                pCTX.inactive = true;
-                setImmediate(handleConnectionInfo);
-            }
+            await setOnlineState( pCTX, false, '- request timeout', null); // log info only
         } else {
             // other error
             for (let ii = 0; ii < pCTX.chunks[pIdx].ids.length; ii++) {
                 await setStates(pCTX.chunks[pIdx].ids[ii], {val: null, ack: true, q:0x44} ); // device reports error
-                /*
-                await adapter.setStateAsync(pCTX.chunks[pIdx].ids[ii], {val: null, ack: true, q:0x44} ); // device reports error
-                if (adapter.config.optTypeStates){
-                    await adapter.setStateAsync(pCTX.chunks[pIdx].ids[ii]+'-type', {val: null, ack: true, q:0x44} ); // device reports error
-                }
-                if (adapter.config.optRawStates){
-                    await adapter.setStateAsync(pCTX.chunks[pIdx].ids[ii]+'-raw', {val: null, ack: true, q:0x44} ); // device reports error
-                }
-                */
             }
-            if (!pCTX.inactive || !pCTX.initialized) {
-                adapter.log.error('[' + devId + '] session.get: ' + result.err.toString());
-                adapter.log.info('[' + devId + '] device disconnected');
-                pCTX.inactive = true;
-                setImmediate(handleConnectionInfo);
-            }
+            await setOnlineState( pCTX, false, null, 'session.get: ' + result.err.toString()); // log an error
         }
-        await adapter.setStateAsync(devId + '.online', false, true);
     } else {
         // success
-        if (pCTX.inactive) {
-            adapter.log.info('[' + devId + '] device (re)connected');
-            pCTX.inactive = false;
-            setImmediate(handleConnectionInfo);
-        }
-        await adapter.setStateAsync(devId + '.online', true, true);
+        await setOnlineState( pCTX, true, null, null);
 
         // process returned values
         for (let ii = 0; ii < result.varbinds.length; ii++) {
@@ -1514,26 +1500,12 @@ async function readChunkOids(pCTX, pIdx) {
                     adapter.log.error('[' + devId + '] session.get: ' + snmp.varbindError(result.varbinds[ii]));
                 }
                 await setStates(pCTX.chunks[pIdx].ids[ii], {val: null, ack: true, q:0x84} ); // sensor reports error
-                /*
-                await adapter.setStateAsync(pCTX.chunks[pIdx].ids[ii], { val: null, ack: true, q: 0x84}); // sensor reports error
-                if (adapter.config.optTypeStates){
-                    await adapter.setStateAsync(pCTX.chunks[pIdx].ids[ii]+'-type', { val: null, ack: true, q: 0x84}); // sensor reports error
-                }
-                if (adapter.config.optRawStates){
-                    await adapter.setStateAsync(pCTX.chunks[pIdx].ids[ii]+'-raw', {val: null, ack: true, q:0x84} ); //sensor reports error
-                }
-                */
             } else {
                 const OID = pCTX.chunks[pIdx].OIDs[ii];
                 const stateId = pCTX.chunks[pIdx].ids[ii];
                 processVarbind(pCTX, stateId, OID.oidFormat, OID.oidWriteable, result.varbinds[ii]);
             }
         }
-    }
-
-    if (!pCTX.initialized) {
-        pCTX.initialized = true;
-        setImmediate(handleConnectionInfo);
     }
 }
 
@@ -1565,7 +1537,7 @@ async function handleConnectionInfo() {
 
     let haveConnection = false;
     for (let ii = 0; ii < CTXs.length; ii++) {
-        if (!CTXs[ii].inactive) {
+        if (!CTXs[ii].online) {
             haveConnection = true;
         }
     }
@@ -2186,7 +2158,7 @@ function onUnload(callback) {
 
         // (re)set device online status
         try {
-            adapter.setState(CTX.id + '.online', false, true);
+            adapter.setState(CTX.id + '.online', {val: false, ack: true, q:0x00});
         } catch (e) { /* */ }
 
         // close session if one exists
