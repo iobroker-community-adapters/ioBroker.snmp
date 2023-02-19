@@ -1442,14 +1442,14 @@ async function processVarbind(pCTX, pStateId, pFormat, pWriteable, pVarbind) {
  */
 async function setOnlineState (pCTX, pOnline, pMsg, pErr){
 
-    await adapter.setStateAsync(pCTX.devId + '.online', {val: pOnline, ack: true, q:0x00});
+    await adapter.setStateAsync(pCTX.id + '.online', {val: pOnline, ack: true, q:0x00});
 
     if (pCTX.initialized && (pCTX.online == pOnline) ) return;
 
-    if (pErr) adapter.log.error(`[${pCTX.devId}] ${pErr}`);
+    if (pErr) adapter.log.error(`[${pCTX.id}] ${pErr}`);
 
     const msg = pOnline ? 'connected' : 'disconnected';
-    adapter.log.info(`[${pCTX.devId}] device ${msg} ${pMsg}`);
+    adapter.log.info(`[${pCTX.id}] device ${msg} ${pMsg}`);
 
     pCTX.initialized = true;
     pCTX.online = pOnline;
