@@ -1448,8 +1448,9 @@ async function setOnlineState (pCTX, pOnline, pMsg, pErr){
 
     if (pErr) adapter.log.error(`[${pCTX.id}] ${pErr}`);
 
-    const msg = pOnline ? 'connected' : 'disconnected';
-    adapter.log.info(`[${pCTX.id}] device ${msg} ${pMsg}`);
+    let msg = pOnline ? 'connected' : 'disconnected';
+    if (pMsg) msg = `${msg} - ${pMsg}`;
+    adapter.log.info(`[${pCTX.id}] device ${msg}`);
 
     pCTX.initialized = true;
     pCTX.online = pOnline;
@@ -1557,8 +1558,9 @@ async function handleConnectionInfo() {
         g_isConnected = haveConnection;
 
         adapter.log.debug('info.connection set to ' + g_isConnected);
-        await adapter.setStateAsync('info.connection', g_isConnected, true);
     }
+    
+    await adapter.setStateAsync('info.connection', g_isConnected, true);
 }
 
 /**
