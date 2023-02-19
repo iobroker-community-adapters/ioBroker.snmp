@@ -1544,9 +1544,7 @@ async function handleConnectionInfo() {
 
     let haveConnection = false;
     for (let ii = 0; ii < CTXs.length; ii++) {
-        if (!CTXs[ii].online) {
-            haveConnection = true;
-        }
+        if (CTXs[ii].online) haveConnection = true;
     }
 
     if (g_isConnected !== haveConnection) {
