@@ -1262,8 +1262,10 @@ async function onReaderSessionClose(pCTX) {
 
     adapter.clearInterval(pCTX.pollTimer);
     pCTX.pollTimer = null;
-    pCTX.sessCtx.session = null;
-    pCTX.sessCtx.session = null;
+    if( pCTX.sessCtx ) {
+        pCTX.sessCtx.session = null;
+        pCTX.sessCtx = null;
+    }
 
     pCTX.retryTimer = adapter.setTimeout((pCTX) => {
         pCTX.retryTimer = null;
@@ -1468,6 +1470,11 @@ async function readChunkOids(pCTX, pIdx) {
 
     const devId = pCTX.id;
     const oids = pCTX.chunks[pIdx].oids;
+
+    if (! pCTX.sessCtx){
+        adapter.log.debug('[' + devId + '] session.get - session context is null, skip processing');
+        return;
+    }
 
     const result = await snmpSessionGetAsync( pCTX.sessCtx.session, oids);
     adapter.log.debug('[' + devId + '] session.get completed for chunk index ' + pIdx );
