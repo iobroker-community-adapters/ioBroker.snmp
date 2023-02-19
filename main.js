@@ -78,7 +78,6 @@
  *      pollTimer  object   timer object for poll timer
  *      retryTimer object   timer object for retry timer
  *      session    object   snmp session object
- *      inactive   bool     flag indicating conection status of device
  */
 
 /* jshint -W097 */
@@ -1850,7 +1849,7 @@ function validateConfig() {
  *		ids			array of iod id strings (index synced with oids array)
  * 		authId 	    string 	snmp community (snmp V1, V2 only)
  *		initialized	boolean	true if connection is initialized
- *		inactive	boolean	true if connection to device is active
+ *		online	    boolean	true if connection to device is active
  */
 function setupContices() {
     adapter.log.debug('setupContices - initializing contices');
