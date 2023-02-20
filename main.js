@@ -323,6 +323,7 @@ async function initObject(pObj) {
         try {
             adapter.log.debug('creating obj "' + pObj._id + '" with type ' + pObj.type);
             await adapter.setObjectNotExistsAsync(pObj._id, pObj);
+            await adapter.extendObjectAsync(pObj._id, pObj);
         } catch (e) {
             adapter.log.error('error initializing obj "' + pObj._id + '" ' + e.message);
         }
@@ -370,14 +371,18 @@ async function initDeviceObjects(pId, pIp) {
             _id: pId,
             type: 'device',
             common: {
-                name: pIp
+                name: pIp,
+                statusStates: {
+                    onlineId: `${adapterName}.${adapter.instance}.${pId}.online`,
+                    errorId: `${adapterName}.${adapter.instance}.${pId}.alarm`
+                }
             },
             native: {
             }
         }
         );
 
-        // create <ip>.online state object
+        // create <ip>.online and .alarm state objects
         await initObject({
             _id: pId + '.online',
             type: 'state',
@@ -387,6 +392,34 @@ async function initDeviceObjects(pId, pIp) {
                 read: true,
                 type: 'boolean',
                 role: 'indicator.reachable'
+            },
+            native: {
+            }
+        }
+        );
+        await initObject({
+            _id: pId + '.alarm',
+            type: 'state',
+            common: {
+                name: pIp + ' online',
+                write: false,
+                read: true,
+                type: 'boolean',
+                role: 'indicator.reachable'
+            },
+            native: {
+            }
+        }
+        );
+        await initObject({
+            _id: pId + '.last_error',
+            type: 'state',
+            common: {
+                name: pIp + ' last error',
+                write: false,
+                read: true,
+                type: 'string',
+                role: 'text'
             },
             native: {
             }
@@ -1367,7 +1400,8 @@ async function onReaderSessionError(pCTX, pErr) {
 async function createReaderSession(pCTX) {
     adapter.log.debug('createReaderSession - device ' + pCTX.name + ' (' + pCTX.ipAddr + ')');
 
-    // (re)set device online status
+    // (re)set device online and alarm status
+    await adapter.setStateAsync(pCTX.id + '.alarm', {val: false, ack: true, q:0x00});
     await adapter.setStateAsync(pCTX.id + '.online', {val: false, ack: true, q:0x00});
 
     // stop existing timers and close session if one exists
@@ -1459,9 +1493,18 @@ async function setOnlineState (pCTX, pOnline, pMsg, pErr){
 
     await adapter.setStateAsync(pCTX.id + '.online', {val: pOnline, ack: true, q:0x00});
 
+    let err = 'RequestTimedOutError: Request timed out';
+    if (pErr) err = pErr;
+    if (pOnline) err = null;
+    await adapter.setStateAsync(pCTX.id + '.last_error', {val: err, ack: true, q:0x00});
+
     if (pCTX.initialized && (pCTX.online == pOnline) ) return;
 
-    if (pErr) adapter.log.error(`[${pCTX.id}] ${pErr}`);
+    if (pErr) {
+        adapter.log.error(`[${pCTX.id}] ${pErr}`);
+        await adapter.setStateAsync(pCTX.id + '.alarm', {val: true, ack: true, q:0x00});
+    }
+    if (pOnline) await adapter.setStateAsync(pCTX.id + '.alarm', {val: false, ack: true, q:0x00});
 
     let msg = pOnline ? 'connected' : 'disconnected';
     if (pMsg) msg = `${msg} - ${pMsg}`;
@@ -2250,6 +2293,7 @@ function onUnload(callback) {
 
         // (re)set device online status
         try {
+            adapter.setState(CTX.id + '.alarm', {val: false, ack: true, q:0x00});
             adapter.setState(CTX.id + '.online', {val: false, ack: true, q:0x00});
         } catch (e) { /* */ }
 

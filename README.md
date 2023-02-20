@@ -24,6 +24,7 @@ This adapter can be used to poll information from devices like printers, network
 * (McM1957) Support to write to oids has been implemented. (#150)
 * (McM1957) Major parts of code have been rewritten so support iod writing.
 * (McM1957) States containing type information can be disabled now. (#218)
+* (McM1957) States indicatin g online and error status of devices have been added.
 
 ### 2.3.0 (2022-12-13)
 * (McM1957) Add support for using native datatypes for states. (#143)
