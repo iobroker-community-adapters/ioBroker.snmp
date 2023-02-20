@@ -91,12 +91,18 @@ const F_BOOLEAN = 2;
 const F_JSON = 3;
 const F_AUTO = 99;
 
+// snmp protocols
 const SNMP_V1 = 1;
 const SNMP_V2c = 2;
 const SNMP_V3 = 3;
 
+// authentication protocols
 const MD5 = 1;
 const SHA = 2;
+const SHA224 = 3;
+const SHA256 = 4;
+const SHA384 = 5;
+const SHA512 = 6;
 
 const DES = 1;
 const AES = 2;
@@ -1129,10 +1135,28 @@ async function snmpCreateSession(pCTX) {
         }
 
         let snmpAuthProtocol = 0;
-        if ( pCTX.authAuthProto == MD5 ) {
-            snmpAuthProtocol = snmp.AuthProtocols.md5;  // MD5 message authentication
-        } else if ( pCTX.authAuthProto == SHA )  {
-            snmpAuthProtocol = snmp.AuthProtocols.sha;   // SHA message authentication
+        switch (pCTX.authAuthProto) {
+            default:
+                snmpAuthProtocol = 0;
+                break;
+            case MD5:
+                snmpAuthProtocol = snmp.AuthProtocols.md5;
+                break;
+            case SHA:
+                snmpAuthProtocol = snmp.AuthProtocols.SHA;
+                break;
+            case SHA224:
+                snmpAuthProtocol = snmp.AuthProtocols.SHA224;
+                break;
+            case SHA256:
+                snmpAuthProtocol = snmp.AuthProtocols.SHA256;
+                break;
+            case SHA384:
+                snmpAuthProtocol = snmp.AuthProtocols.SHA384;
+                break;
+            case SHA512:
+                snmpAuthProtocol = snmp.AuthProtocols.SHA512;
+                break;
         }
 
         let snmpPrivProtocol = 0;
