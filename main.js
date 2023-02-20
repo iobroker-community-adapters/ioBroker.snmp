@@ -243,9 +243,12 @@ function oidFormat2StateType(pOidFormat){
         case F_JSON /* 3 */: {
             return 'string';
         }
+        case F_AUTO /* 99 */: {
+            return 'mixed';
+        }
         default:{
             adapter.log.warn('oidFormat2StateType - unknown code ' + pOidFormat );
-            return 'string';
+            return 'mixed';
         }
     }
 }
@@ -604,7 +607,7 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
                     retval.format = F_BOOLEAN;
                     break;
                 case F_JSON /* 3 */:
-                    retval.val = JSON.stringify(pVarbind.value);
+                    retval.val = JSON.stringify({type: 'boolean', data: pVarbind.value});
                     break;
             }
             break;
@@ -638,7 +641,7 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
                     break;
                 }
                 case F_JSON /* 3 */:
-                    retval.val = JSON.stringify(pVarbind.value);
+                    retval.val = JSON.stringify({type: 'number', data: pVarbind.value});
                     break;
             }
             break;
@@ -671,7 +674,7 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
                     break;
                 }
                 case F_JSON /* 3 */:
-                    retval.val = JSON.stringify(pVarbind.value);
+                    retval.val = JSON.stringify({type: 'number', data: pVarbind.value});
                     break;
             }
             break;
@@ -700,7 +703,7 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
                     break;
                 }
                 case F_JSON /* 3 */:
-                    retval.val = JSON.stringify(pVarbind.value);
+                    retval.val = JSON.stringify(pVarbind.value); /* type: Buffer */
                     break;
             }
             break;
@@ -735,7 +738,7 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
                     adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type oid to boolean ` + JSON.stringify(pVarbind));
                     break;
                 case F_JSON /* 3 */:
-                    retval.val = JSON.stringify(pVarbind.value);
+                    retval.val = JSON.stringify(pVarbind.value); /* Buffer */
                     break;
             }
             break;
@@ -761,7 +764,7 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
                     adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type ipaddress to boolean ` + JSON.stringify(pVarbind));
                     break;
                 case F_JSON /* 3 */:
-                    retval.val = JSON.stringify(pVarbind.value);
+                    retval.val = JSON.stringify(pVarbind.value); /* Buffer */
                     break;
             }
             break;
@@ -789,7 +792,7 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
                         retval.val = value !== 0;
                         break;
                     case F_JSON /* 3 */:
-                        retval.val = JSON.stringify(pVarbind.value);
+                        retval.val = JSON.stringify(pVarbind.value); /* Buffer */
                         break;
                 }
             } else {
@@ -816,6 +819,80 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
 }
 
 /**
+*/
+function json2buffer(pJson){
+    adapter.log.debug(`json2buffer - ${pJson}`);
+
+    let json = {};
+    try {
+        json=JSON.parse(pJson);
+    } catch (e) {
+        adapter.log.warn(`cannot parse json data ${e.error} - ${pJson}`);
+        return null;
+    }
+
+    if (json.type !== 'Buffer') {
+        adapter.log.warn(`cannot convert json data, type must be Buffer - ${pJson}`);
+        return null;
+    }
+
+    if (!json.data){
+        adapter.log.warn(`cannot convert json data, data element missing - ${pJson}`);
+        return null;
+    }
+
+    return Buffer.from(json.data);
+}
+
+function json2boolean(pJson){
+    adapter.log.debug(`json2buffer - ${pJson}`);
+
+    let json = {};
+    try {
+        json=JSON.parse(pJson);
+    } catch (e) {
+        adapter.log.warn(`cannot parse json data ${e.error} - ${pJson}`);
+        return null;
+    }
+
+    if (json.type !== 'boolean') {
+        adapter.log.warn(`cannot convert json data, type must be boolean - ${pJson}`);
+        return null;
+    }
+
+    if (!json.data){
+        adapter.log.warn(`cannot convert json data, data element missing - ${pJson}`);
+        return null;
+    }
+
+    return Number(json.data) != 0;
+}
+
+function json2number(pJson){
+    adapter.log.debug(`json2buffer - ${pJson}`);
+
+    let json = {};
+    try {
+        json=JSON.parse(pJson);
+    } catch (e) {
+        adapter.log.warn(`cannot parse json data ${e.error} - ${pJson}`);
+        return null;
+    }
+
+    if (json.type !== 'number') {
+        adapter.log.warn(`cannot convert json data, type must be number - ${pJson}`);
+        return null;
+    }
+
+    if (!json.data){
+        adapter.log.warn(`cannot convert json data, data element missing - ${pJson}`);
+        return null;
+    }
+
+    return Number(json.data);
+}
+
+/**
  * varbindEncode - convert native data to varbind data
  *
  * @param   {object}    pVarbind    varbind template
@@ -834,27 +911,37 @@ function varbindEncode( pState, pData, pDevId, pStateId ) {
         value:      null
     };
 
+    let dataType = typeof(pData);
+    switch (dataType) {
+        case 'boolean':
+        case 'number':
+            break; /* ok, we can handle it */
+
+        case 'string':
+            if (pState.format === F_JSON) dataType='json'; /* json must be handled special */
+            break; /* ok, we can handle it */
+
+        default:
+            retval.value = null;
+            adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode data of type ${dataType} - ` + pData);
+            return retval;
+    }
+
     switch (pState.varbind.type) {
         // The JavaScript true and false keywords are used for the values of varbinds with type Boolean.
         case snmp.ObjectType.Boolean: {
-            switch (pState.format) {
-                case F_TEXT /* 0 */:
-                default:
+            switch (dataType) {
+                case 'string':
                     retval.value = pData.toString() == 'true';
                     break;
-                case F_NUMERIC /* 1 */:
+                case 'number':
                     retval.value = pData != 0;
                     break;
-                case F_BOOLEAN /* 2 */:
+                case 'boolean':
                     retval.value = pData;
                     break;
-                case F_JSON /* 3 */:
-                    retval.value = null;
-                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode JSON data (target boolean) - ` + pData);
-                    break;
-                case F_AUTO /* 99 */:
-                    retval.value = null;
-                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode AUTO data (target boolean) - ` + pData);
+                case 'json':
+                    retval.value = json2boolean(pData);
                     break;
             }
             break;
@@ -869,28 +956,22 @@ function varbindEncode( pState, pData, pDevId, pStateId ) {
         case snmp.ObjectType.Counter32:
         case snmp.ObjectType.Gauge32:
         case snmp.ObjectType.Unsigned32: {
-            switch (pState.format) {
-                case F_TEXT /* 0 */:
-                default: {
+            switch (dataType) {
+                case 'string': {
                     const valint = parseInt(pData, 10);
                     retval.value = valint;
                     if (isNaN (valint)) retval.qual=0x01; // general error
                     break;
                 }
-                case F_NUMERIC /* 1 */:
-                    retval.value = pData != 0;
-                    break;
-                case F_BOOLEAN /* 2 */: {
+                case 'number':
                     retval.value = pData;
                     break;
-                }
-                case F_JSON /* 3 */:
-                    retval.value = null;
-                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode JSON data (target numeric) - ` + pData);
+                case 'boolean': {
+                    retval.value = pData?1:0;
                     break;
-                case F_AUTO /* 99 */:
-                    retval.value = null;
-                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode AUTO data (target numeric) - ` + pData);
+                }
+                case 'json':
+                    retval.value = json2number(pData);
                     break;
             }
             break;
@@ -901,6 +982,7 @@ function varbindEncode( pState, pData, pDevId, pStateId ) {
         // and consuming (i.e. the varbinds passed to callback functions) Buffer objects.
         case snmp.ObjectType.Counter64:{
             // TODO
+            retval.value = null;
             adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode data (target counter64) - ` + pData);
             break;
         }
@@ -908,24 +990,18 @@ function varbindEncode( pState, pData, pDevId, pStateId ) {
         // Node.js Buffer objects are used for the values of varbinds with type Opaque and OctetString. For varbinds with type
         // OctetString this module will accept JavaScript strings, but will always give back Buffer objects.
         case snmp.ObjectType.OctetString: {
-            switch (pState.format) {
-                case F_TEXT /* 0 */:
-                default:
+            switch (dataType) {
+                case 'string':
                     retval.value = pData;
                     break;
-                case F_NUMERIC /* 1 */:
+                case 'number':
                     retval.value = pData.toString;
                     break;
-                case F_BOOLEAN /* 2 */:
+                case 'boolean':
                     retval.value = pData.toString;
                     break;
-                case F_JSON /* 3 */:
-                    retval.value = null;
-                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode JSON data (target octetstring) - ` + pData);
-                    break;
-                case F_AUTO /* 99 */:
-                    retval.value = null;
-                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode AUTO data (target octetstring) - ` + pData);
+                case 'json':
+                    retval.value = json2buffer(pData);
                     break;
             }
             break;
@@ -940,26 +1016,20 @@ function varbindEncode( pState, pData, pDevId, pStateId ) {
 
         // Dotted decimal strings are used for the values of varbinds with type OID, e.g. 1.3.6.1.2.1.1.5.0.
         case snmp.ObjectType.OID: {
-            switch (pState.format) {
-                case F_TEXT /* 0 */:
-                default:
-                    retval.value = pData.toString();
+            switch (dataType) {
+                case 'string':
+                    retval.value = pData;
                     break;
-                case F_NUMERIC /* 1 */:
+                case 'numeric':
                     retval.value = null;
                     adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode NUMERIC data (target OID) - ` + pData);
                     break;
-                case F_BOOLEAN /* 2 */:
+                case 'boolean':
                     retval.val = null;
                     adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode BOOLEAN data (target OID) - ` + pData);
                     break;
-                case F_JSON /* 3 */:
-                    retval.value = null;
-                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode JSON data (target OID) - ` + pData);
-                    break;
-                case F_AUTO /* 99 */:
-                    retval.value = null;
-                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode AUTO data (target OID) - ` + pData);
+                case 'json':
+                    retval.value = json2buffer(pData);
                     break;
             }
             break;
@@ -967,26 +1037,20 @@ function varbindEncode( pState, pData, pDevId, pStateId ) {
 
         // Dotted quad formatted strings are used for the values of varbinds with type IpAddress, e.g. 192.168.1.1.
         case snmp.ObjectType.IpAddress:{
-            switch (pState.format) {
-                case F_TEXT /* 0 */:
-                default:
+            switch (dataType) {
+                case 'string':
                     retval.value = pData.toString();
                     break;
-                case F_NUMERIC /* 1 */:
+                case 'numeric':
                     retval.value = null;
                     adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode NUMERIC data (target IP) - ` + pData);
                     break;
-                case F_BOOLEAN /* 2 */:
+                case 'boolean':
                     retval.value = null;
                     adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode BOOLEAN data (target IP) - ` + pData);
                     break;
-                case F_JSON /* 3 */:
-                    retval.value = null;
-                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode JSON data (target IP) - ` + pData);
-                    break;
-                case F_AUTO /* 99 */:
-                    retval.value = null;
-                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode AUTO data (target IP) - ` + pData);
+                case 'json':
+                    retval.value = json2buffer(pData);
                     break;
             }
             break;
@@ -994,10 +1058,24 @@ function varbindEncode( pState, pData, pDevId, pStateId ) {
 
         // Node.js Buffer objects are used for the values of varbinds with type Opaque and OctetString. For varbinds with type
         // OctetString this module will accept JavaScript strings, but will always give back Buffer objects.
-        // NOTE: currently only a heuristic implementation for floating point number is implemented for formats other than json.
         case snmp.ObjectType.Opaque:{
-            retval.value = null;
-            adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode data (target opaque)` + pData);
+            switch (dataType) {
+                case 'string':
+                    retval.value = null;
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode STRIMG data (target opaque) - ` + pData);
+                    break;
+                case 'numeric':
+                    retval.value = null;
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode NUMERIC data (target opaque) - ` + pData);
+                    break;
+                case 'boolean':
+                    retval.value = null;
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode BOOLEAN data (target opaque) - ` + pData);
+                    break;
+                case 'json':
+                    retval.value = json2buffer(pData);
+                    break;
+            }
             break;
         }
 
@@ -1135,7 +1213,7 @@ async function snmpCreateSession(pCTX) {
         }
 
         let snmpAuthProtocol = 0;
-        switch (pCTX.authAuthProto) {
+        switch (Number(pCTX.authAuthProto)) {   /* ensure numeric type */
             default:
                 snmpAuthProtocol = 0;
                 break;
@@ -2117,11 +2195,14 @@ async function onStateChange (pFullId, pState) {
     const varbind = varbindEncode( STATEs[pFullId], pState.val, devId, stateId );
 
     let sessCtx = await snmpCreateSession(CTX);
-    const resultSet = await snmpSessionSetAsync(sessCtx.session, [varbind]);
-    if (resultSet.err) {
-        adapter.log.error('[' + devId + '] session.set: ' + resultSet.err.toString());
-    } else {
-        adapter.log.debug('[' + devId + '] session.set: success');
+
+    if (varbind.value) {
+        const resultSet = await snmpSessionSetAsync(sessCtx.session, [varbind]);
+        if (resultSet.err) {
+            adapter.log.error('[' + devId + '] session.set: ' + resultSet.err.toString());
+        } else {
+            adapter.log.debug('[' + devId + '] session.set: success');
+        }
     }
 
     // reread data of device

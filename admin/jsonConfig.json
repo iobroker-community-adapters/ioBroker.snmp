@@ -352,7 +352,7 @@
                                 { "label": "sha384", "value": 5},
                                 { "label": "sha512", "value": 6}
                                 ],
-                            "default": "1"
+                            "default": 1
                         },
                         {
                             "type": "password",
