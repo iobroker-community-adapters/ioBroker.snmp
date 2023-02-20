@@ -2,11 +2,11 @@
  *
  * snmp adapter,
  *		copyright CTJaeger 2017, MIT
- *		copyright McM1957 2022, MIT
+ *		copyright McM1957 2022-2023, MIT
  *
  */
 
-/*CTX
+/*
  * Remark related to REAL / FLOAT values returned:
  *
  * see http://www.net-snmp.org/docs/mibs/NET-SNMP-TC.txt
@@ -118,7 +118,6 @@ const InstallUtils = require('./lib/installUtils');
 // Load modules required by adapter
 const snmp = require('net-snmp');
 const net = require('net');
-// const { toUnicode } = require('punycode');
 
 // init installation marker
 let doInstall = false;
@@ -621,12 +620,13 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
                     break;
                 case F_NUMERIC /* 1 */:
                 case F_AUTO /* 99 */:
-                    retval.val = parseInt(pVarbind.value.toString(), 10);
+                    //retval.val = parseInt(pVarbind.value.toString(), 10);
+                    retval.val = pVarbind.value;
                     if (isNaN(retval.val)) retval.qual=0x01; // general error
                     retval.format = F_NUMERIC;
                     break;
                 case F_BOOLEAN /* 2 */: {
-                    const valint = parseInt(pVarbind.value.toString(), 10);
+                    const valint = pVarbind.value;
                     retval.val = valint !== 0;
                     if (isNaN (valint)) retval.qual=0x01; // general error
                     break;
@@ -681,12 +681,18 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
                     retval.val = pVarbind.value.toString();
                     retval.format = F_TEXT;
                     break;
-                case F_NUMERIC /* 1 */:
-                    retval.val = parseInt(pVarbind.value.toString, 10);
+                case F_NUMERIC /* 1 */: {
+                    const valint = parseInt(pVarbind.value.toString, 10);
+                    retval.val = valint;
+                    if (isNaN (valint)) retval.qual=0x01; // general error
                     break;
-                case F_BOOLEAN /* 2 */:
-                    retval.val = parseInt(pVarbind.value.toString, 10) !== 0;
+                }
+                case F_BOOLEAN /* 2 */: {
+                    const valint = parseInt(pVarbind.value.toString, 10);
+                    retval.val = valint !== 0;
+                    if (isNaN (valint)) retval.qual=0x01; // general error
                     break;
+                }
                 case F_JSON /* 3 */:
                     retval.val = JSON.stringify(pVarbind.value);
                     break;
@@ -696,29 +702,10 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
 
         // no dcumentation for type null available
         case snmp.ObjectType.Null: {
-            switch (pFormat) {
-                case F_TEXT /* 0 */:
-                case F_AUTO /* 99 */:
-                default:
-                    retval.val = null;
-                    retval.qual = 0x1; // general error
-                    retval.format = F_TEXT;
-                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type null to text ` + JSON.stringify(pVarbind));
-                    break;
-                case F_NUMERIC /* 1 */:
-                    retval.val = null;
-                    retval.qual = 0x1; // general error
-                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type null to numeric ` + JSON.stringify(pVarbind));
-                    break;
-                case F_BOOLEAN /* 2 */:
-                    retval.val = null;
-                    retval.qual = 0x1; // general error
-                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type null to boolean ` + JSON.stringify(pVarbind));
-                    break;
-                case F_JSON /* 3 */:
-                    retval.val = JSON.stringify(pVarbind.value);
-                    break;
-            }
+            retval.val = null;
+            retval.qual = 0x1; // general error
+            retval.format = F_TEXT;
+            adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type null` + JSON.stringify(pVarbind));
             break;
         }
 
@@ -800,29 +787,10 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
                         break;
                 }
             } else {
-                switch (pFormat) {
-                    case F_TEXT /* 0 */:
-                    case F_AUTO /* 99 */:
-                    default:
-                        retval.val = null;
-                        retval.qual = 0x1; // general error
-                        retval.format = F_TEXT;
-                        adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert opaque data to text ` + JSON.stringify(pVarbind));
-                        break;
-                    case F_NUMERIC /* 1 */:
-                        retval.val = null;
-                        retval.qual = 0x1; // general error
-                        adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert opaque data to number ` + JSON.stringify(pVarbind));
-                        break;
-                    case F_BOOLEAN /* 2 */:
-                        retval.val = null;
-                        retval.qual = 0x1; // general error
-                        adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert opaque data to boolean ` + JSON.stringify(pVarbind));
-                        break;
-                    case F_JSON /* 3 */:
-                        retval.val = JSON.stringify(pVarbind.value);
-                        break;
-                }
+                retval.val = null;
+                retval.qual = 0x1; // general error
+                retval.format = F_TEXT;
+                adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert opaque data` + JSON.stringify(pVarbind));
             }
             break;
         }
@@ -830,35 +798,12 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
         case snmp.ObjectType.NoSuchObject:
         case snmp.ObjectType.NoSuchInstance:
         case snmp.ObjectType.EndOfMibView:
+        default:
             retval.val = null;
             retval.qual = 0x1; // general error
             retval.format = F_TEXT;
+            adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data` + JSON.stringify(pVarbind));
             break;
-
-        default:{
-            switch (pFormat) {
-                case F_TEXT /* 0 */:
-                case F_AUTO /* 99 */:
-                default:
-                    retval.val = pVarbind.value.toString();
-                    retval.format = F_TEXT;
-                    break;
-                case F_NUMERIC /* 1 */:
-                    retval.val = null;
-                    retval.qual = 0x1; // general error
-                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert unknown data to numeric ` + JSON.stringify(pVarbind));
-                    break;
-                case F_BOOLEAN /* 2 */:
-                    retval.val = null;
-                    retval.qual = 0x1; // general error
-                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert unknown data to boolean ` + JSON.stringify(pVarbind));
-                    break;
-                case F_JSON /* 3 */:
-                    retval.val = JSON.stringify(pVarbind.value);
-                    break;
-            }
-            break;
-        }
     }
 
     return retval;
@@ -874,7 +819,7 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
  * @return  {object}    varbind object containing data
  *
  */
-function varbindEncode( pState, pData, _pDevId, _pStateId ) {
+function varbindEncode( pState, pData, pDevId, pStateId ) {
     adapter.log.debug('varbindEncode - encode varbind');
 
     const retval = {
@@ -889,16 +834,21 @@ function varbindEncode( pState, pData, _pDevId, _pStateId ) {
             switch (pState.format) {
                 case F_TEXT /* 0 */:
                 default:
-                    retval.value = pData.toString();
+                    retval.value = pData.toString() == 'true';
                     break;
                 case F_NUMERIC /* 1 */:
-                    retval.value = pData?true:false;
+                    retval.value = pData != 0;
                     break;
                 case F_BOOLEAN /* 2 */:
-                    retval.value = pData?true:false;
+                    retval.value = pData;
                     break;
                 case F_JSON /* 3 */:
-                    retval.value = JSON.stringify(pData.value);
+                    retval.value = null;
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode JSON data (target boolean) - ` + pData);
+                    break;
+                case F_AUTO /* 99 */:
+                    retval.value = null;
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode AUTO data (target boolean) - ` + pData);
                     break;
             }
             break;
@@ -915,21 +865,26 @@ function varbindEncode( pState, pData, _pDevId, _pStateId ) {
         case snmp.ObjectType.Unsigned32: {
             switch (pState.format) {
                 case F_TEXT /* 0 */:
-                default:
-                    retval.value = pData.toString();
-                    break;
-                case F_NUMERIC /* 1 */:
-                    retval.value = parseInt(pData.value.toString(), 10);
-                    if (isNaN(retval.val)) retval.qual=0x01; // general error
-                    break;
-                case F_BOOLEAN /* 2 */: {
-                    const valint = parseInt(pData.value.toString(), 10);
-                    retval.value = valint !== 0;
+                default: {
+                    const valint = parseInt(pData, 10);
+                    retval.value = valint;
                     if (isNaN (valint)) retval.qual=0x01; // general error
                     break;
                 }
+                case F_NUMERIC /* 1 */:
+                    retval.value = pData != 0;
+                    break;
+                case F_BOOLEAN /* 2 */: {
+                    retval.value = pData;
+                    break;
+                }
                 case F_JSON /* 3 */:
-                    retval.value = JSON.stringify(pData.value);
+                    retval.value = null;
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode JSON data (target numeric) - ` + pData);
+                    break;
+                case F_AUTO /* 99 */:
+                    retval.value = null;
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode AUTO data (target numeric) - ` + pData);
                     break;
             }
             break;
@@ -940,6 +895,7 @@ function varbindEncode( pState, pData, _pDevId, _pStateId ) {
         // and consuming (i.e. the varbinds passed to callback functions) Buffer objects.
         case snmp.ObjectType.Counter64:{
             // TODO
+            adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode data (target counter64) - ` + pData);
             break;
         }
 
@@ -958,7 +914,12 @@ function varbindEncode( pState, pData, _pDevId, _pStateId ) {
                     retval.value = pData.toString;
                     break;
                 case F_JSON /* 3 */:
-                    retval.value = JSON.stringify(pData.value);
+                    retval.value = null;
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode JSON data (target octetstring) - ` + pData);
+                    break;
+                case F_AUTO /* 99 */:
+                    retval.value = null;
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode AUTO data (target octetstring) - ` + pData);
                     break;
             }
             break;
@@ -966,24 +927,8 @@ function varbindEncode( pState, pData, _pDevId, _pStateId ) {
 
         // no dcumentation for type null available
         case snmp.ObjectType.Null: {
-            switch (pState.format) {
-                case F_TEXT /* 0 */:
-                default:
-                    retval.value = null;
-                    //adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type null to text ` + JSON.stringify(pVarbind));
-                    break;
-                case F_NUMERIC /* 1 */:
-                    retval.value = null;
-                    //adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type null to numeric ` + JSON.stringify(pVarbind));
-                    break;
-                case F_BOOLEAN /* 2 */:
-                    retval.value = null;
-                    //adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type null to boolean ` + JSON.stringify(pVarbind));
-                    break;
-                case F_JSON /* 3 */:
-                    //retval.value = JSON.stringify(pVarbind.value);
-                    break;
-            }
+            retval.value = null;
+            adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode data (target Null) - ` + pData);
             break;
         }
 
@@ -996,14 +941,19 @@ function varbindEncode( pState, pData, _pDevId, _pStateId ) {
                     break;
                 case F_NUMERIC /* 1 */:
                     retval.value = null;
-                    //adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type oid to numeric ` + JSON.stringify(pVarbind));
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode NUMERIC data (target OID) - ` + pData);
                     break;
                 case F_BOOLEAN /* 2 */:
                     retval.val = null;
-                    //adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type oid to boolean ` + JSON.stringify(pVarbind));
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode BOOLEAN data (target OID) - ` + pData);
                     break;
                 case F_JSON /* 3 */:
-                    retval.value = JSON.stringify(pData.value);
+                    retval.value = null;
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode JSON data (target OID) - ` + pData);
+                    break;
+                case F_AUTO /* 99 */:
+                    retval.value = null;
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode AUTO data (target OID) - ` + pData);
                     break;
             }
             break;
@@ -1018,14 +968,19 @@ function varbindEncode( pState, pData, _pDevId, _pStateId ) {
                     break;
                 case F_NUMERIC /* 1 */:
                     retval.value = null;
-                    //adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type ipaddress to numeric ` + JSON.stringify(pVarbind));
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode NUMERIC data (target IP) - ` + pData);
                     break;
                 case F_BOOLEAN /* 2 */:
                     retval.value = null;
-                    //adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type ipaddress to boolean ` + JSON.stringify(pVarbind));
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode BOOLEAN data (target IP) - ` + pData);
                     break;
                 case F_JSON /* 3 */:
-                    retval.value = JSON.stringify(pData.value);
+                    retval.value = null;
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode JSON data (target IP) - ` + pData);
+                    break;
+                case F_AUTO /* 99 */:
+                    retval.value = null;
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode AUTO data (target IP) - ` + pData);
                     break;
             }
             break;
@@ -1035,18 +990,17 @@ function varbindEncode( pState, pData, _pDevId, _pStateId ) {
         // OctetString this module will accept JavaScript strings, but will always give back Buffer objects.
         // NOTE: currently only a heuristic implementation for floating point number is implemented for formats other than json.
         case snmp.ObjectType.Opaque:{
+            retval.value = null;
+            adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode data (target opaque)` + pData);
             break;
         }
 
         case snmp.ObjectType.NoSuchObject:
         case snmp.ObjectType.NoSuchInstance:
-        case snmp.ObjectType.EndOfMibView: {
+        case snmp.ObjectType.EndOfMibView:
+        default: {
             retval.value = null;
-            break;
-        }
-
-        default:{
-            retval.value = null;
+            adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode data (target default)` + pData);
             break;
         }
     }
@@ -1251,6 +1205,8 @@ async function snmpCloseSession(pSessCtx ) {
 }
 
 /**
+
+/**
  * onReaderSessionClose - callback called whenever a reader session is closed
  *
  * @param {object}      pCTX    CTX object
@@ -1332,6 +1288,8 @@ async function createReaderSession(pCTX) {
     pCTX.sessCtx = await snmpCreateSession(pCTX);
 
     if (pCTX.sessCtx && pCTX.sessCtx.session) {
+        // ok: session created
+
         pCTX.sessCtx.session.on('close', () => { onReaderSessionClose(pCTX); });
         pCTX.sessCtx.session.on('error', (err) => { onReaderSessionError(pCTX, err); });
 
@@ -1340,19 +1298,31 @@ async function createReaderSession(pCTX) {
 
         // start recurrent reading
         pCTX.pollTimer = adapter.setInterval(readOids, pCTX.pollIntvl, pCTX);
+
+        adapter.log.debug('session for device "' + pCTX.name + '" (' + pCTX.ipAddr + ') created');
+
+    } else {
+        // error: retry again
+
+        adapter.log.debug('session for device "' + pCTX.name + '" (' + pCTX.ipAddr + ') NOT created, will retry');
+
+        pCTX.retryTimer = adapter.setTimeout((pCTX) => {
+            pCTX.retryTimer = null;
+            createReaderSession(pCTX);
+        }, pCTX.retryIntvl, pCTX);
+
     }
-
-    // TODO: if no session could be created some retry should be implemented
-
-    adapter.log.debug('session for device "' + pCTX.name + '" (' + pCTX.ipAddr + ')' + ((pCTX.sessCtx && pCTX.sessCtx.session) ? '' : ' NOT') + ' created');
 
 }
 
 /**
- * setStates - set states related to one oid
+ * setStates - set all states related to one oid
  *
- * @param {pVarbind} snmp varbind object
- * @return string
+ * @param   {string}    pVarbind    (base) state id
+ * @param   {object}    pOptions    options object as definded by adapter.setState
+ * @param   {object}    pValues     (optional) values object containing values for base, type and json states
+ *
+ * @return  nothing
  *
  */
 async function setStates (pStateId, pOptions, pValues ) {
@@ -1371,6 +1341,33 @@ async function setStates (pStateId, pOptions, pValues ) {
         if (pValues) state.val = pValues.json;
         await adapter.setStateAsync(pStateId+'-raw', state);
     }
+}
+
+/**
+ * setOnlineState - set online state for a device
+ *
+ * @param {object}      pCTX        device context object
+ * @param {boolean}     pOnline     true if device is online, false otherwise
+ * @param {string}      pMsg        (optional) text to add to info message
+ * @param {string}      pErr        (optional) text to use for error message
+ *                                  error message logged only if pErr != null
+ * @return nothiung
+ */
+async function setOnlineState (pCTX, pOnline, pMsg, pErr){
+
+    await adapter.setStateAsync(pCTX.id + '.online', {val: pOnline, ack: true, q:0x00});
+
+    if (pCTX.initialized && (pCTX.online == pOnline) ) return;
+
+    if (pErr) adapter.log.error(`[${pCTX.id}] ${pErr}`);
+
+    let msg = pOnline ? 'connected' : 'disconnected';
+    if (pMsg) msg = `${msg} - ${pMsg}`;
+    adapter.log.info(`[${pCTX.id}] device ${msg}`);
+
+    pCTX.initialized = true;
+    pCTX.online = pOnline;
+    setImmediate(handleConnectionInfo);
 }
 
 /**
@@ -1435,26 +1432,6 @@ async function processVarbind(pCTX, pStateId, pFormat, pWriteable, pVarbind) {
         };
     }
     return;
-}
-
-/**
- *
- */
-async function setOnlineState (pCTX, pOnline, pMsg, pErr){
-
-    await adapter.setStateAsync(pCTX.id + '.online', {val: pOnline, ack: true, q:0x00});
-
-    if (pCTX.initialized && (pCTX.online == pOnline) ) return;
-
-    if (pErr) adapter.log.error(`[${pCTX.id}] ${pErr}`);
-
-    let msg = pOnline ? 'connected' : 'disconnected';
-    if (pMsg) msg = `${msg} - ${pMsg}`;
-    adapter.log.info(`[${pCTX.id}] device ${msg}`);
-
-    pCTX.initialized = true;
-    pCTX.online = pOnline;
-    setImmediate(handleConnectionInfo);
 }
 
 /**
@@ -2064,6 +2041,9 @@ async function onReady() {
     await initAllObjects();
 
     adapter.log.debug('initialization completed');
+
+    // cleanup states
+    await cleanupStates();
 
     // start one reader thread per device
     adapter.log.debug('starting reader threads');
