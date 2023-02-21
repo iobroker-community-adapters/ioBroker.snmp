@@ -20,7 +20,7 @@ This adapter can be used to poll information from devices like printers, network
 <!--
 ## __WORK IN PROGRESS__
 -->
-### __WORK IN PROGRESS__
+### 2.4.0 (2023-02-21)
 * (McM1957) Support to write data to oids has been implemented. (#150)
 * (McM1957) Major parts of code have been rewritten so support oid writing.
 * (McM1957) States containing type information can be disabled now. (#218)

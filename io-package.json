@@ -1,304 +1,304 @@
 {
-    "common": {
-        "name": "snmp",
-        "version": "2.3.0",
-        "news": {
-            "2.3.0": {
-                "en": "Add support for using native datatypes for states. (#143)\nSupport has been added to store binary oid data as json. (#188)\nIncorrect setting of write mode has been fixed. (#191)\nTables within german documentation have been fixed. (#192)\nNaming an oid with the reserved name 'online' has been blocked. (#203)\nSome changes related to code quality have been implemnted. (#201, #190)",
-                "de": "Unterstützung für die Verwendung von nativen Datentypen für States. #(143)\nUnterstützung wurde hinzugefügt, um binäre oid Daten als json zu speichern. #(188)\nFalsche Einstellungen des Schreibmodus wurde behoben. #(191)\nTabellen innerhalb der deutschen Dokumentation wurden korrigiert. #(192)\nDie Benennung von oids mit dem reservierten Namen online wurde blockiert. (203)\nEinige Änderungen in Bezug auf die Codequalität wurden umgesetzt. #(201, #190)",
-                "ru": "Добавьте поддержку для использования нативных типов данных для государств. #(143)\nПоддержка была добавлена для хранения бинарных oid данных в качестве json. #(188)\nИсправлена некорректная настройка режима записи. #(191)\nИсправлены таблицы в немецкой документации. #(192)\nНазвание недействительного с зарезервированным именем онлайн было заблокировано. #(203)\nНекоторые изменения, связанные с качеством кода, были нарушены. #(201, #190)",
-                "pt": "Adicione suporte para usar tipos de dados nativos para estados. #(143)\nO suporte foi adicionado para armazenar dados binários como json. #(188)\nA configuração incorreta do modo de gravação foi corrigida. #(191)\nForam fixadas tabelas na documentação alemã. #(192)\nNomear um oid com o nome reservado on-line foi bloqueado. 20\nAlgumas mudanças relacionadas à qualidade do código foram impelidas. #(201, #190)",
-                "nl": "Steun voor het gebruik van inheemse datatypes voor staten. ♪ (143)\nSupport is toegevoegd aan binaire oid data als Json. ♪ (188)\nDe onjuiste instelling van schrijven is opgelost. ♪ (191)\nTafels binnen Duitse documenten zijn gerepareerd. ♪ (192)\nEen leegte noemen met de gereserveerde naam online is geblokkeerd. ♪ (203)\nSommige veranderingen zijn gerelateerd aan code kwaliteit",
-                "fr": "Ajouter le support pour l'utilisation de types de données indigènes pour les états. #(143)\nLe support a été ajouté pour stocker les données oid binaires comme json. #(188)\nLe réglage incorrect du mode d'écriture a été corrigé. #(191)\nLes tableaux dans la documentation allemande ont été corrigés. #(192)\nLa désignation d'un oid avec le nom réservé en ligne a été bloquée. #(203)\nCertains changements liés à la qualité du code ont été implémentés. #(201, #190)",
-                "it": "Aggiungi supporto per l'utilizzo di tipi di dati nativi per gli stati. #(143)\nIl supporto è stato aggiunto per memorizzare i dati binari oid come json. #(188)\nL'impostazione sbagliata della modalità di scrittura è stata fissata. #(191)\nSono state fissate tabelle all'interno della documentazione tedesca. # (192)\nChiamare un oid con il nome riservato online è stato bloccato. #(203)\nAlcuni cambiamenti relativi alla qualità del codice sono stati implemnted. #(201, #190)",
-                "es": "Añadir soporte para el uso de datatypes nativos para los estados. #(143)\nSe ha añadido soporte para almacenar datos binarios oid como json. #(188)\nSe ha fijado el ajuste incorrecto del modo de escritura. #(191)\nSe han fijado tablas dentro de la documentación alemana. #(192)\nNombrar un oid con el nombre reservado en línea ha sido bloqueado. #(203)\nAlgunos cambios relacionados con la calidad del código han sido implemnted. #(201, #190)",
-                "pl": "Wsparcie dla danych dla państw członkowskich. #(143)\nWsparcie zostało dodane do przechowywania danych podwójnych jako json. (1)88)\nNieprawidłowe ustawienie trybu tekstowego zostało ustalone. #(191)\nZastosowano tablice w dokumentacji niemieckiej. 192)\nNamianie oid z zarezerwowaną nazwą online zostało zablokowane. (203)\nNiektóre zmiany związane z jakością kodu zostały zweryfikowane jako #(201, #190)",
-                "uk": "Додати підтримку для використання рідних типів даних для штатів. #(143)\nПідтримка було додано для зберігання бінарних oid даних як json. #(188)\nВиправлено неправильне налаштування режиму запису. #(191)\nЗафіксовано таблиці в межах німецької документації. #(192)\nЗаблоковано нумерацію з замкненим іменем. #(203)\nДеякі зміни, пов’язані з якістю коду, були пропущені. #(201, #190)",
-                "zh-cn": "增加对使用本国数据型国家的支持。 行动(143)\n此外,还支持将不可替代数据作为 json。 行动(188)\n文件的编排不正确。 行动(191)\n各种文件内的表格已经确定。 行动(192)\n网上保留名称的名称被阻止。 行动(203)\n与守则质量有关的一些变化被推断。"
-            },
-            "2.2.1": {
-                "en": "Fixed an error within io-package.json.",
-                "de": "Es wurde ein Fehler innerhalb von io-Package behoben. Json.",
-                "ru": "Исправлена ошибка в io-package. Джсон.",
-                "pt": "Corrigido um erro no io-package. O que foi.",
-                "nl": "Ik heb een fout gemaakt in io-package. Json.",
-                "fr": "Correction d'une erreur dans io-package. json.",
-                "it": "Risolto un errore all'interno del pacchetto io. J.",
-                "es": "Arregló un error dentro de io-paquete. json.",
-                "pl": "Okazało się, że błąd wewnątrz io-package. json.",
-                "uk": "Виправлено помилку в io-package. свінгери.",
-                "zh-cn": "在碘剂内有错误。 json."
-            },
-            "2.2.0": {
-                "en": "The compatibility flag is now deprecated and will be removed in future releases. Please adapt config if required.\nSNMP V3 support has been added (#71)\nSupport for IPv6 has been added (#138)\nCode has been cleaned as suggested by eslint \nBase modules have been upgraded to current versions\nDocumentation has been updates (en, de, ru)",
-                "de": "Das Kompatibilitäts-Flag wird nunmehr abgekündigtund in zukünftigen Versionen entfernt. Bitte passen Sie die Konfiguration bei Bedarf an.\nSNMP V3 Unterstützung wurde hinzugefügt (#71)\nUnterstützung für IPv6 wurde hinzugefügt (#138)\nCode wurde wie von eslint vorgeschlagen bereinigt\nBasismodule wurden auf aktuelle Versionen aktualisiert\nDie Dokumentation wurde aktualisiert (de, de, ru)",
-                "ru": "Флаг совместимости теперь устарел и будет удален в будущих выпусках. Пожалуйста, при необходимости адаптируйте конфиг.\nДобавлена поддержка SNMP V3 (#71)\nДобавлена поддержка IPv6 (#138)\nКод был очищен как предложил eslint\nБазовые модули были обновлены до текущих версий\nDocumentaion был обновлен (ru, de, ru)",
-                "pt": "A bandeira de compatibilidade é agora desprezada e será removida em versões futuras. Por favor, adapte a configuração se necessário.\nSuporte SNMP V3 foi adicionado (#71)\nSuporte para IPv6 foi adicionado (#138)\nCódigo foi limpo como sugerido por eslint\nMódulos base foram atualizados para as versões atuais\nDocumentação tem sido atualizações (en, de, ru)",
-                "nl": "De compatibiliteits vlag is nu gedegradeerd en zal worden verwijderd in toekomstige vrijlating. Gelieve zich aan te passen als het nodig is.\nSNMP V3 steun is toegevoegd\nIPV6 is toegevoegd\nCode is gereinigd zoals voorgesteld door eslint\nBasismodules zijn geüpgradeerd tot huidige versies\nDocumentaion is bijgepraat",
-                "fr": "Le drapeau de compatibilité est maintenant déprécié et sera retiré dans les versions futures. Veuillez adapter la configuration si nécessaire.\nLe support SNMP V3 a été ajouté (#71)\nLe support pour IPv6 a été ajouté (#138)\nLe code a été nettoyé comme le suggère Eslint\nLes modules de base ont été mis à niveau aux versions actuelles\nDocumentaion a été mise à jour (en, de, ru)",
-                "it": "La bandierina di compatibilità è ora deprecata e verrà rimossa nelle versioni future. Si prega di adattare config se necessario.\nIl supporto SNMP V3 è stato aggiunto (#71)\nÈ stato aggiunto il supporto per IPv6 (#138)\nIl codice è stato pulito come suggerito da eslint\nI moduli di base sono stati aggiornati alle versioni attuali\nDocumentaion è stato aggiornato (it, de, ru)",
-                "es": "La bandera de compatibilidad está ahora deprecatada y será eliminada en futuras versiones. Por favor, adapte el config si es necesario.\nSe ha añadido soporte SNMP V3 (#71)\nSe ha añadido soporte para IPv6 (#138)\nEl código se ha limpiado según lo sugerido por eslint\nLos módulos de base se han actualizado a las versiones actuales\nDocumentaion has been updates (en, de, ru)",
-                "pl": "Flaga kompatybilności jest obecnie odrzucana i zostanie usunięta w przyszłych wydaniach. Dostosowuje się do konfigu.\nWsparcie SNMP V3 zostało dodane (#71)\nDodano wsparcie dla IPv6 (#138)\nKod został oczyszczony przez eslinta\nModuł bazy został zmodernizowany do obecnych wersji\nDokumentacja jest aktualizowana (de, ru)",
-                "uk": "Відхилено прапор сумісності і буде видалено в майбутньому релізах. Будь ласка, перевірте налаштування.\nДодано підтримку SNMP V3 (#71)\nДодано підтримку IPv6 (#138)\nКод був очищений, як пропонується eslint\nБазові модулі модернізовані до поточних версій\nДокументація було оновлено (en, de, ru)",
-                "zh-cn": "兼容的旗帜现在被取消,今后将被取消。 请在必要时作修改。.\nSNMP V3 支持(第71号)\n增加了对IPv6的支助(第138号)。\n正如林特建议的那样,守则已经清理。\n基地单元已升级到现有版本。\n文件的更新(en, de,ru)"
-            },
-            "2.1.10": {
-                "en": "Validation of OID and device names has been enhanced, crash was reported by sentry (#169)",
-                "de": "Die Validierung von OID- und Gerätenamen wurde verbessert, der Crash wurde von Sentry gemeldet (#169)",
-                "ru": "Действие OID и названия устройств было улучшено, авария была сообщена отправкой (#169)",
-                "pt": "Validação de OID e nomes de dispositivos foram aprimorados, acidente foi relatado por remetente (#169)",
-                "nl": "Validatie van OID en apparatuur is verbeterd, crash is gemeld door sentiment (169)",
-                "fr": "La validation des noms d'ID et de périphériques a été améliorée, l'écrasement a été signalé par la sentinelle (#169)",
-                "it": "La convalida dei nomi OID e dei dispositivi è stata migliorata, l'incidente è stato segnalato dalla sentinella (#169)",
-                "es": "Se ha mejorado la validación de OID y los nombres de los dispositivos, el bloqueo fue reportado por centry (#169)",
-                "pl": "Obserwacje OID i nazwy urządzenie zostały poprawione przez przesyłkę (#169)",
-                "zh-cn": "已经加强了OID和装置名称的撤销,发送的事故报告(第169号)",
-                "uk": "Покращено перевірку OID і назв пристроїв, вартовий повідомив про збій (#169)"
-            },
-            "2.1.9": {
-                "en": "Support for (IPv4) domainnames has been readded (#165)\nDevices without any active oid do no longer cause an fatal error but only log a warning (#155)\nTimervalues are now validated more strictly (#156, #164)\nSome crashes reported by sentry have been fixed (#167)\nexternal packages have been updated by dependabot",
-                "de": "Unterstützung für (IPv4) Domainnamen wurde wieder hinzugefügt (#165)\nGeräte ohne aktive OIDs verursachen keinen fatalen Fehler mehr, sondern protokollieren nur eine Warnung (#155)\nTimervalues werden nun strenger validiert (#156, #164)\nEinige Abstürze, die von Sentry gemeldet wurden, wurden behoben (#167)\nexterne Pakete wurden aktualisiert",
-                "ru": "Добавлена поддержка (IPv4) доменных имен (#165)\nУстройства без какого-либо активного не допуска больше не вызывают смертельной ошибки, но только регистрируют предупреждение (#155)\nTimervalues теперь действует более строго (#156, #164)\nНекоторые сбои, сообщаемые судоходством, были зафиксированы (#167)\nвнешние пакеты были обновлены в зависимости от",
-                "pt": "Suporte para (IPv4) nomes de domínio foi adicionado (#165)\nDispositivos sem qualquer oide ativo não causam mais um erro fatal, mas apenas registram um aviso (#155)\nValores de tempo são agora validados mais estritamente (#156, #164)\nAlgumas falhas relatadas por sentinela foram corrigidas (#167)\npacotes externos foram atualizados por dependeabot",
-                "nl": "Vertaling:\nVerdedigingen zonder actieve leegte veroorzaken geen fatale fouten meer, maar alleen een waarschuwing inloggen\nTimervalues zijn nu meer strikt (156, #164)\nSommige crashes gemeld door sentimenten zijn gerepareerd\nvertaling:",
-                "fr": "Support pour (IPv4) noms de domaine a été lue (#165)\nLes appareils sans oid actif ne provoquent plus une erreur fatale mais ne enregistrent qu'un avertissement (#155)\nLes valeurs temporelles sont maintenant validées plus strictement (#156, #164)\nCertains accidents signalés par la sentinelle ont été corrigés (#167)\ndes paquets externes ont été mis à jour par dependabot",
-                "it": "Supporto per (IPv4) nomi di dominio è stato letto (#165)\nI dispositivi senza oid attivo non causano più un errore fatale ma registrano solo un avviso (#155)\nI valori temporali sono ora convalidati più rigorosamente (#156, #164)\nAlcuni crash segnalati dalla sentinella sono stati fissati (#167)\npacchetti esterni sono stati aggiornati da dipendeabot",
-                "es": "Se ha leído el soporte para (IPv4) nombres de dominio (#165)\nLos dispositivos sin oid activo ya no causan un error mortal, pero solo registran una advertencia (#155)\nLos valores temporales se validan más estrictamente (#156, #164)\nAlgunos accidentes reportados por centinela han sido fijos (#167)\npaquetes externos han sido actualizados por dependabot",
-                "pl": "Wsparcie (IPv4) zostało odczytane (#165)\nUrządzenia bez żadnej aktywnej oidy nie powodują już błędu, ale tylko ocenił ostrzeżenie (#155)\nWartość Timeru jest teraz prawidłowa (#156, #164)\nCzęść z nich została ustalona (#167)\npakiety zewnętrzne zostały zaktualizowane w zależności od bota",
-                "zh-cn": "对(IPv4)域名的支助(第165号)\n无任何积极无效的人不再造成致命错误,只是警告(第155号)\n时间价值现在更严格(第156号,第164号)\n一些发货人的事故已经确定(第167号)\n外部包件经过依赖性更新。",
-                "uk": "Прочитано підтримку доменних імен (IPv4) (#165)\nПристрої без жодного активного oid більше не викликають фатальну помилку, а лише реєструють попередження (#155)\nЗначення таймера тепер перевіряються суворіше (#156, #164)\nДеякі збої, про які повідомляє sentry, виправлено (#167)\nзовнішні пакунки були оновлені dependabot"
-            },
-            "2.1.8": {
-                "en": "HOTFIX: Parameter \"community\" has not been migrated when updating to version v2.x.x from previous releases. (#163)",
-                "de": "HOTFIX: Der Parameter \"community\" wurde bei der Aktualisierung der Version v2.x.x aus früheren Versionen nicht migriert. (#163)",
-                "ru": "HOTFIX: Параметр сообщество не было мигрировано при обновлении версии v2.x.x из предыдущих релизов. (#163)",
-                "pt": "HOTFIX: A comunidade de parâmetros não foi migrada ao atualizar para a versão v2.x.x de versões anteriores. (#163)",
-                "nl": "De parametergemeenschap is niet gemigreerd als je aan het opvoeden bent naar versie V2.x van eerdere vrijlating. (163)",
-                "fr": "HOTFIX : La communauté de paramètres n'a pas été migrée lors de la mise à jour de la version v2.x.x des versions précédentes. (#163)",
-                "it": "HOTFIX: La comunità dei parametri non è stata migrata durante l'aggiornamento alla versione v2.x.x.x dalle versioni precedenti. (#163)",
-                "es": "HOTFIX: La comunidad del parámetro no ha sido migrada al actualizar a versión v2.x.x de versiones anteriores. (#163)",
-                "pl": "HOTFIX: Parameter community nie zostało migrowane, gdy dodano do wersji v2.x.x. (2)",
-                "zh-cn": "HOTFIX:在从以前的释放中更新到第2.x.x号时,没有移居第二线社区。 (第163号)",
-                "uk": "ВИПРАВЛЕННЯ: параметр «community» не було перенесено під час оновлення до версії v2.x.x із попередніх випусків. (#163)"
-            },
-            "2.1.7": {
-                "en": "Documentation within README.md has been updated (#133)",
-                "de": "Die Dokumentation innerhalb von README.md wurde aktualisiert (#133)",
-                "ru": "Документация в README.md была обновлена (#133)",
-                "pt": "A documentação no README.md foi atualizada (#133)",
-                "nl": "Documentatie binnen de lijkschouwing is geüpload",
-                "fr": "La documentation de README.md a été mise à jour (#133)",
-                "it": "La documentazione all'interno di README.md è stata aggiornata (#133)",
-                "es": "Se ha actualizado la documentación dentro de README.md (#133)",
-                "pl": "Dokumentacja w README.md jest aktualizowana (#133)",
-                "zh-cn": "中小企业内部的文件已经更新(第133号)。",
-                "uk": "Документацію в README.md оновлено (#133)"
-            }
-        },
-        "title": "SNMP",
-        "titleLang": {
-            "en": "SNMP",
-            "de": "SNMP",
-            "ru": "SNMP",
-            "pt": "SNMP",
-            "nl": "SNMP",
-            "fr": "SNMP",
-            "it": "SNMP",
-            "es": "SNMP",
-            "pl": "SNMP",
-            "zh-cn": "SNMP",
-            "uk": "SNMP"
-        },
-        "desc": {
-            "en": "Allows to poll SNMP OIDs in ioBroker",
-            "de": "Ermöglicht das Polling von SNMP Objekten im ioBroker",
-            "ru": "Позволяет считывать SNPM объекты по OID в ioBroker",
-            "pt": "ioBroker SNMP-OID Adapter",
-            "fr": "ioBroker SNMP-OID Adapter",
-            "nl": "ioBroker SNMP-OID Adapter",
-            "it": "Consente di eseguire il polling degli OID SNMP in ioBroker",
-            "es": "Permite sondear los OID de SNMP en ioBroker",
-            "pl": "Umożliwia odpytywanie identyfikatorów SNMP OID w ioBroker",
-            "zh-cn": "允许在 ioBroker 中轮询 SNMP OID",
-            "uk": "Дозволяє опитувати SNMP OID в ioBroker"
-        },
-        "license": "MIT",
-        "platform": "Javascript/Node.js",
-        "icon": "snmp.png",
-        "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.snmp/master/admin/snmp.png",
-        "keywords": [
-            "SNMP-OID"
-        ],
-        "readme": "https://github.com/mcm1957/ioBroker.snmp/blob/master/README.md",
-        "loglevel": "info",
-        "mode": "daemon",
-        "type": "infrastructure",
-        "connectionType": "local",
-        "dataSource": "poll",
-        "compact": true,
-        "authors": [
-            {
-                "name": "Marcolotti",
-                "email": "info@ct-j.de"
-            },
-            {
-                "name": "mcm1957",
-                "email": "mcm57@gmx.at"
-            }
-        ],
-        "adminUI": {
-            "config": "json"
-        },
-        "stopBeforeUpdate": "true",
-        "plugins": {
-            "sentry": {
-                "dsn": "https://621ac710b70445f8b170cbb783045988@sentry.iobroker.net/181"
-            }
-        },
-        "globalDependencies": [
-            {
-                "admin": ">=5.1.28"
-            }
-        ],
-        "dependencies": [
-            {
-                "js-controller": ">=3.3.22"
-            }
-        ],
-        "messages": [
-            {
-                "condition": {
-                    "operand": "and",
-                    "rules": [
-                        "oldVersion<2.0.0",
-                        "newVersion>=2.0.0"
-                    ]
-                },
-                "title": {
-                    "en": "Important notice!",
-                    "de": "Wichtiger Hinweis!",
-                    "ru": "Важное замечание!",
-                    "pt": "Notícia importante!",
-                    "nl": "Belangrijke mededeling!",
-                    "fr": "Avis important!",
-                    "it": "Avviso IMPORTANTE!",
-                    "es": "Noticia importante!",
-                    "pl": "Ważna uwaga!",
-                    "zh-cn": "重要通知!",
-                    "uk": "Важливе повідомлення!"
-                },
-                "text": {
-                    "en": "Configuration data has been changed for version 2.0.0 (and newer). Installation will try to migrate data but there is a chance that this fails. Please ensure that you have a backup and a external documention of your configuration before upgrading to version 2.0.0 or newer.",
-                    "de": "Konfigurationsdaten wurden für Version 2.0.0 (und neuer) geändert. Die Installation wird versuchen, Daten zu migrieren, aber es gibt eine Chance, dass dies versagt. Bitte stellen Sie sicher, dass Sie ein Backup und eine externe Dokumentation Ihrer Konfiguration vor dem Upgrade auf Version 2.0.0 oder neuer haben.",
-                    "ru": "Данные конфигурации были изменены для версии 2.0.0 (и новее). Установка будет пытаться перенести данные, но есть шанс, что это не работает. Пожалуйста, убедитесь, что у вас есть резервное копирование и внешний документирование вашей конфигурации перед обновлением до версии 2.0.0 или новее.",
-                    "pt": "Os dados de configuração foram alterados para a versão 2.0.0 (e mais recente). A instalação tentará migrar dados, mas há uma chance de que isso falha. Certifique-se de ter um backup e uma documentação externa de sua configuração antes de atualizar para a versão 2.0.0 ou mais recente.",
-                    "nl": "Vermoedende data is veranderd voor versie 2.0. Installatie zal proberen data te verminderen maar er is een kans dat dit mislukt. Zorg ervoor dat je een back-up hebt en een externe documentie van je zelfvertrouwen voordat je verstoort naar versie 2.0 of nieuwer.",
-                    "fr": "Les données de configuration ont été modifiées pour la version 2.0.0 (et plus récente). L'installation tentera de migrer les données, mais il y a une chance que cela échoue. Assurez-vous d'avoir une sauvegarde et une documentation externe de votre configuration avant de passer à la version 2.0.0 ou plus récente.",
-                    "it": "I dati di configurazione sono stati modificati per la versione 2.0.0 (e più recente). L'installazione cercherà di migrare i dati, ma c'è la possibilità che questo fallisca. Si prega di assicurarsi di avere un backup e un documento esterno della configurazione prima di aggiornare alla versione 2.0.0 o più recente.",
-                    "es": "Los datos de configuración se han modificado para la versión 2.0.0 (y más reciente). La instalación intentará migrar datos pero hay una posibilidad de que esto falle. Por favor, asegúrese de tener una copia de seguridad y una documentación externa de su configuración antes de actualizar a la versión 2.0.0 o más reciente.",
-                    "pl": "Dane konfiguracyjne zostały zmienione na wersję 2.0.0 (i nowszą). Instalacja stara się wyemitować dane, ale istnieje szansa, że to się nie udaje. Zapewniajcie, że mamy backup i zewnętrzną dokumentację twojej wersji 2.0.0 lub nowszego.",
-                    "zh-cn": "对2.0.0版本(和新版)的合并数据进行了修改。 绝大部分将试图迁移数据,但有失败的机会。 请确保在更新至2.0.0或新版之前,对你的配置进行反馈和外部记录。.",
-                    "uk": "Дані конфігурації змінено для версії 2.0.0 (і новішої). Інсталяція спробує перенести дані, але існує ймовірність, що це не вдасться. Переконайтеся, що у вас є резервна копія та зовнішня документація вашої конфігурації перед оновленням до версії 2.0.0 або новішої."
-                },
-                "link": "https://github.com/iobroker-community-adapters/ioBroker.snmp#changelog",
-                "level": "warn",
-                "linkText": {
-                    "en": "Changelog",
-                    "de": "Änderungsprotokoll",
-                    "ru": "Список изменений",
-                    "pt": "Registro de alterações",
-                    "nl": "Wijzigingslog",
-                    "fr": "Journal des modifications",
-                    "it": "Registro delle modifiche",
-                    "es": "registro de cambios",
-                    "pl": "Dziennik zmian",
-                    "zh-cn": "变更日志",
-                    "uk": "Журнал змін"
-                },
-                "buttons": [
-                    "agree",
-                    "cancel"
-                ]
-            },
-            {
-                "condition": {
-                    "operand": "and",
-                    "rules": [
-                        "oldVersion<1.0.0",
-                        "newVersion>=1.0.0"
-                    ]
-                },
-                "title": {
-                    "en": "Important notice!",
-                    "de": "Wichtiger Hinweis!",
-                    "ru": "Важное замечание!",
-                    "pt": "Notícia importante!",
-                    "nl": "Belangrijke mededeling!",
-                    "fr": "Avis important!",
-                    "it": "Avviso IMPORTANTE!",
-                    "es": "Noticia importante!",
-                    "pl": "Ważna uwaga!",
-                    "zh-cn": "重要通知!",
-                    "uk": "Важливе повідомлення!"
-                },
-                "text": {
-                    "en": "Version 1.0.0 will change the names of objects containing special characters like \\\".\\\", \\\"-\\\" or spaces! Please delete the old objects manually if needed.",
-                    "de": "Version 1.0.0 ändert die Namen von Objekten, die spezielle Zeichen wie \\\"\\\", \\\"-\\\" oder Leerzeichen enthalten! Bitte löschen Sie die alten Objekte bei Bedarf manuell.",
-                    "ru": "Версия 1.0.0 изменит имена объектов, содержащих специальные символы, такие как \\\".\\\", \\\"-\\\" или пространства! Пожалуйста, удалите старые объекты вручную, если это необходимо.",
-                    "pt": "A versão 1.0.0 mudará os nomes de objetos contendo caracteres especiais como \\\".\\\", \\\"-\\\" ou espaços! Por favor, exclua os objetos antigos manualmente, se necessário.",
-                    "nl": "Version 1.0.0 zal de namen veranderen van objecten met speciale personages zoals . Verwijder de oude objecten handmatig als het nodig is.",
-                    "fr": "La version 1.0.0 va changer les noms des objets contenant des caractères spéciaux comme \\\".\\\", \\\"-\\\" ou des espaces! Veuillez supprimer les anciens objets manuellement si nécessaire.",
-                    "it": "La versione 1.0.0 cambierà i nomi di oggetti contenenti caratteri speciali come \\\", \\\"-\\\" o spazi! Si prega di eliminare i vecchi oggetti manualmente se necessario.",
-                    "es": "Versión 1.0.0 cambiará los nombres de objetos que contienen caracteres especiales como \\\".\\\", \\\"-\\\" o espacios! Por favor, borre los viejos objetos manualmente si es necesario.",
-                    "pl": "Wersja 1.0.0 zmienia nazwę obiektów o specjalnych postaciach, takich jak: \\, \\ lub przestrzeni! Okazuje się, że stare obiekty ręcznie będą potrzebne.",
-                    "zh-cn": "Version1.0.0将改变含有特殊特性的物体的名称,如乙型号、乙型号或空间。 请在必要时删除旧物体。.",
-                    "uk": "Версія 1.0.0 змінить назви об'єктів, які містять спеціальні символи, такі як \\\".\\\", \\\"-\\\" або пробіли! За потреби видаліть старі об’єкти вручну."
-                },
-                "link": "https://github.com/iobroker-community-adapters/ioBroker.snmp#changelog",
-                "level": "warn",
-                "linkText": {
-                    "en": "Changelog",
-                    "de": "Änderungsprotokoll",
-                    "ru": "Список изменений",
-                    "pt": "Registro de alterações",
-                    "nl": "Wijzigingslog",
-                    "fr": "Journal des modifications",
-                    "it": "Registro delle modifiche",
-                    "es": "registro de cambios",
-                    "pl": "Dziennik zmian",
-                    "zh-cn": "变更日志",
-                    "uk": "Журнал змін"
-                },
-                "buttons": [
-                    "agree",
-                    "cancel"
-                ]
-            }
-        ]
+  "common": {
+    "name": "snmp",
+    "version": "2.4.0",
+    "news": {
+      "2.4.0": {
+        "en": "Support to write data to oids has been implemented. (#150)\nMajor parts of code have been rewritten so support oid writing.\nStates containing type information can be disabled now. (#218)\nStates indicating online and error status of devices have been added. State 'online' has been moved to folder info.\nDevicestatus is now displayed at object view using colour and icons.\nData type 'automatic' has been added to oid states datatype selector.\nA problem reported by sentry has been fixed. (#224)\nAn incorrect setting of ack flags has been corrected. (#225)\nSupport for sha224, sha256, sha384 and sha512 message authentication has been added (#210)",
+        "de": "Unterstützung zum Schreiben von Daten an OIDs wurde implementiert. (#150)\nGrößere Teile des Codes wurden neu geschrieben um die Unterstützung des Schreiben von OIDs umzusetzen.\nZustände mit Typinformationen können jetzt deaktiviert werden (#218)\nZustände, die den Online- und Fehlerstatus von Geräten anzeigen, wurden hinzugefügt. Der Zustand 'online' wurde in den Ordner 'info' verschoben.\nDer Devicestatus wird nun in der Objektansicht farbig und mit Symbolen angezeigt.\nDer Datentyp 'automatisch' wurde zur OID Zustands-Datatypauswahl hinzugefügt.\nEs wurde ein Problem behoben, das von sentry gemeldet wurde. (#224)\nEine falsche Erstellung von ack-Flags wurde korrigiert. (#225)\nUnterstützung für die Nachrichten-Authentifizierung mittels sha224, sha256, sha384 und sha512 wurde hinzugefügt (#210)",
+        "ru": "Реализована поддержка написания данных для избежаний. (#150)\nОсновные части кода были переписаны, поэтому поддержка не писать.\nГосударства, содержащие информацию типа, могут быть отключены сейчас. (#218)\nДобавлены государства с указанием онлайн и статуса ошибок устройств. Государство онлайн было перенесено в папку info.\nDevicestatus теперь отображается на вид объекта с использованием цветов и иконок.\nТип данных автоматический был добавлен в избегать состояния селектора данных.\nПроблема, сообщенная судоходством, была исправлена. (#224)\nИсправлена некорректная настройка флагов ack. (#225)\nДобавлена поддержка sha224, sha256, sha384 и sha512 сообщения аутентификации (#210)",
+        "pt": "O suporte para escrever dados para oids foi implementado. (#150)\nPartes principais do código foram reescritas para apoiar a escrita oid.\nEstados que contêm informações do tipo podem ser desativados agora. (#218)\nEstados que indicam o estado on-line e erro dos dispositivos foram adicionados. Estado on-line foi movido para informações da pasta.\nO Devicestatus agora é exibido na visualização de objetos usando cores e ícones.\nO tipo de dados automático foi adicionado ao seletor do tipo de dados dos estados oides.\nUm problema relatado por sentinela foi corrigido. (#224)\nUma configuração incorreta de bandeiras de ack foi corrigida. (#225)\nSuporte para a autenticação de mensagem sha224, sha256, sha384 e sha512 foi adicionado (#210)",
+        "nl": "Om gegevens te schrijven aan leegtes is geïmplementeerd\nGrote delen van de code zijn herschreven, dus ondersteuning oid schrift.\nDe staat met bevatten van type informatie kan nu gehandicapt worden\nDe Verenigde Staten wijzen online en foute status van apparaten toegevoegd. Staats online is verplaatst naar map informatie.\nDevicestatus wordt nu tentoongesteld op objecten met kleur en iconen.\nData type automatisch is toegevoegd aan de datatype selector.\nEen probleem gemeld door sentiment is opgelost. ( 224)\nEen onjuiste setting van ack vlaggen is gecorrigeerd. (225)\nVertaling:",
+        "fr": "Le support pour écrire des données aux oïdes a été mis en œuvre. (#150)\nLes principales parties de code ont été réécrites afin de soutenir l'écriture oid.\nLes États contenant des informations de type peuvent être désactivés maintenant. (#218)\nLes États indiquant l ' état en ligne et l ' état d ' erreur des dispositifs ont été ajoutés. State online a été déplacé à l'information de dossier.\nDevicestatus est maintenant affiché à la vue de l'objet en utilisant la couleur et les icônes.\nType de données automatique a été ajouté au sélecteur de type de données oid.\nUn problème signalé par la sentinelle a été corrigé. (#224)\nUn réglage incorrect des drapeaux ack a été corrigé. (#225)\nLe support pour l'authentification des messages sha224, sha256, sha384 et sha512 a été ajouté (#210)",
+        "it": "Il supporto per la scrittura dei dati agli oids è stato implementato. (#150)\nLe parti principali del codice sono state riscritte in modo da sostenere la scrittura oid.\nGli Stati che contengono informazioni di tipo possono essere disabilitati ora. (#218)\nSono stati aggiunti Stati che indicano lo stato di errore e online dei dispositivi. Stato on-line è stato spostato a informazioni cartella.\nDevicestatus viene ora visualizzato alla vista degli oggetti utilizzando colori e icone.\nIl tipo di dati automatico è stato aggiunto al selettore oid stati del tipo di dati.\nUn problema segnalato dalla sentinella è stato risolto. (#224)\nÈ stata corretta un'impostazione errata delle bandiere di ack. (#225)\nÈ stato aggiunto il supporto per l'autenticazione dei messaggi sha224, sha256, sha384 e sha512 (#210)",
+        "es": "Se ha implementado el apoyo para escribir datos a oids. (#150)\nLas principales partes del código se han reescrito para apoyar la escritura de oid.\nLos Estados que contienen información de tipo pueden desactivarse ahora. (#218)\nSe han añadido estados que indican el estado de los dispositivos en línea y el error. El estado en línea se ha trasladado a la información de carpetas.\nDevicestatus se muestra ahora a la vista del objeto utilizando colores e iconos.\nEl tipo de datos automático se ha añadido al selector de datos de los estados oid.\nSe ha solucionado un problema reportado por centinela. (#224)\nSe ha corregido un ajuste incorrecto de las banderas de la cubierta. (#225)\nSe ha añadido soporte para la autentificación de mensajes sha224, sha256, sha384 y sha512 (#210)",
+        "pl": "Wsparcie danych do oid (#150)\nWiększość kodów została przepisany tak, aby wspierać pisanie oidów.\nStany zawierające informacje o typie mogą być aktualizowane (#218)\nDodano status urządzenia online i błędów. Stan online został przeniesiony do folder info.\nDevicestatus jest obecnie eksponowany w widoku obiektowym przy użyciu koloru i ikon.\nAutomatyczny typ danych został dodany do selektora danych.\nProblem doniesiony przez sentry został ustalony. (2)\nNieprawidłowe ustawienie flag zostało poprawione. (#225)\nWsparcie dla sha224, sha256, sha384 i sha512",
+        "uk": "Запроваджується підтримка запису даних до oids. (#150)\nОсновні частини коду були написані таким чином, що підтримка oid написання.\nДані, які містять інформацію про тип, можуть бути відключені зараз. (#218)\nДодана інформація про стан пристроїв онлайн та помилки. Державна онлайн була перенесена в папку інформація.\nПристрої на даний момент відображаються при перегляді об'єкта за кольором та значками.\nАвтоматичний тип даних був доданий до вибраного типу оїдних станів.\nЗафіксовано проблему, яку було відправлено. (#224)\nВиправлено неправильне встановлення прапорів ack. (#225)\nДодано підтримку sha224, sha256, sha384 та sha512 повідомлення (#210)",
+        "zh-cn": "已经执行了用于注销数据的支助。\n守则的主要部分被改写为无效的书面支持。.\n含有这类资料的国家现在可以残疾。\n添加了显示装置的在线和错误状况的国家。 网上国家已经转向集中。.\n现用颜色和色彩,以目标为名。.\n数据类型自动添加到无效的国家数据类型中。.\n传发器所报告的问题已经确定。 (第224号)\n纠正了包装旗帜的不正确状况。 (第225号)\n添加了对Sha224、Shasha256、Shasha384和Shasha512信息核证的支持(第210号)。"
+      },
+      "2.3.0": {
+        "en": "Add support for using native datatypes for states. (#143)\nSupport has been added to store binary oid data as json. (#188)\nIncorrect setting of write mode has been fixed. (#191)\nTables within german documentation have been fixed. (#192)\nNaming an oid with the reserved name 'online' has been blocked. (#203)\nSome changes related to code quality have been implemnted. (#201, #190)",
+        "de": "Unterstützung für die Verwendung von nativen Datentypen für States. #(143)\nUnterstützung wurde hinzugefügt, um binäre oid Daten als json zu speichern. #(188)\nFalsche Einstellungen des Schreibmodus wurde behoben. #(191)\nTabellen innerhalb der deutschen Dokumentation wurden korrigiert. #(192)\nDie Benennung von oids mit dem reservierten Namen online wurde blockiert. (203)\nEinige Änderungen in Bezug auf die Codequalität wurden umgesetzt. #(201, #190)",
+        "ru": "Добавьте поддержку для использования нативных типов данных для государств. #(143)\nПоддержка была добавлена для хранения бинарных oid данных в качестве json. #(188)\nИсправлена некорректная настройка режима записи. #(191)\nИсправлены таблицы в немецкой документации. #(192)\nНазвание недействительного с зарезервированным именем онлайн было заблокировано. #(203)\nНекоторые изменения, связанные с качеством кода, были нарушены. #(201, #190)",
+        "pt": "Adicione suporte para usar tipos de dados nativos para estados. #(143)\nO suporte foi adicionado para armazenar dados binários como json. #(188)\nA configuração incorreta do modo de gravação foi corrigida. #(191)\nForam fixadas tabelas na documentação alemã. #(192)\nNomear um oid com o nome reservado on-line foi bloqueado. 20\nAlgumas mudanças relacionadas à qualidade do código foram impelidas. #(201, #190)",
+        "nl": "Steun voor het gebruik van inheemse datatypes voor staten. ♪ (143)\nSupport is toegevoegd aan binaire oid data als Json. ♪ (188)\nDe onjuiste instelling van schrijven is opgelost. ♪ (191)\nTafels binnen Duitse documenten zijn gerepareerd. ♪ (192)\nEen leegte noemen met de gereserveerde naam online is geblokkeerd. ♪ (203)\nSommige veranderingen zijn gerelateerd aan code kwaliteit",
+        "fr": "Ajouter le support pour l'utilisation de types de données indigènes pour les états. #(143)\nLe support a été ajouté pour stocker les données oid binaires comme json. #(188)\nLe réglage incorrect du mode d'écriture a été corrigé. #(191)\nLes tableaux dans la documentation allemande ont été corrigés. #(192)\nLa désignation d'un oid avec le nom réservé en ligne a été bloquée. #(203)\nCertains changements liés à la qualité du code ont été implémentés. #(201, #190)",
+        "it": "Aggiungi supporto per l'utilizzo di tipi di dati nativi per gli stati. #(143)\nIl supporto è stato aggiunto per memorizzare i dati binari oid come json. #(188)\nL'impostazione sbagliata della modalità di scrittura è stata fissata. #(191)\nSono state fissate tabelle all'interno della documentazione tedesca. # (192)\nChiamare un oid con il nome riservato online è stato bloccato. #(203)\nAlcuni cambiamenti relativi alla qualità del codice sono stati implemnted. #(201, #190)",
+        "es": "Añadir soporte para el uso de datatypes nativos para los estados. #(143)\nSe ha añadido soporte para almacenar datos binarios oid como json. #(188)\nSe ha fijado el ajuste incorrecto del modo de escritura. #(191)\nSe han fijado tablas dentro de la documentación alemana. #(192)\nNombrar un oid con el nombre reservado en línea ha sido bloqueado. #(203)\nAlgunos cambios relacionados con la calidad del código han sido implemnted. #(201, #190)",
+        "pl": "Wsparcie dla danych dla państw członkowskich. #(143)\nWsparcie zostało dodane do przechowywania danych podwójnych jako json. (1)88)\nNieprawidłowe ustawienie trybu tekstowego zostało ustalone. #(191)\nZastosowano tablice w dokumentacji niemieckiej. 192)\nNamianie oid z zarezerwowaną nazwą online zostało zablokowane. (203)\nNiektóre zmiany związane z jakością kodu zostały zweryfikowane jako #(201, #190)",
+        "uk": "Додати підтримку для використання рідних типів даних для штатів. #(143)\nПідтримка було додано для зберігання бінарних oid даних як json. #(188)\nВиправлено неправильне налаштування режиму запису. #(191)\nЗафіксовано таблиці в межах німецької документації. #(192)\nЗаблоковано нумерацію з замкненим іменем. #(203)\nДеякі зміни, пов’язані з якістю коду, були пропущені. #(201, #190)",
+        "zh-cn": "增加对使用本国数据型国家的支持。 行动(143)\n此外,还支持将不可替代数据作为 json。 行动(188)\n文件的编排不正确。 行动(191)\n各种文件内的表格已经确定。 行动(192)\n网上保留名称的名称被阻止。 行动(203)\n与守则质量有关的一些变化被推断。"
+      },
+      "2.2.1": {
+        "en": "Fixed an error within io-package.json.",
+        "de": "Es wurde ein Fehler innerhalb von io-Package behoben. Json.",
+        "ru": "Исправлена ошибка в io-package. Джсон.",
+        "pt": "Corrigido um erro no io-package. O que foi.",
+        "nl": "Ik heb een fout gemaakt in io-package. Json.",
+        "fr": "Correction d'une erreur dans io-package. json.",
+        "it": "Risolto un errore all'interno del pacchetto io. J.",
+        "es": "Arregló un error dentro de io-paquete. json.",
+        "pl": "Okazało się, że błąd wewnątrz io-package. json.",
+        "uk": "Виправлено помилку в io-package. свінгери.",
+        "zh-cn": "在碘剂内有错误。 json."
+      },
+      "2.2.0": {
+        "en": "The compatibility flag is now deprecated and will be removed in future releases. Please adapt config if required.\nSNMP V3 support has been added (#71)\nSupport for IPv6 has been added (#138)\nCode has been cleaned as suggested by eslint \nBase modules have been upgraded to current versions\nDocumentation has been updates (en, de, ru)",
+        "de": "Das Kompatibilitäts-Flag wird nunmehr abgekündigtund in zukünftigen Versionen entfernt. Bitte passen Sie die Konfiguration bei Bedarf an.\nSNMP V3 Unterstützung wurde hinzugefügt (#71)\nUnterstützung für IPv6 wurde hinzugefügt (#138)\nCode wurde wie von eslint vorgeschlagen bereinigt\nBasismodule wurden auf aktuelle Versionen aktualisiert\nDie Dokumentation wurde aktualisiert (de, de, ru)",
+        "ru": "Флаг совместимости теперь устарел и будет удален в будущих выпусках. Пожалуйста, при необходимости адаптируйте конфиг.\nДобавлена поддержка SNMP V3 (#71)\nДобавлена поддержка IPv6 (#138)\nКод был очищен как предложил eslint\nБазовые модули были обновлены до текущих версий\nDocumentaion был обновлен (ru, de, ru)",
+        "pt": "A bandeira de compatibilidade é agora desprezada e será removida em versões futuras. Por favor, adapte a configuração se necessário.\nSuporte SNMP V3 foi adicionado (#71)\nSuporte para IPv6 foi adicionado (#138)\nCódigo foi limpo como sugerido por eslint\nMódulos base foram atualizados para as versões atuais\nDocumentação tem sido atualizações (en, de, ru)",
+        "nl": "De compatibiliteits vlag is nu gedegradeerd en zal worden verwijderd in toekomstige vrijlating. Gelieve zich aan te passen als het nodig is.\nSNMP V3 steun is toegevoegd\nIPV6 is toegevoegd\nCode is gereinigd zoals voorgesteld door eslint\nBasismodules zijn geüpgradeerd tot huidige versies\nDocumentaion is bijgepraat",
+        "fr": "Le drapeau de compatibilité est maintenant déprécié et sera retiré dans les versions futures. Veuillez adapter la configuration si nécessaire.\nLe support SNMP V3 a été ajouté (#71)\nLe support pour IPv6 a été ajouté (#138)\nLe code a été nettoyé comme le suggère Eslint\nLes modules de base ont été mis à niveau aux versions actuelles\nDocumentaion a été mise à jour (en, de, ru)",
+        "it": "La bandierina di compatibilità è ora deprecata e verrà rimossa nelle versioni future. Si prega di adattare config se necessario.\nIl supporto SNMP V3 è stato aggiunto (#71)\nÈ stato aggiunto il supporto per IPv6 (#138)\nIl codice è stato pulito come suggerito da eslint\nI moduli di base sono stati aggiornati alle versioni attuali\nDocumentaion è stato aggiornato (it, de, ru)",
+        "es": "La bandera de compatibilidad está ahora deprecatada y será eliminada en futuras versiones. Por favor, adapte el config si es necesario.\nSe ha añadido soporte SNMP V3 (#71)\nSe ha añadido soporte para IPv6 (#138)\nEl código se ha limpiado según lo sugerido por eslint\nLos módulos de base se han actualizado a las versiones actuales\nDocumentaion has been updates (en, de, ru)",
+        "pl": "Flaga kompatybilności jest obecnie odrzucana i zostanie usunięta w przyszłych wydaniach. Dostosowuje się do konfigu.\nWsparcie SNMP V3 zostało dodane (#71)\nDodano wsparcie dla IPv6 (#138)\nKod został oczyszczony przez eslinta\nModuł bazy został zmodernizowany do obecnych wersji\nDokumentacja jest aktualizowana (de, ru)",
+        "uk": "Відхилено прапор сумісності і буде видалено в майбутньому релізах. Будь ласка, перевірте налаштування.\nДодано підтримку SNMP V3 (#71)\nДодано підтримку IPv6 (#138)\nКод був очищений, як пропонується eslint\nБазові модулі модернізовані до поточних версій\nДокументація було оновлено (en, de, ru)",
+        "zh-cn": "兼容的旗帜现在被取消,今后将被取消。 请在必要时作修改。.\nSNMP V3 支持(第71号)\n增加了对IPv6的支助(第138号)。\n正如林特建议的那样,守则已经清理。\n基地单元已升级到现有版本。\n文件的更新(en, de,ru)"
+      },
+      "2.1.10": {
+        "en": "Validation of OID and device names has been enhanced, crash was reported by sentry (#169)",
+        "de": "Die Validierung von OID- und Gerätenamen wurde verbessert, der Crash wurde von Sentry gemeldet (#169)",
+        "ru": "Действие OID и названия устройств было улучшено, авария была сообщена отправкой (#169)",
+        "pt": "Validação de OID e nomes de dispositivos foram aprimorados, acidente foi relatado por remetente (#169)",
+        "nl": "Validatie van OID en apparatuur is verbeterd, crash is gemeld door sentiment (169)",
+        "fr": "La validation des noms d'ID et de périphériques a été améliorée, l'écrasement a été signalé par la sentinelle (#169)",
+        "it": "La convalida dei nomi OID e dei dispositivi è stata migliorata, l'incidente è stato segnalato dalla sentinella (#169)",
+        "es": "Se ha mejorado la validación de OID y los nombres de los dispositivos, el bloqueo fue reportado por centry (#169)",
+        "pl": "Obserwacje OID i nazwy urządzenie zostały poprawione przez przesyłkę (#169)",
+        "zh-cn": "已经加强了OID和装置名称的撤销,发送的事故报告(第169号)",
+        "uk": "Покращено перевірку OID і назв пристроїв, вартовий повідомив про збій (#169)"
+      },
+      "2.1.9": {
+        "en": "Support for (IPv4) domainnames has been readded (#165)\nDevices without any active oid do no longer cause an fatal error but only log a warning (#155)\nTimervalues are now validated more strictly (#156, #164)\nSome crashes reported by sentry have been fixed (#167)\nexternal packages have been updated by dependabot",
+        "de": "Unterstützung für (IPv4) Domainnamen wurde wieder hinzugefügt (#165)\nGeräte ohne aktive OIDs verursachen keinen fatalen Fehler mehr, sondern protokollieren nur eine Warnung (#155)\nTimervalues werden nun strenger validiert (#156, #164)\nEinige Abstürze, die von Sentry gemeldet wurden, wurden behoben (#167)\nexterne Pakete wurden aktualisiert",
+        "ru": "Добавлена поддержка (IPv4) доменных имен (#165)\nУстройства без какого-либо активного не допуска больше не вызывают смертельной ошибки, но только регистрируют предупреждение (#155)\nTimervalues теперь действует более строго (#156, #164)\nНекоторые сбои, сообщаемые судоходством, были зафиксированы (#167)\nвнешние пакеты были обновлены в зависимости от",
+        "pt": "Suporte para (IPv4) nomes de domínio foi adicionado (#165)\nDispositivos sem qualquer oide ativo não causam mais um erro fatal, mas apenas registram um aviso (#155)\nValores de tempo são agora validados mais estritamente (#156, #164)\nAlgumas falhas relatadas por sentinela foram corrigidas (#167)\npacotes externos foram atualizados por dependeabot",
+        "nl": "Vertaling:\nVerdedigingen zonder actieve leegte veroorzaken geen fatale fouten meer, maar alleen een waarschuwing inloggen\nTimervalues zijn nu meer strikt (156, #164)\nSommige crashes gemeld door sentimenten zijn gerepareerd\nvertaling:",
+        "fr": "Support pour (IPv4) noms de domaine a été lue (#165)\nLes appareils sans oid actif ne provoquent plus une erreur fatale mais ne enregistrent qu'un avertissement (#155)\nLes valeurs temporelles sont maintenant validées plus strictement (#156, #164)\nCertains accidents signalés par la sentinelle ont été corrigés (#167)\ndes paquets externes ont été mis à jour par dependabot",
+        "it": "Supporto per (IPv4) nomi di dominio è stato letto (#165)\nI dispositivi senza oid attivo non causano più un errore fatale ma registrano solo un avviso (#155)\nI valori temporali sono ora convalidati più rigorosamente (#156, #164)\nAlcuni crash segnalati dalla sentinella sono stati fissati (#167)\npacchetti esterni sono stati aggiornati da dipendeabot",
+        "es": "Se ha leído el soporte para (IPv4) nombres de dominio (#165)\nLos dispositivos sin oid activo ya no causan un error mortal, pero solo registran una advertencia (#155)\nLos valores temporales se validan más estrictamente (#156, #164)\nAlgunos accidentes reportados por centinela han sido fijos (#167)\npaquetes externos han sido actualizados por dependabot",
+        "pl": "Wsparcie (IPv4) zostało odczytane (#165)\nUrządzenia bez żadnej aktywnej oidy nie powodują już błędu, ale tylko ocenił ostrzeżenie (#155)\nWartość Timeru jest teraz prawidłowa (#156, #164)\nCzęść z nich została ustalona (#167)\npakiety zewnętrzne zostały zaktualizowane w zależności od bota",
+        "zh-cn": "对(IPv4)域名的支助(第165号)\n无任何积极无效的人不再造成致命错误,只是警告(第155号)\n时间价值现在更严格(第156号,第164号)\n一些发货人的事故已经确定(第167号)\n外部包件经过依赖性更新。",
+        "uk": "Прочитано підтримку доменних імен (IPv4) (#165)\nПристрої без жодного активного oid більше не викликають фатальну помилку, а лише реєструють попередження (#155)\nЗначення таймера тепер перевіряються суворіше (#156, #164)\nДеякі збої, про які повідомляє sentry, виправлено (#167)\nзовнішні пакунки були оновлені dependabot"
+      },
+      "2.1.8": {
+        "en": "HOTFIX: Parameter \"community\" has not been migrated when updating to version v2.x.x from previous releases. (#163)",
+        "de": "HOTFIX: Der Parameter \"community\" wurde bei der Aktualisierung der Version v2.x.x aus früheren Versionen nicht migriert. (#163)",
+        "ru": "HOTFIX: Параметр сообщество не было мигрировано при обновлении версии v2.x.x из предыдущих релизов. (#163)",
+        "pt": "HOTFIX: A comunidade de parâmetros não foi migrada ao atualizar para a versão v2.x.x de versões anteriores. (#163)",
+        "nl": "De parametergemeenschap is niet gemigreerd als je aan het opvoeden bent naar versie V2.x van eerdere vrijlating. (163)",
+        "fr": "HOTFIX : La communauté de paramètres n'a pas été migrée lors de la mise à jour de la version v2.x.x des versions précédentes. (#163)",
+        "it": "HOTFIX: La comunità dei parametri non è stata migrata durante l'aggiornamento alla versione v2.x.x.x dalle versioni precedenti. (#163)",
+        "es": "HOTFIX: La comunidad del parámetro no ha sido migrada al actualizar a versión v2.x.x de versiones anteriores. (#163)",
+        "pl": "HOTFIX: Parameter community nie zostało migrowane, gdy dodano do wersji v2.x.x. (2)",
+        "zh-cn": "HOTFIX:在从以前的释放中更新到第2.x.x号时,没有移居第二线社区。 (第163号)",
+        "uk": "ВИПРАВЛЕННЯ: параметр «community» не було перенесено під час оновлення до версії v2.x.x із попередніх випусків. (#163)"
+      }
     },
-    "native": {},
-    "objects": [],
-    "instanceObjects": [
-        {
-            "_id": "info",
-            "type": "channel",
-            "common": {
-                "name": "Information"
-            },
-            "native": {}
+    "title": "SNMP",
+    "titleLang": {
+      "en": "SNMP",
+      "de": "SNMP",
+      "ru": "SNMP",
+      "pt": "SNMP",
+      "nl": "SNMP",
+      "fr": "SNMP",
+      "it": "SNMP",
+      "es": "SNMP",
+      "pl": "SNMP",
+      "zh-cn": "SNMP",
+      "uk": "SNMP"
+    },
+    "desc": {
+      "en": "Allows to poll SNMP OIDs in ioBroker",
+      "de": "Ermöglicht das Polling von SNMP Objekten im ioBroker",
+      "ru": "Позволяет считывать SNPM объекты по OID в ioBroker",
+      "pt": "ioBroker SNMP-OID Adapter",
+      "fr": "ioBroker SNMP-OID Adapter",
+      "nl": "ioBroker SNMP-OID Adapter",
+      "it": "Consente di eseguire il polling degli OID SNMP in ioBroker",
+      "es": "Permite sondear los OID de SNMP en ioBroker",
+      "pl": "Umożliwia odpytywanie identyfikatorów SNMP OID w ioBroker",
+      "zh-cn": "允许在 ioBroker 中轮询 SNMP OID",
+      "uk": "Дозволяє опитувати SNMP OID в ioBroker"
+    },
+    "license": "MIT",
+    "platform": "Javascript/Node.js",
+    "icon": "snmp.png",
+    "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.snmp/master/admin/snmp.png",
+    "keywords": [
+      "SNMP-OID"
+    ],
+    "readme": "https://github.com/mcm1957/ioBroker.snmp/blob/master/README.md",
+    "loglevel": "info",
+    "mode": "daemon",
+    "type": "infrastructure",
+    "connectionType": "local",
+    "dataSource": "poll",
+    "compact": true,
+    "authors": [
+      {
+        "name": "Marcolotti",
+        "email": "info@ct-j.de"
+      },
+      {
+        "name": "mcm1957",
+        "email": "mcm57@gmx.at"
+      }
+    ],
+    "adminUI": {
+      "config": "json"
+    },
+    "stopBeforeUpdate": "true",
+    "plugins": {
+      "sentry": {
+        "dsn": "https://621ac710b70445f8b170cbb783045988@sentry.iobroker.net/181"
+      }
+    },
+    "globalDependencies": [
+      {
+        "admin": ">=5.1.28"
+      }
+    ],
+    "dependencies": [
+      {
+        "js-controller": ">=3.3.22"
+      }
+    ],
+    "messages": [
+      {
+        "condition": {
+          "operand": "and",
+          "rules": [
+            "oldVersion<2.0.0",
+            "newVersion>=2.0.0"
+          ]
         },
-        {
-            "_id": "info.connection",
-            "type": "state",
-            "common": {
-                "role": "indicator.connected",
-                "name": "If connected to device",
-                "type": "boolean",
-                "read": true,
-                "write": false,
-                "def": false
-            },
-            "native": {}
-        }
+        "title": {
+          "en": "Important notice!",
+          "de": "Wichtiger Hinweis!",
+          "ru": "Важное замечание!",
+          "pt": "Notícia importante!",
+          "nl": "Belangrijke mededeling!",
+          "fr": "Avis important!",
+          "it": "Avviso IMPORTANTE!",
+          "es": "Noticia importante!",
+          "pl": "Ważna uwaga!",
+          "zh-cn": "重要通知!",
+          "uk": "Важливе повідомлення!"
+        },
+        "text": {
+          "en": "Configuration data has been changed for version 2.0.0 (and newer). Installation will try to migrate data but there is a chance that this fails. Please ensure that you have a backup and a external documention of your configuration before upgrading to version 2.0.0 or newer.",
+          "de": "Konfigurationsdaten wurden für Version 2.0.0 (und neuer) geändert. Die Installation wird versuchen, Daten zu migrieren, aber es gibt eine Chance, dass dies versagt. Bitte stellen Sie sicher, dass Sie ein Backup und eine externe Dokumentation Ihrer Konfiguration vor dem Upgrade auf Version 2.0.0 oder neuer haben.",
+          "ru": "Данные конфигурации были изменены для версии 2.0.0 (и новее). Установка будет пытаться перенести данные, но есть шанс, что это не работает. Пожалуйста, убедитесь, что у вас есть резервное копирование и внешний документирование вашей конфигурации перед обновлением до версии 2.0.0 или новее.",
+          "pt": "Os dados de configuração foram alterados para a versão 2.0.0 (e mais recente). A instalação tentará migrar dados, mas há uma chance de que isso falha. Certifique-se de ter um backup e uma documentação externa de sua configuração antes de atualizar para a versão 2.0.0 ou mais recente.",
+          "nl": "Vermoedende data is veranderd voor versie 2.0. Installatie zal proberen data te verminderen maar er is een kans dat dit mislukt. Zorg ervoor dat je een back-up hebt en een externe documentie van je zelfvertrouwen voordat je verstoort naar versie 2.0 of nieuwer.",
+          "fr": "Les données de configuration ont été modifiées pour la version 2.0.0 (et plus récente). L'installation tentera de migrer les données, mais il y a une chance que cela échoue. Assurez-vous d'avoir une sauvegarde et une documentation externe de votre configuration avant de passer à la version 2.0.0 ou plus récente.",
+          "it": "I dati di configurazione sono stati modificati per la versione 2.0.0 (e più recente). L'installazione cercherà di migrare i dati, ma c'è la possibilità che questo fallisca. Si prega di assicurarsi di avere un backup e un documento esterno della configurazione prima di aggiornare alla versione 2.0.0 o più recente.",
+          "es": "Los datos de configuración se han modificado para la versión 2.0.0 (y más reciente). La instalación intentará migrar datos pero hay una posibilidad de que esto falle. Por favor, asegúrese de tener una copia de seguridad y una documentación externa de su configuración antes de actualizar a la versión 2.0.0 o más reciente.",
+          "pl": "Dane konfiguracyjne zostały zmienione na wersję 2.0.0 (i nowszą). Instalacja stara się wyemitować dane, ale istnieje szansa, że to się nie udaje. Zapewniajcie, że mamy backup i zewnętrzną dokumentację twojej wersji 2.0.0 lub nowszego.",
+          "zh-cn": "对2.0.0版本(和新版)的合并数据进行了修改。 绝大部分将试图迁移数据,但有失败的机会。 请确保在更新至2.0.0或新版之前,对你的配置进行反馈和外部记录。.",
+          "uk": "Дані конфігурації змінено для версії 2.0.0 (і новішої). Інсталяція спробує перенести дані, але існує ймовірність, що це не вдасться. Переконайтеся, що у вас є резервна копія та зовнішня документація вашої конфігурації перед оновленням до версії 2.0.0 або новішої."
+        },
+        "link": "https://github.com/iobroker-community-adapters/ioBroker.snmp#changelog",
+        "level": "warn",
+        "linkText": {
+          "en": "Changelog",
+          "de": "Änderungsprotokoll",
+          "ru": "Список изменений",
+          "pt": "Registro de alterações",
+          "nl": "Wijzigingslog",
+          "fr": "Journal des modifications",
+          "it": "Registro delle modifiche",
+          "es": "registro de cambios",
+          "pl": "Dziennik zmian",
+          "zh-cn": "变更日志",
+          "uk": "Журнал змін"
+        },
+        "buttons": [
+          "agree",
+          "cancel"
+        ]
+      },
+      {
+        "condition": {
+          "operand": "and",
+          "rules": [
+            "oldVersion<1.0.0",
+            "newVersion>=1.0.0"
+          ]
+        },
+        "title": {
+          "en": "Important notice!",
+          "de": "Wichtiger Hinweis!",
+          "ru": "Важное замечание!",
+          "pt": "Notícia importante!",
+          "nl": "Belangrijke mededeling!",
+          "fr": "Avis important!",
+          "it": "Avviso IMPORTANTE!",
+          "es": "Noticia importante!",
+          "pl": "Ważna uwaga!",
+          "zh-cn": "重要通知!",
+          "uk": "Важливе повідомлення!"
+        },
+        "text": {
+          "en": "Version 1.0.0 will change the names of objects containing special characters like \\\".\\\", \\\"-\\\" or spaces! Please delete the old objects manually if needed.",
+          "de": "Version 1.0.0 ändert die Namen von Objekten, die spezielle Zeichen wie \\\"\\\", \\\"-\\\" oder Leerzeichen enthalten! Bitte löschen Sie die alten Objekte bei Bedarf manuell.",
+          "ru": "Версия 1.0.0 изменит имена объектов, содержащих специальные символы, такие как \\\".\\\", \\\"-\\\" или пространства! Пожалуйста, удалите старые объекты вручную, если это необходимо.",
+          "pt": "A versão 1.0.0 mudará os nomes de objetos contendo caracteres especiais como \\\".\\\", \\\"-\\\" ou espaços! Por favor, exclua os objetos antigos manualmente, se necessário.",
+          "nl": "Version 1.0.0 zal de namen veranderen van objecten met speciale personages zoals . Verwijder de oude objecten handmatig als het nodig is.",
+          "fr": "La version 1.0.0 va changer les noms des objets contenant des caractères spéciaux comme \\\".\\\", \\\"-\\\" ou des espaces! Veuillez supprimer les anciens objets manuellement si nécessaire.",
+          "it": "La versione 1.0.0 cambierà i nomi di oggetti contenenti caratteri speciali come \\\", \\\"-\\\" o spazi! Si prega di eliminare i vecchi oggetti manualmente se necessario.",
+          "es": "Versión 1.0.0 cambiará los nombres de objetos que contienen caracteres especiales como \\\".\\\", \\\"-\\\" o espacios! Por favor, borre los viejos objetos manualmente si es necesario.",
+          "pl": "Wersja 1.0.0 zmienia nazwę obiektów o specjalnych postaciach, takich jak: \\, \\ lub przestrzeni! Okazuje się, że stare obiekty ręcznie będą potrzebne.",
+          "zh-cn": "Version1.0.0将改变含有特殊特性的物体的名称,如乙型号、乙型号或空间。 请在必要时删除旧物体。.",
+          "uk": "Версія 1.0.0 змінить назви об'єктів, які містять спеціальні символи, такі як \\\".\\\", \\\"-\\\" або пробіли! За потреби видаліть старі об’єкти вручну."
+        },
+        "link": "https://github.com/iobroker-community-adapters/ioBroker.snmp#changelog",
+        "level": "warn",
+        "linkText": {
+          "en": "Changelog",
+          "de": "Änderungsprotokoll",
+          "ru": "Список изменений",
+          "pt": "Registro de alterações",
+          "nl": "Wijzigingslog",
+          "fr": "Journal des modifications",
+          "it": "Registro delle modifiche",
+          "es": "registro de cambios",
+          "pl": "Dziennik zmian",
+          "zh-cn": "变更日志",
+          "uk": "Журнал змін"
+        },
+        "buttons": [
+          "agree",
+          "cancel"
+        ]
+      }
     ]
+  },
+  "native": {},
+  "objects": [],
+  "instanceObjects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.connection",
+      "type": "state",
+      "common": {
+        "role": "indicator.connected",
+        "name": "If connected to device",
+        "type": "boolean",
+        "read": true,
+        "write": false,
+        "def": false
+      },
+      "native": {}
+    }
+  ]
 }
