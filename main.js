@@ -366,6 +366,10 @@ async function initDeviceObjects(pId, pIp) {
     adapter.log.debug('initdeviceObjects (' + pId + '/' + pIp + ')');
 
     try {
+        await adapter.delForeignObjectAsync(`${adapterName}.${adapter.instance}.${pId}.online`, {recursive: false});
+    } catch (e) { /* */ }
+
+    try {
         // create <ip> device object
         await initObject({
             _id: pId,
@@ -373,8 +377,8 @@ async function initDeviceObjects(pId, pIp) {
             common: {
                 name: pIp,
                 statusStates: {
-                    onlineId: `${adapterName}.${adapter.instance}.${pId}.online`,
-                    errorId: `${adapterName}.${adapter.instance}.${pId}.alarm`
+                    onlineId: `${adapterName}.${adapter.instance}.${pId}.info.online`,
+                    errorId: `${adapterName}.${adapter.instance}.${pId}.info.error`
                 }
             },
             native: {
@@ -384,10 +388,22 @@ async function initDeviceObjects(pId, pIp) {
 
         // create <ip>.online and .alarm state objects
         await initObject({
-            _id: pId + '.online',
+            _id: pId + '.info',
+            type: 'folder',
+            common: {
+                name:'',
+                desc: 'folder containing device status states'
+            },
+            native: {
+            }
+        }
+        );
+        await initObject({
+            _id: pId + '.info.online',
             type: 'state',
             common: {
-                name: pIp + ' online',
+                name: pId + '.info.online',
+                desc: 'true if device is reachable',
                 write: false,
                 read: true,
                 type: 'boolean',
@@ -398,10 +414,11 @@ async function initDeviceObjects(pId, pIp) {
         }
         );
         await initObject({
-            _id: pId + '.alarm',
+            _id: pId + '.info.error',
             type: 'state',
             common: {
-                name: pIp + ' online',
+                name: pId + '.info.error',
+                desc: 'true if error occured',
                 write: false,
                 read: true,
                 type: 'boolean',
@@ -412,10 +429,11 @@ async function initDeviceObjects(pId, pIp) {
         }
         );
         await initObject({
-            _id: pId + '.last_error',
+            _id: pId + '.info.error_text',
             type: 'state',
             common: {
-                name: pIp + ' last error',
+                name: pId + '.info.error_text',
+                desc: 'text describing last error',
                 write: false,
                 read: true,
                 type: 'string',
@@ -1401,8 +1419,8 @@ async function createReaderSession(pCTX) {
     adapter.log.debug('createReaderSession - device ' + pCTX.name + ' (' + pCTX.ipAddr + ')');
 
     // (re)set device online and alarm status
-    await adapter.setStateAsync(pCTX.id + '.alarm', {val: false, ack: true, q:0x00});
-    await adapter.setStateAsync(pCTX.id + '.online', {val: false, ack: true, q:0x00});
+    await adapter.setStateAsync(pCTX.id + '.info.error', {val: false, ack: true, q:0x00});
+    await adapter.setStateAsync(pCTX.id + '.info.online', {val: false, ack: true, q:0x00});
 
     // stop existing timers and close session if one exists
     if (pCTX.retryTimer) {
@@ -1491,20 +1509,20 @@ async function setStates (pStateId, pOptions, pValues ) {
  */
 async function setOnlineState (pCTX, pOnline, pMsg, pErr){
 
-    await adapter.setStateAsync(pCTX.id + '.online', {val: pOnline, ack: true, q:0x00});
+    await adapter.setStateAsync(pCTX.id + '.info.online', {val: pOnline, ack: true, q:0x00});
 
     let err = 'RequestTimedOutError: Request timed out';
     if (pErr) err = pErr;
     if (pOnline) err = null;
-    await adapter.setStateAsync(pCTX.id + '.last_error', {val: err, ack: true, q:0x00});
+    await adapter.setStateAsync(pCTX.id + '.info.error_text', {val: err, ack: true, q:0x00});
 
     if (pCTX.initialized && (pCTX.online == pOnline) ) return;
 
     if (pErr) {
         adapter.log.error(`[${pCTX.id}] ${pErr}`);
-        await adapter.setStateAsync(pCTX.id + '.alarm', {val: true, ack: true, q:0x00});
+        await adapter.setStateAsync(pCTX.id + '.info.error', {val: true, ack: true, q:0x00});
     }
-    if (pOnline) await adapter.setStateAsync(pCTX.id + '.alarm', {val: false, ack: true, q:0x00});
+    if (pOnline) await adapter.setStateAsync(pCTX.id + '.info.error', {val: false, ack: true, q:0x00});
 
     let msg = pOnline ? 'connected' : 'disconnected';
     if (pMsg) msg = `${msg} - ${pMsg}`;
@@ -1745,6 +1763,10 @@ function validateConfig() {
         }
         if (oid.oidName === 'online') {
             adapter.log.error('oid "' + oid.oidName + '"is invalid. Name "online" is reserved. Please correct configuration.');
+            ok = false;
+        }
+        if (oid.oidName.startsWith('info.')) {
+            adapter.log.error('oid "' + oid.oidName + '"is invalid. Folder "info" is reserved. Please correct configuration.');
             ok = false;
         }
 
@@ -2293,8 +2315,8 @@ function onUnload(callback) {
 
         // (re)set device online status
         try {
-            adapter.setState(CTX.id + '.alarm', {val: false, ack: true, q:0x00});
-            adapter.setState(CTX.id + '.online', {val: false, ack: true, q:0x00});
+            adapter.setState(CTX.id + '.info.error', {val: false, ack: true, q:0x00});
+            adapter.setState(CTX.id + '.info.online', {val: false, ack: true, q:0x00});
         } catch (e) { /* */ }
 
         // close session if one exists
