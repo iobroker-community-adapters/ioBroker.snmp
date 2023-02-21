@@ -2,7 +2,7 @@
  *
  * snmp adapter,
  *		copyright CTJaeger 2017, MIT
- *		copyright McM1957 2022, MIT
+ *		copyright McM1957 2022-2023, MIT
  *
  */
 
@@ -59,7 +59,7 @@
  *      name       string   name of the device
  *      ipAddr     string   ip address (without port number)
  *      ipPort     number   ip port number
- *      id         string   id of device, dereived from ip address or from name
+ *      devId      string   devId of device, dereived from ip address or from name
  *      isIPv6     bool     true if IPv6 to be used
  *      timeout    number   snmp connect timeout (ms)
  *      retryIntvl number   snmp retry intervall (ms)
@@ -78,7 +78,6 @@
  *      pollTimer  object   timer object for poll timer
  *      retryTimer object   timer object for retry timer
  *      session    object   snmp session object
- *      inactive   bool     flag indicating conection status of device
  */
 
 /* jshint -W097 */
@@ -90,13 +89,20 @@ const F_TEXT = 0;
 const F_NUMERIC = 1;
 const F_BOOLEAN = 2;
 const F_JSON = 3;
+const F_AUTO = 99;
 
+// snmp protocols
 const SNMP_V1 = 1;
 const SNMP_V2c = 2;
 const SNMP_V3 = 3;
 
+// authentication protocols
 const MD5 = 1;
 const SHA = 2;
+const SHA224 = 3;
+const SHA256 = 4;
+const SHA384 = 5;
+const SHA512 = 6;
 
 const DES = 1;
 const AES = 2;
@@ -111,6 +117,8 @@ const AES256R = 4;
 // you need to create an adapter
 const utils = require('@iobroker/adapter-core');
 const { EXIT_CODES } = require('@iobroker/js-controller-common');
+const adapterName = require('./package.json').name.split('.').pop();
+
 const InstallUtils = require('./lib/installUtils');
 
 // Load modules required by adapter
@@ -124,11 +132,12 @@ let didInstall = false;
 // #################### global variables ####################
 let adapter;    // adapter instance - @type {ioBroker.Adapter}
 
-const CTXs = [];		    // see description at header of file
-const STATEs = [];          // states cache
-let g_isConnected = false; 	// local copy of info.connection state
+const CTXs = [];		            // see description at header of file
+const STATEs = [];                  // states cache, index by full id
+let g_isConnected = false; 	        // local copy of info.connection state
+let g_shutdownInProgress = false;   // maximum number of OIDs per request
 let g_connUpdateTimer = null;
-let g_chunkSize = 3;         // maximum number of OIDs per request
+let g_chunkSize = 3;                // maximum number of OIDs per request
 
 /**
  * Start the adapter instance
@@ -158,15 +167,7 @@ function startAdapter(options) {
         // },
 
         // stateChange is called if a subscribed state changes
-        // stateChange: (id, state) => {
-        //	if (state) {
-        //		// The state was changed
-        //		adapter.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
-        //	} else {
-        //		// The state was deleted
-        //		adapter.log.info(`state ${id} deleted`);
-        //	}
-        //},
+        stateChange: onStateChange,
 
         // If you need to accept messages in your adapter, uncomment the following block.
         // /**
@@ -243,11 +244,62 @@ function oidFormat2StateType(pOidFormat){
         case F_JSON /* 3 */: {
             return 'string';
         }
+        case F_AUTO /* 99 */: {
+            return 'mixed';
+        }
         default:{
             adapter.log.warn('oidFormat2StateType - unknown code ' + pOidFormat );
-            return 'string';
+            return 'mixed';
         }
     }
+}
+
+// #################### object initialization functions ####################
+
+/**
+ * cleanupStates - cleanup unused states
+ *
+ * @param   {string}    pPattern    pattern to match state id
+ *
+ * @return  objects
+ *
+ */
+async function delStates( pPattern ) {
+    adapter.log.debug ( 'delStates ('+pPattern+')');
+
+    const objs = await adapter.getForeignObjectsAsync( `${adapterName}.${adapter.instance}.${pPattern}` );
+    if (objs){
+        if ( Object.values(objs).length ) {
+            adapter.log.info(`removing states ${pPattern}...`);
+        }
+        for (const obj of Object.values(objs)) {
+            adapter.log.debug(`removing object ${obj._id}...`);
+            await adapter.delForeignObjectAsync( obj._id, {recursive: true} );
+        }
+    }
+}
+
+/**
+ * cleanupStates - cleanup unused states
+ *
+ * @return  nothing
+ *
+ */
+async function cleanupStates() {
+    adapter.log.debug('cleanupStates ');
+
+    // delete -rap states if no lonager enabled
+    if ( ! adapter.config.optRawStates )
+    {
+        await delStates ( '*-raw' );
+    }
+
+    // delete -type states if no lonager enabled
+    if ( ! adapter.config.optTypeStates )
+    {
+        await delStates ( '*-type' );
+    }
+
 }
 
 // #################### object initialization functions ####################
@@ -266,31 +318,40 @@ function oidFormat2StateType(pOidFormat){
 async function initObject(pObj) {
     adapter.log.debug('initobject ' + pObj._id);
 
-    if (typeof(STATEs[pObj._id]) === 'undefined') {
+    const fullId = `${adapterName}.${adapter.instance}.${pObj._id}`;
+
+    if (typeof(STATEs[fullId]) === 'undefined') {
         try {
             adapter.log.debug('creating obj "' + pObj._id + '" with type ' + pObj.type);
             await adapter.setObjectNotExistsAsync(pObj._id, pObj);
+            await adapter.extendObjectAsync(pObj._id, pObj);
         } catch (e) {
             adapter.log.error('error initializing obj "' + pObj._id + '" ' + e.message);
         }
+        STATEs[fullId] = {
+            type: pObj.type,
+            commonType: null,
+        };
     }
 
     if (pObj.type === 'state') {
-        if (typeof (STATEs[pObj._id]) === 'undefined' ) {
-            adapter.log.debug('extending obj "' + pObj._id + '" with '+ JSON.stringify(pObj));
-            await adapter.extendObjectAsync(pObj._id, pObj);
-            STATEs[ pObj._id ] = {
-                value: null,
-                oidType: null,
-                type: pObj.common.type
+        if ( (typeof (STATEs[fullId].commonType) === 'undefined' ) ||
+             (STATEs[fullId].commonType === null ) ) {
+            const obj = await adapter.getObjectAsync(pObj._id);
+            STATEs[fullId] = {
+                commonType: obj.common.type
             };
         }
 
-        if ( STATEs[pObj._id].type !== pObj.common.type ) {
+        if ( STATEs[fullId].commonType !== pObj.common.type ) {
             try {
-                adapter.log.info('reinitializing obj "' + pObj._id + '" state-type change '+STATEs[pObj._id].type+' -> '+pObj.common.type);
+                if ( STATEs[fullId].commonType === 'mixed') {
+                    adapter.log.debug('reinitializing obj "' + pObj._id + '" state-type change '+STATEs[fullId].commonType+' -> '+pObj.common.type);
+                } else {
+                    adapter.log.info('reinitializing obj "' + pObj._id + '" state-type change '+STATEs[fullId].commonType+' -> '+pObj.common.type);
+                }
                 await adapter.extendObjectAsync(pObj._id, {common: { type: pObj.common.type }});
-                STATEs[pObj._id].type = pObj.common.type;
+                STATEs[fullId].commonType = pObj.common.type;
             } catch (e) {
                 adapter.log.error('error reinitializing obj "' + pObj._id + '" ' + e.message);
             }
@@ -310,28 +371,78 @@ async function initDeviceObjects(pId, pIp) {
     adapter.log.debug('initdeviceObjects (' + pId + '/' + pIp + ')');
 
     try {
+        await adapter.delForeignObjectAsync(`${adapterName}.${adapter.instance}.${pId}.online`, {recursive: false});
+    } catch (e) { /* */ }
+
+    try {
         // create <ip> device object
         await initObject({
             _id: pId,
             type: 'device',
             common: {
-                name: pIp
+                name: pIp,
+                statusStates: {
+                    onlineId: `${adapterName}.${adapter.instance}.${pId}.info.online`,
+                    errorId: `${adapterName}.${adapter.instance}.${pId}.info.error`
+                }
             },
             native: {
             }
         }
         );
 
-        // create <ip>.online state object
+        // create <ip>.online and .alarm state objects
         await initObject({
-            _id: pId + '.online',
+            _id: pId + '.info',
+            type: 'folder',
+            common: {
+                name:'',
+                desc: 'folder containing device status states'
+            },
+            native: {
+            }
+        }
+        );
+        await initObject({
+            _id: pId + '.info.online',
             type: 'state',
             common: {
-                name: pIp + ' online',
+                name: pId + '.info.online',
+                desc: 'true if device is reachable',
                 write: false,
                 read: true,
                 type: 'boolean',
                 role: 'indicator.reachable'
+            },
+            native: {
+            }
+        }
+        );
+        await initObject({
+            _id: pId + '.info.error',
+            type: 'state',
+            common: {
+                name: pId + '.info.error',
+                desc: 'true if error occured',
+                write: false,
+                read: true,
+                type: 'boolean',
+                role: 'indicator.reachable'
+            },
+            native: {
+            }
+        }
+        );
+        await initObject({
+            _id: pId + '.info.error_text',
+            type: 'state',
+            common: {
+                name: pId + '.info.error_text',
+                desc: 'text describing last error',
+                write: false,
+                read: true,
+                type: 'string',
+                role: 'text'
             },
             native: {
             }
@@ -381,7 +492,7 @@ async function initOidObjects(pId, pOid, pOID) {
             type: 'state',
             common: {
                 name: pId,
-                write: !!pOID.oidWriteable, //## TODO
+                write: !!pOID.oidWriteable,
                 read: true,
                 type: oidFormat2StateType(pOID.oidFormat),
                 role: 'value'
@@ -390,19 +501,27 @@ async function initOidObjects(pId, pOid, pOID) {
             }
         });
 
-        await initObject({
-            _id: pId+'-type',
-            type: 'state',
-            common: {
-                name: pId+'-type',
-                write: false,
-                read: true,
-                type: 'string',
-                role: 'type.encoding'
-            },
-            native: {
-            }
-        });
+        if (pOID.oidWriteable) {
+            const fullId = `${adapterName}.${adapter.instance}.${pId}`;
+            adapter.log.debug ( `subscribing state ${fullId}` );
+            await adapter.subscribeStatesAsync( fullId );
+        }
+
+        if (adapter.config.optTypeStates) {
+            await initObject({
+                _id: pId+'-type',
+                type: 'state',
+                common: {
+                    name: pId+'-type',
+                    write: false,
+                    read: true,
+                    type: 'string',
+                    role: 'type.encoding'
+                },
+                native: {
+                }
+            });
+        }
 
         // create OID state.raw objects
         if (adapter.config.optRawStates) {
@@ -447,50 +566,656 @@ async function initAllObjects() {
 }
 
 
+// #################### varbind convert functions ####################
+/**
+ * oidObjType2Text - translate oid object type into textual string
+ *
+ * @param   {integer}   pOidObjType    oid object type
+ * @return  {string}    textual representation of object type
+ *
+ */
+function oidObjType2Text( pOidObjType ) {
+    adapter.log.debug('oidObjType2Text - stringify oid object type');
+
+    const OBJECT_TYPE ={
+        [snmp.ObjectType.Boolean]       : 'Boolean',
+        [snmp.ObjectType.Integer]       : 'Integer',
+        [snmp.ObjectType.OctetString]   : 'OctetString',
+        [snmp.ObjectType.Null]          : 'Null',
+        [snmp.ObjectType.OID]           : 'OID',
+        [snmp.ObjectType.IpAddress]     : 'IpAddress',
+        [snmp.ObjectType.Counter]       : 'Counter',
+        [snmp.ObjectType.Gauge]         : 'Gauge',
+        [snmp.ObjectType.TimeTicks]     : 'TimeTicks',
+        [snmp.ObjectType.Opaque]        : 'Opaque',
+        [snmp.ObjectType.Integer32]     : 'Integer32',
+        [snmp.ObjectType.Counter32]     : 'Counter32',
+        [snmp.ObjectType.Gauge32]       : 'Gauge32',
+        [snmp.ObjectType.Unsigned32]    : 'Unsigned32',
+        [snmp.ObjectType.Counter64]     : 'Counter64',
+        [snmp.ObjectType.NoSuchObject]  : 'NoSuchObject',
+        [snmp.ObjectType.NoSuchInstance]: 'NoSuchInstance',
+        [snmp.ObjectType.EndOfMibView]  : 'EndOfMibView',
+    };
+
+    return OBJECT_TYPE[pOidObjType] || `Unknown (${pOidObjType})`;
+}
+
+/**
+ * varbindDecode - convert varbind data to native data
+ *
+ * @param   {object}    pVarbind    varbind to decode
+ * @param   {integer}   pFormat     format constant
+ * @param   {string}    pDevId      id of device
+ * @param   {string}    pStateId    id of state
+ * @return  {object}    state object containing val, typestr and qual values
+ *
+ */
+function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
+    adapter.log.debug('varbindDeode - decode varbind');
+
+    // taken from https://github.com/markabrahams/node-net-snmp#oid-strings--varbinds
+    // varbind data is encoded based on snmp.ObjectType object.
+    //
+    // The JavaScript true and false keywords are used for the values of varbinds with type Boolean.
+    //
+    // All integer based types are specified as expected (this includes Integer, Counter, Gauge, TimeTicks, Integer32,
+    // Counter32, Gauge32, and Unsigned32), e.g. -128 or 100.
+    //
+    // Since JavaScript does not offer full 64 bit integer support objects with type Counter64 cannot be supported in the same way
+    // as other integer types, instead Node.js Buffer objects are used. Users are responsible for producing (i.e. for set() requests)
+    // and consuming (i.e. the varbinds passed to callback functions) Buffer objects. That is, this module does not work with
+    // 64 bit integers, it simply treats them as opaque Buffer objects.
+    //
+    // Dotted decimal strings are used for the values of varbinds with type OID, e.g. 1.3.6.1.2.1.1.5.0.
+    //
+    // Dotted quad formatted strings are used for the values of varbinds with type IpAddress, e.g. 192.168.1.1.
+    //
+    // Node.js Buffer objects are used for the values of varbinds with type Opaque and OctetString. For varbinds with type
+    // OctetString this module will accept JavaScript strings, but will always give back Buffer objects.
+    //
+    // The NoSuchObject, NoSuchInstance and EndOfMibView types are used to indicate an error condition. Currently there is
+    // no reason for users of this module to to build varbinds using these types.
+    //
+
+    const retval = {
+        val:        null,
+        typeStr:    oidObjType2Text(pVarbind.type),
+        qual:       0x00, // assume OK
+        format:     pFormat
+    };
+    //
+
+    switch (pVarbind.type) {
+    // The JavaScript true and false keywords are used for the values of varbinds with type Boolean.
+        case snmp.ObjectType.Boolean: {
+            switch (pFormat) {
+                case F_TEXT /* 0 */:
+                default:
+                    retval.val = pVarbind.value.toString();
+                    break;
+                case F_NUMERIC /* 1 */:
+                    retval.val = pVarbind.value?1:0;
+                    break;
+                case F_BOOLEAN /* 2 */:
+                case F_AUTO /* 99 */:
+                    retval.val = pVarbind.value;
+                    retval.format = F_BOOLEAN;
+                    break;
+                case F_JSON /* 3 */:
+                    retval.val = JSON.stringify({type: 'boolean', data: pVarbind.value});
+                    break;
+            }
+            break;
+        }
+
+        // All integer based types are specified as expected
+        case snmp.ObjectType.Integer:
+        case snmp.ObjectType.Counter:
+        case snmp.ObjectType.Gauge:
+        case snmp.ObjectType.TimeTicks:
+        case snmp.ObjectType.Integer32:
+        case snmp.ObjectType.Counter32:
+        case snmp.ObjectType.Gauge32:
+        case snmp.ObjectType.Unsigned32: {
+            switch (pFormat) {
+                case F_TEXT /* 0 */:
+                default:
+                    retval.val = pVarbind.value.toString();
+                    break;
+                case F_NUMERIC /* 1 */:
+                case F_AUTO /* 99 */:
+                    //retval.val = parseInt(pVarbind.value.toString(), 10);
+                    retval.val = pVarbind.value;
+                    if (isNaN(retval.val)) retval.qual=0x01; // general error
+                    retval.format = F_NUMERIC;
+                    break;
+                case F_BOOLEAN /* 2 */: {
+                    const valint = pVarbind.value;
+                    retval.val = valint !== 0;
+                    if (isNaN (valint)) retval.qual=0x01; // general error
+                    break;
+                }
+                case F_JSON /* 3 */:
+                    retval.val = JSON.stringify({type: 'number', data: pVarbind.value});
+                    break;
+            }
+            break;
+        }
+
+        // Since JavaScript does not offer full 64 bit integer support objects with type Counter64 cannot be supported in the same way
+        // as other integer types, instead Node.js Buffer objects are used. Users are responsible for producing (i.e. for set() requests)
+        // and consuming (i.e. the varbinds passed to callback functions) Buffer objects.
+        case snmp.ObjectType.Counter64:{
+            // convert buffer to string using bigin
+            let value = BigInt(0); //bigint constant
+            for (let ii= 0; ii<pVarbind.value.length; ii++){
+                value=value*BigInt(256) + BigInt(pVarbind.value[ii]);
+            }
+            switch (pFormat) {
+                case F_TEXT /* 0 */:
+                default:
+                    retval.val = value.toString();
+                    break;
+                case F_NUMERIC /* 1 */:
+                case F_AUTO /* 99 */:
+                    retval.val = Number(value);
+                    if (isNaN(retval.val)) retval.qual=0x01; // general error
+                    retval.format = F_NUMERIC;
+                    break;
+                case F_BOOLEAN /* 2 */: {
+                    const valint = Number(value);
+                    retval.val =  valint !== 0;
+                    if (isNaN (valint)) retval.qual=0x01; // general error
+                    break;
+                }
+                case F_JSON /* 3 */:
+                    retval.val = JSON.stringify({type: 'number', data: pVarbind.value});
+                    break;
+            }
+            break;
+        }
+
+        // Node.js Buffer objects are used for the values of varbinds with type Opaque and OctetString. For varbinds with type
+        // OctetString this module will accept JavaScript strings, but will always give back Buffer objects.
+        case snmp.ObjectType.OctetString: {
+            switch (pFormat) {
+                case F_TEXT /* 0 */:
+                case F_AUTO /* 99 */:
+                default:
+                    retval.val = pVarbind.value.toString();
+                    retval.format = F_TEXT;
+                    break;
+                case F_NUMERIC /* 1 */: {
+                    const valint = parseInt(pVarbind.value.toString, 10);
+                    retval.val = valint;
+                    if (isNaN (valint)) retval.qual=0x01; // general error
+                    break;
+                }
+                case F_BOOLEAN /* 2 */: {
+                    const valint = parseInt(pVarbind.value.toString, 10);
+                    retval.val = valint !== 0;
+                    if (isNaN (valint)) retval.qual=0x01; // general error
+                    break;
+                }
+                case F_JSON /* 3 */:
+                    retval.val = JSON.stringify(pVarbind.value); /* type: Buffer */
+                    break;
+            }
+            break;
+        }
+
+        // no dcumentation for type null available
+        case snmp.ObjectType.Null: {
+            retval.val = null;
+            retval.qual = 0x1; // general error
+            retval.format = F_TEXT;
+            adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type null` + JSON.stringify(pVarbind));
+            break;
+        }
+
+        // Dotted decimal strings are used for the values of varbinds with type OID, e.g. 1.3.6.1.2.1.1.5.0.
+        case snmp.ObjectType.OID: {
+            switch (pFormat) {
+                case F_TEXT /* 0 */:
+                case F_AUTO /* 99 */:
+                default:
+                    retval.val = pVarbind.value.toString();
+                    retval.format = F_TEXT;
+                    break;
+                case F_NUMERIC /* 1 */:
+                    retval.val = null;
+                    retval.qual = 0x1; // general error
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type oid to numeric ` + JSON.stringify(pVarbind));
+                    break;
+                case F_BOOLEAN /* 2 */:
+                    retval.val = null;
+                    retval.qual = 0x1; // general error
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type oid to boolean ` + JSON.stringify(pVarbind));
+                    break;
+                case F_JSON /* 3 */:
+                    retval.val = JSON.stringify(pVarbind.value); /* Buffer */
+                    break;
+            }
+            break;
+        }
+
+        // Dotted quad formatted strings are used for the values of varbinds with type IpAddress, e.g. 192.168.1.1.
+        case snmp.ObjectType.IpAddress:{
+            switch (pFormat) {
+                case F_TEXT /* 0 */:
+                case F_AUTO /* 99 */:
+                default:
+                    retval.val = pVarbind.value.toString();
+                    retval.format = F_TEXT;
+                    break;
+                case F_NUMERIC /* 1 */:
+                    retval.val = null;
+                    retval.qual = 0x1; // general error
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type ipaddress to numeric ` + JSON.stringify(pVarbind));
+                    break;
+                case F_BOOLEAN /* 2 */:
+                    retval.val = null;
+                    retval.qual = 0x1; // general error
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type ipaddress to boolean ` + JSON.stringify(pVarbind));
+                    break;
+                case F_JSON /* 3 */:
+                    retval.val = JSON.stringify(pVarbind.value); /* Buffer */
+                    break;
+            }
+            break;
+        }
+
+        // Node.js Buffer objects are used for the values of varbinds with type Opaque and OctetString.
+        // NOTE: currently only a heuristic implementation for floating point number is implemented for formats other than json.
+        case snmp.ObjectType.Opaque:{
+            if ( pVarbind.value.length === 7 &&
+                pVarbind.value[0] === 159 &&
+                pVarbind.value[1] === 120 &&
+                pVarbind.value[2] === 4 ) {
+                const value = pVarbind.value.readFloatBE(3);
+                switch (pFormat) {
+                    case F_TEXT /* 0 */:
+                    default:
+                        retval.val = value.toString();
+                        break;
+                    case F_NUMERIC /* 1 */:
+                    case F_AUTO /* 99 */:
+                        retval.val = value;
+                        retval.format = F_NUMERIC;
+                        break;
+                    case F_BOOLEAN /* 2 */:
+                        retval.val = value !== 0;
+                        break;
+                    case F_JSON /* 3 */:
+                        retval.val = JSON.stringify(pVarbind.value); /* Buffer */
+                        break;
+                }
+            } else {
+                retval.val = null;
+                retval.qual = 0x1; // general error
+                retval.format = F_TEXT;
+                adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert opaque data` + JSON.stringify(pVarbind));
+            }
+            break;
+        }
+
+        case snmp.ObjectType.NoSuchObject:
+        case snmp.ObjectType.NoSuchInstance:
+        case snmp.ObjectType.EndOfMibView:
+        default:
+            retval.val = null;
+            retval.qual = 0x1; // general error
+            retval.format = F_TEXT;
+            adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data` + JSON.stringify(pVarbind));
+            break;
+    }
+
+    return retval;
+}
+
+/**
+*/
+function json2buffer(pJson){
+    adapter.log.debug(`json2buffer - ${pJson}`);
+
+    let json = {};
+    try {
+        json=JSON.parse(pJson);
+    } catch (e) {
+        adapter.log.warn(`cannot parse json data ${e.error} - ${pJson}`);
+        return null;
+    }
+
+    if (json.type !== 'Buffer') {
+        adapter.log.warn(`cannot convert json data, type must be Buffer - ${pJson}`);
+        return null;
+    }
+
+    if (!json.data){
+        adapter.log.warn(`cannot convert json data, data element missing - ${pJson}`);
+        return null;
+    }
+
+    return Buffer.from(json.data);
+}
+
+function json2boolean(pJson){
+    adapter.log.debug(`json2buffer - ${pJson}`);
+
+    let json = {};
+    try {
+        json=JSON.parse(pJson);
+    } catch (e) {
+        adapter.log.warn(`cannot parse json data ${e.error} - ${pJson}`);
+        return null;
+    }
+
+    if (json.type !== 'boolean') {
+        adapter.log.warn(`cannot convert json data, type must be boolean - ${pJson}`);
+        return null;
+    }
+
+    if (!json.data){
+        adapter.log.warn(`cannot convert json data, data element missing - ${pJson}`);
+        return null;
+    }
+
+    return Number(json.data) != 0;
+}
+
+function json2number(pJson){
+    adapter.log.debug(`json2buffer - ${pJson}`);
+
+    let json = {};
+    try {
+        json=JSON.parse(pJson);
+    } catch (e) {
+        adapter.log.warn(`cannot parse json data ${e.error} - ${pJson}`);
+        return null;
+    }
+
+    if (json.type !== 'number') {
+        adapter.log.warn(`cannot convert json data, type must be number - ${pJson}`);
+        return null;
+    }
+
+    if (!json.data){
+        adapter.log.warn(`cannot convert json data, data element missing - ${pJson}`);
+        return null;
+    }
+
+    return Number(json.data);
+}
+
+/**
+ * varbindEncode - convert native data to varbind data
+ *
+ * @param   {object}    pVarbind    varbind template
+ * @param   {any}       pData       data to store in varbind
+ * @param   {string}    pDevId      id of device
+ * @param   {string}    pStateId    id of state
+ * @return  {object}    varbind object containing data
+ *
+ */
+function varbindEncode( pState, pData, pDevId, pStateId ) {
+    adapter.log.debug('varbindEncode - encode varbind');
+
+    const retval = {
+        oid:        pState.varbind.oid,
+        type:       pState.varbind.type,
+        value:      null
+    };
+
+    let dataType = typeof(pData);
+    switch (dataType) {
+        case 'boolean':
+        case 'number':
+            break; /* ok, we can handle it */
+
+        case 'string':
+            if (pState.format === F_JSON) dataType='json'; /* json must be handled special */
+            break; /* ok, we can handle it */
+
+        default:
+            retval.value = null;
+            adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode data of type ${dataType} - ` + pData);
+            return retval;
+    }
+
+    switch (pState.varbind.type) {
+        // The JavaScript true and false keywords are used for the values of varbinds with type Boolean.
+        case snmp.ObjectType.Boolean: {
+            switch (dataType) {
+                case 'string':
+                    retval.value = pData.toString() == 'true';
+                    break;
+                case 'number':
+                    retval.value = pData != 0;
+                    break;
+                case 'boolean':
+                    retval.value = pData;
+                    break;
+                case 'json':
+                    retval.value = json2boolean(pData);
+                    break;
+            }
+            break;
+        }
+
+        // All integer based types are specified as expected
+        case snmp.ObjectType.Integer:
+        case snmp.ObjectType.Counter:
+        case snmp.ObjectType.Gauge:
+        case snmp.ObjectType.TimeTicks:
+        case snmp.ObjectType.Integer32:
+        case snmp.ObjectType.Counter32:
+        case snmp.ObjectType.Gauge32:
+        case snmp.ObjectType.Unsigned32: {
+            switch (dataType) {
+                case 'string': {
+                    const valint = parseInt(pData, 10);
+                    retval.value = valint;
+                    if (isNaN (valint)) retval.qual=0x01; // general error
+                    break;
+                }
+                case 'number':
+                    retval.value = pData;
+                    break;
+                case 'boolean': {
+                    retval.value = pData?1:0;
+                    break;
+                }
+                case 'json':
+                    retval.value = json2number(pData);
+                    break;
+            }
+            break;
+        }
+
+        // Since JavaScript does not offer full 64 bit integer support objects with type Counter64 cannot be supported in the same way
+        // as other integer types, instead Node.js Buffer objects are used. Users are responsible for producing (i.e. for set() requests)
+        // and consuming (i.e. the varbinds passed to callback functions) Buffer objects.
+        case snmp.ObjectType.Counter64:{
+            // TODO
+            retval.value = null;
+            adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode data (target counter64) - ` + pData);
+            break;
+        }
+
+        // Node.js Buffer objects are used for the values of varbinds with type Opaque and OctetString. For varbinds with type
+        // OctetString this module will accept JavaScript strings, but will always give back Buffer objects.
+        case snmp.ObjectType.OctetString: {
+            switch (dataType) {
+                case 'string':
+                    retval.value = pData;
+                    break;
+                case 'number':
+                    retval.value = pData.toString;
+                    break;
+                case 'boolean':
+                    retval.value = pData.toString;
+                    break;
+                case 'json':
+                    retval.value = json2buffer(pData);
+                    break;
+            }
+            break;
+        }
+
+        // no dcumentation for type null available
+        case snmp.ObjectType.Null: {
+            retval.value = null;
+            adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode data (target Null) - ` + pData);
+            break;
+        }
+
+        // Dotted decimal strings are used for the values of varbinds with type OID, e.g. 1.3.6.1.2.1.1.5.0.
+        case snmp.ObjectType.OID: {
+            switch (dataType) {
+                case 'string':
+                    retval.value = pData;
+                    break;
+                case 'numeric':
+                    retval.value = null;
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode NUMERIC data (target OID) - ` + pData);
+                    break;
+                case 'boolean':
+                    retval.val = null;
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode BOOLEAN data (target OID) - ` + pData);
+                    break;
+                case 'json':
+                    retval.value = json2buffer(pData);
+                    break;
+            }
+            break;
+        }
+
+        // Dotted quad formatted strings are used for the values of varbinds with type IpAddress, e.g. 192.168.1.1.
+        case snmp.ObjectType.IpAddress:{
+            switch (dataType) {
+                case 'string':
+                    retval.value = pData.toString();
+                    break;
+                case 'numeric':
+                    retval.value = null;
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode NUMERIC data (target IP) - ` + pData);
+                    break;
+                case 'boolean':
+                    retval.value = null;
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode BOOLEAN data (target IP) - ` + pData);
+                    break;
+                case 'json':
+                    retval.value = json2buffer(pData);
+                    break;
+            }
+            break;
+        }
+
+        // Node.js Buffer objects are used for the values of varbinds with type Opaque and OctetString. For varbinds with type
+        // OctetString this module will accept JavaScript strings, but will always give back Buffer objects.
+        case snmp.ObjectType.Opaque:{
+            switch (dataType) {
+                case 'string':
+                    retval.value = null;
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode STRIMG data (target opaque) - ` + pData);
+                    break;
+                case 'numeric':
+                    retval.value = null;
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode NUMERIC data (target opaque) - ` + pData);
+                    break;
+                case 'boolean':
+                    retval.value = null;
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode BOOLEAN data (target opaque) - ` + pData);
+                    break;
+                case 'json':
+                    retval.value = json2buffer(pData);
+                    break;
+            }
+            break;
+        }
+
+        case snmp.ObjectType.NoSuchObject:
+        case snmp.ObjectType.NoSuchInstance:
+        case snmp.ObjectType.EndOfMibView:
+        default: {
+            retval.value = null;
+            adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode data (target default)` + pData);
+            break;
+        }
+    }
+    return retval;
+}
 
 // #################### snmp session handling functions ####################
 
-
 /**
- * onSessionClose - callback called whenever a session is closed
+ * snmpSessionGetAsync - async version of snmp.session.get
  *
- * @param {CTX object}  pCTX    CTX object
- * @return
+ * @param   {object}    pSession    snmp session refernece
+ * @param   {object}    pOids       snmp oids array
+ *
+ * @return  {object}                object containing { error, varbinds } as returned by snmp.session.get
  *
  */
-async function onSessionClose(pCTX) {
-    adapter.log.debug('onSessionClose - device ' + pCTX.name + ' (' + pCTX.ipAddr + ')');
 
-    adapter.clearInterval(pCTX.pollTimer);
-    pCTX.pollTimer = null;
-    pCTX.session = null;
+async function snmpSessionGetAsync( pSession, pOids) {
+    return new Promise((resolve,_reject)=>{
+        const ret={
+            err: null,
+            varbinds: []
+        };
 
-    pCTX.retryTimer = adapter.setTimeout((pCTX) => {
-        pCTX.retryTimer = null;
-        createSession(pCTX);
-    }, pCTX.retryIntvl, pCTX);
+        if (! pSession) {
+            adapter.log.debug( 'session vanished, skipping get oparation');
+            ret.err = 'no active session';
+            resolve(ret);
+        } else {
+            pSession.get (pOids, function (error, varbinds) {
+                ret.err = error;
+                ret.varbinds = varbinds;
+                resolve(ret);
+            });
+        }
+    });
 }
 
 /**
- * onSessionError - callback called whenever a session encounters an error
+ * snmpSessionSetAsync - async version of snmp.session.set
  *
- * @param {CTX object} 	pCTX    CTX object
- * @param {object}      pErr    error object
- * @return
+ * @param   {object}    pSession    snmp session refernece
+ * @param   {object}    pVarbinds   snmp varbinds array
+ *
+ * @return  {object}                object containing { error, varbinds } as returned by snmp.session.set
  *
  */
-async function onSessionError(pCTX, pErr) {
-    adapter.log.debug('onSessionError - device ' + pCTX.name + ' (' + pCTX.ipAddr + ') - ' + pErr.toString);
+async function snmpSessionSetAsync( pSession, pVarbinds) {
+    return new Promise((resolve,_reject)=>{
+        const ret={
+            err: null,
+            varbinds: null
+        };
 
-    // ### to be implemented ###
+        if (! pSession) {
+            adapter.log.debug( 'session vanished, skipping set operation');
+            ret.err = 'no active session';
+            resolve(ret);
+        } else {
+            pSession.set (pVarbinds, function (error, varbinds) {
+                ret.err = error;
+                ret.varbinds = varbinds;
+                resolve(ret);
+            });
+        }
+    });
 }
 
 /**
-/**
- * createSession - initializes a snmp session to one device and starts reader thread
+ * snmpCreateSession - initializes a snmp session
  *
  * @param   {CTX object}    pCTX    CTX object
- * @return
+ *
+ * @return  {object}                session
  *
 var options = {
     port: 161,
@@ -502,34 +1227,16 @@ var options = {
     version: snmp.Version1,
     backwardsGetNexts: true,
     idBitsSize: 32
-}; */
-async function createSession(pCTX) {
-    adapter.log.debug('createSession - device ' + pCTX.name + ' (' + pCTX.ipAddr + ')');
+};
+*/
+async function snmpCreateSession(pCTX) {
+    adapter.log.debug('snmpCreateSession - device ' + pCTX.name + ' (' + pCTX.ipAddr + ')');
 
-    // (re)set device online status
-    adapter.setState(pCTX.id + '.online', false, true);
-
-    // close old session if one exists
-    if (pCTX.retryTimer) {
-        adapter.clearTimeout(pCTX.retryTimer);
-        pCTX.retryTimer = null;
-    }
-
-    if (pCTX.pollTimer) {
-        adapter.clearInterval(pCTX.pollTimer);
-        pCTX.pollTimer = null;
-    }
-
-    if (pCTX.session) {
-        try {
-            pCTX.session.on('error', null); // avoid nesting callbacks
-            pCTX.session.on('close', null); // avoid nesting callbacks
-            pCTX.session.close();
-        } catch (e) {
-            adapter.log.warn('cannot close session for device "' + pCTX.name + '" (' + pCTX.ip + '), ' + e);
-        }
-        pCTX.session = null;
-    }
+    const ret = {
+        session: null,
+        name: pCTX.name,
+        ipAddr: pCTX.ipAddr
+    };
 
     // create snmp session for device
     if (pCTX.snmpVers == SNMP_V1 ||
@@ -538,7 +1245,7 @@ async function createSession(pCTX) {
         const snmpTransport = pCTX.isIPv6 ? 'udp6' : 'udp4';
         const snmpVersion = (pCTX.snmpVers == SNMP_V1) ? snmp.Version1 : snmp.Version2c;
 
-        pCTX.session = snmp.createSession(pCTX.ipAddr, pCTX.authId, {
+        ret.session = snmp.createSession(pCTX.ipAddr, pCTX.authId, {
             port: pCTX.ipPort,   // default:161
             retries: 1,
             timeout: pCTX.timeout,
@@ -562,10 +1269,28 @@ async function createSession(pCTX) {
         }
 
         let snmpAuthProtocol = 0;
-        if ( pCTX.authAuthProto == MD5 ) {
-            snmpAuthProtocol = snmp.AuthProtocols.md5;  // MD5 message authentication
-        } else if ( pCTX.authAuthProto == SHA )  {
-            snmpAuthProtocol = snmp.AuthProtocols.sha;   // SHA message authentication
+        switch (Number(pCTX.authAuthProto)) {   /* ensure numeric type */
+            default:
+                snmpAuthProtocol = 0;
+                break;
+            case MD5:
+                snmpAuthProtocol = snmp.AuthProtocols.md5;
+                break;
+            case SHA:
+                snmpAuthProtocol = snmp.AuthProtocols.SHA;
+                break;
+            case SHA224:
+                snmpAuthProtocol = snmp.AuthProtocols.SHA224;
+                break;
+            case SHA256:
+                snmpAuthProtocol = snmp.AuthProtocols.SHA256;
+                break;
+            case SHA384:
+                snmpAuthProtocol = snmp.AuthProtocols.SHA384;
+                break;
+            case SHA512:
+                snmpAuthProtocol = snmp.AuthProtocols.SHA512;
+                break;
         }
 
         let snmpPrivProtocol = 0;
@@ -592,7 +1317,7 @@ async function createSession(pCTX) {
         const snmpVersion = snmp.Version3;
         // ??? engineID: "8000B98380XXXXXXXXXXXXXXXXXXXXXXXX", // where the X's are random hex digits
 
-        pCTX.session = snmp.createV3Session(pCTX.ipAddr, snmpUser, {
+        ret.session = snmp.createV3Session(pCTX.ipAddr, snmpUser, {
             port: pCTX.ipPort,   // default:161
             retries: 1,
             timeout: pCTX.timeout,
@@ -608,17 +1333,218 @@ async function createSession(pCTX) {
         adapter.log.error('unsupported snmp version code (' + pCTX.snmpVers + ') for device "' + pCTX.name + '" (' + pCTX.ip + ')');
     }
 
-    if (pCTX.session) {
-        pCTX.session.on('close', () => { onSessionClose(pCTX); });
-        pCTX.session.on('error', (err) => { onSessionError(pCTX, err); });
-        pCTX.pollTimer = adapter.setInterval(readOids, pCTX.pollIntvl, pCTX);
+    adapter.log.debug('session for device "' + pCTX.name + '" (' + pCTX.ipAddr + ')' + (ret.session ? '' : ' NOT') + ' created');
 
-        // read one time immediately
-        readOids(pCTX);
+    return ret;
+}
+
+/**
+/**
+ * snmpCloseSession - close a snmp session
+ *
+ * @param   {object}    pSessionCTX    session object
+ *
+ * @return  nothing
+ *
+ */
+async function snmpCloseSession(pSessCtx ) {
+    adapter.log.debug(`snmpCloseSession - device ${pSessCtx.name} (${pSessCtx.ipAddr}`);
+
+    if (pSessCtx.session) {
+        try {
+            pSessCtx.session.close();
+        } catch (e) {
+            adapter.log.warn('cannot close session for device "' + pSessCtx.name + '" (' + pSessCtx.ip + '), ' + e);
+        }
+        pSessCtx.session = null;
     }
 
-    adapter.log.debug('session for device "' + pCTX.name + '" (' + pCTX.ipAddr + ')' + (pCTX.session ? '' : ' NOT') + ' created');
+    return;
+}
 
+/**
+
+/**
+ * onReaderSessionClose - callback called whenever a reader session is closed
+ *
+ * @param {object}      pCTX    CTX object
+ * @return
+ *
+ */
+async function onReaderSessionClose(pCTX) {
+    adapter.log.debug('onReaderSessionClose - device ' + pCTX.name + ' (' + pCTX.ipAddr + ')');
+
+    adapter.clearInterval(pCTX.pollTimer);
+    pCTX.pollTimer = null;
+    if( pCTX.sessCtx ) {
+        pCTX.sessCtx.session = null;
+        pCTX.sessCtx = null;
+    }
+
+    if (!g_shutdownInProgress) {
+        pCTX.retryTimer = adapter.setTimeout((pCTX) => {
+            pCTX.retryTimer = null;
+            createReaderSession(pCTX);
+        }, pCTX.retryIntvl, pCTX);
+    }
+}
+
+/**
+ * onReaderSessionError - callback called whenever a reader session encounters an error
+ *
+ * @param {CTX object} 	pCTX    CTX object
+ * @param {object}      pErr    error object
+ * @return
+ *
+ */
+async function onReaderSessionError(pCTX, pErr) {
+    adapter.log.debug('onReaderSessionError - device ' + pCTX.name + ' (' + pCTX.ipAddr + ') - ' + pErr.toString);
+
+    adapter.log.warn(`device ${pCTX.name} (${pCTX.ipAddr}) reported error ${pErr.toString}`);
+
+    adapter.clearInterval(pCTX.pollTimer);
+    pCTX.pollTimer = null;
+    pCTX.sessCtx.session = null;
+    pCTX.sessCtx = null;
+
+    if (!g_shutdownInProgress) {
+        pCTX.retryTimer = adapter.setTimeout((pCTX) => {
+            pCTX.retryTimer = null;
+            createReaderSession(pCTX);
+        }, pCTX.retryIntvl, pCTX);
+    }
+}
+
+/**
+/**
+ * createReaderSession - initializes a snmp reader session for one device and starts the reader thread
+ *
+ * @param   {object}    pCTX    CTX object
+ * @return
+ *
+ */
+async function createReaderSession(pCTX) {
+    adapter.log.debug('createReaderSession - device ' + pCTX.name + ' (' + pCTX.ipAddr + ')');
+
+    // (re)set device online and alarm status
+    await adapter.setStateAsync(pCTX.id + '.info.error', {val: false, ack: true, q:0x00});
+    await adapter.setStateAsync(pCTX.id + '.info.online', {val: false, ack: true, q:0x00});
+
+    // stop existing timers and close session if one exists
+    if (pCTX.retryTimer) {
+        adapter.clearTimeout(pCTX.retryTimer);
+        pCTX.retryTimer = null;
+    }
+
+    if (pCTX.pollTimer) {
+        adapter.clearInterval(pCTX.pollTimer);
+        pCTX.pollTimer = null;
+    }
+
+    if (pCTX.sessCtx) {
+        await snmpCloseSession(pCTX.sessCtx);
+        pCTX.sessCtx = null;
+    }
+
+    // do NOT create any new session if already shutting down
+    if (g_shutdownInProgress) {
+        adapter.log.warn('session for device "' + pCTX.name + '" (' + pCTX.ipAddr + ') NOT created as instance is shutting down');
+        return;
+    }
+
+    // create snmp session for device
+    pCTX.sessCtx = await snmpCreateSession(pCTX);
+
+    if (pCTX.sessCtx && pCTX.sessCtx.session) {
+        // ok: session created
+
+        pCTX.sessCtx.session.on('close', () => { onReaderSessionClose(pCTX); });
+        pCTX.sessCtx.session.on('error', (err) => { onReaderSessionError(pCTX, err); });
+
+        // read one time immediately
+        await readOids(pCTX);
+
+        // start recurrent reading
+        pCTX.pollTimer = adapter.setInterval(readOids, pCTX.pollIntvl, pCTX);
+
+        adapter.log.debug('session for device "' + pCTX.name + '" (' + pCTX.ipAddr + ') created');
+
+    } else {
+        // error: retry again
+
+        adapter.log.debug('session for device "' + pCTX.name + '" (' + pCTX.ipAddr + ') NOT created, will retry');
+
+        pCTX.retryTimer = adapter.setTimeout((pCTX) => {
+            pCTX.retryTimer = null;
+            createReaderSession(pCTX);
+        }, pCTX.retryIntvl, pCTX);
+
+    }
+
+}
+
+/**
+ * setStates - set all states related to one oid
+ *
+ * @param   {string}    pVarbind    (base) state id
+ * @param   {object}    pOptions    options object as definded by adapter.setState
+ * @param   {object}    pValues     (optional) values object containing values for base, type and json states
+ *
+ * @return  nothing
+ *
+ */
+async function setStates (pStateId, pOptions, pValues ) {
+    adapter.log.debug('setStates - ' + pStateId);
+
+    const state = pOptions;
+
+    if (pValues) state.val = pValues.val;
+    await adapter.setStateAsync(pStateId, state);
+
+    if (adapter.config.optTypeStates){
+        if (pValues) state.val = pValues.type;
+        await adapter.setStateAsync(pStateId+'-type', state);
+    }
+    if (adapter.config.optRawStates){
+        if (pValues) state.val = pValues.json;
+        await adapter.setStateAsync(pStateId+'-raw', state);
+    }
+}
+
+/**
+ * setOnlineState - set online state for a device
+ *
+ * @param {object}      pCTX        device context object
+ * @param {boolean}     pOnline     true if device is online, false otherwise
+ * @param {string}      pMsg        (optional) text to add to info message
+ * @param {string}      pErr        (optional) text to use for error message
+ *                                  error message logged only if pErr != null
+ * @return nothiung
+ */
+async function setOnlineState (pCTX, pOnline, pMsg, pErr){
+
+    await adapter.setStateAsync(pCTX.id + '.info.online', {val: pOnline, ack: true, q:0x00});
+
+    let err = 'RequestTimedOutError: Request timed out';
+    if (pErr) err = pErr;
+    if (pOnline) err = null;
+    await adapter.setStateAsync(pCTX.id + '.info.error_text', {val: err, ack: true, q:0x00});
+
+    if (pCTX.initialized && (pCTX.online == pOnline) ) return;
+
+    if (pErr) {
+        adapter.log.error(`[${pCTX.id}] ${pErr}`);
+        await adapter.setStateAsync(pCTX.id + '.info.error', {val: true, ack: true, q:0x00});
+    }
+    if (pOnline) await adapter.setStateAsync(pCTX.id + '.info.error', {val: false, ack: true, q:0x00});
+
+    let msg = pOnline ? 'connected' : 'disconnected';
+    if (pMsg) msg = `${msg} - ${pMsg}`;
+    adapter.log.info(`[${pCTX.id}] device ${msg}`);
+
+    pCTX.initialized = true;
+    pCTX.online = pOnline;
+    setImmediate(handleConnectionInfo);
 }
 
 /**
@@ -628,516 +1554,59 @@ async function createSession(pCTX) {
  * @return string
  *
  */
-async function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
-    adapter.log.debug('processVarbind - [' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx]);
+async function processVarbind(pCTX, pStateId, pFormat, pWriteable, pVarbind) {
+//async function processVarbind(pCTX, pChunkIdx, pIdx, pVarbind) {
+    adapter.log.debug('processVarbind - [' + pCTX.id + '] ' + pStateId);
 
-    let val;
-    let valTypeStr;
-    const OID = pCTX.chunks[pChunkIdx].OIDs[pIdx];
-    const oidFormat = OID.oidFormat;
+    const devId = pCTX.id;
+    //const OID = pCTX.chunks[pChunkIdx].OIDs[pIdx];
+    //const stateId = pCTX.chunks[pChunkIdx].ids[pIdx];
+    const fullId = `${adapterName}.${adapter.instance}.${pStateId}`;
 
-    switch (pVarbind.type){
-        case snmp.ObjectType.Boolean:{
-            valTypeStr = 'Boolean';
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = pVarbind.value.toString();
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = JSON.parse(pVarbind.value)?1:0;
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = JSON.parse(pVarbind.value);
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = JSON.stringify(pVarbind.value);
-                    break;
-                }
-                default:{
-                    val = pVarbind.value.toString();
-                    break;
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.Integer:{
-            valTypeStr = 'Integer';
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = pVarbind.value.toString();
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = parseInt(pVarbind.value, 10);
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value, 10) !== 0;
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = JSON.stringify(pVarbind.value);
-                    break;
-                }
-                default:{
-                    val = pVarbind.value.toString();
-                    break;
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.OctetString:{
-            valTypeStr = 'OctetString';
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = pVarbind.value.toString();
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = parseInt(pVarbind.value.toString, 10);
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value.toString, 10) !== 0;
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = JSON.stringify(pVarbind.value);
-                    break;
-                }
-                default:{
-                    val = pVarbind.value.toString();
-                    break;
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.Null:{
-            valTypeStr = 'Null';
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = null;
-                    adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert data of type null to text ' + JSON.stringify(pVarbind));
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = null;
-                    adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert data of type null to numeric ' + JSON.stringify(pVarbind));
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = null;
-                    adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert data of type null to boolean ' + JSON.stringify(pVarbind));
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = JSON.stringify(pVarbind.value);
-                    break;
-                }
-                default:{
-                    val = null;
-                    break;
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.OID:{
-            valTypeStr = 'OID';
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = pVarbind.value.toString();
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = null;
-                    adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert data of type OID to numeric ' + JSON.stringify(pVarbind));
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = null;
-                    adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert data of type OID to boolean ' + JSON.stringify(pVarbind));
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = JSON.stringify(pVarbind.value);
-                    break;
-                }
-                default:{
-                    val = pVarbind.value.toString();
-                    break;
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.IpAddress:{
-            valTypeStr = 'IpAddress';
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = pVarbind.value.toString();
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = null;
-                    adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert data of type ipaddress to numeric ' + JSON.stringify(pVarbind));
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = null;
-                    adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert data of type ipaddress to boolean ' + JSON.stringify(pVarbind));
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = JSON.stringify(pVarbind.value);
-                    break;
-                }
-                default:{
-                    val = pVarbind.value.toString();
-                    break;
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.Counter:{
-            valTypeStr = 'Counter';
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = pVarbind.value.toString();
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = parseInt(pVarbind.value.toString, 10);
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value.toString, 10) !== 0;
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = JSON.stringify(pVarbind.value);
-                    break;
-                }
-                default:{
-                    val = pVarbind.value.toString();
-                    break;
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.Gauge:{
-            valTypeStr = 'Gauge';
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = pVarbind.value.toString();
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = parseInt(pVarbind.value.toString, 10);
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value.toString, 10) !== 0;
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = JSON.stringify(pVarbind.value);
-                    break;
-                }
-                default:{
-                    val = pVarbind.value.toString();
-                    break;
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.TimeTicks:{
-            valTypeStr = 'TimeTicks';
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = pVarbind.value.toString();
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = parseInt(pVarbind.value.toString, 10);
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value.toString, 10) !== 0;
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = JSON.stringify(pVarbind.value);
-                    break;
-                }
-                default:{
-                    val = pVarbind.value.toString();
-                    break;
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.Opaque:{
-            valTypeStr = 'Opaque';
-            if ( pVarbind.value.length === 7 &&
-                pVarbind.value[0] === 159 &&
-                pVarbind.value[1] === 120 &&
-                pVarbind.value[2] === 4 ) {
-                const value = pVarbind.value.readFloatBE(3);
-                switch (oidFormat) {
-                    case F_TEXT /* 0 */: {
-                        val = value.toString();
-                        break;
-                    }
-                    case F_NUMERIC /* 1 */: {
-                        val = value;
-                        break;
-                    }
-                    case F_BOOLEAN /* 2 */: {
-                        val = value !== 0;
-                        break;
-                    }
-                    case F_JSON /* 3 */: {
-                        val = JSON.stringify(pVarbind.value);
-                        break;
-                    }
-                    default:{
-                        val = value.toString();
-                        break;
-                    }
-                }
-            }
-            else {
-                switch (oidFormat) {
-                    case F_TEXT /* 0 */: {
-                        val = null;
-                        adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert opaque data to text ' + JSON.stringify(pVarbind));
-                        break;
-                    }
-                    case F_NUMERIC /* 1 */: {
-                        val = null;
-                        adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert opaque data to number ' + JSON.stringify(pVarbind));
-                        break;
-                    }
-                    case F_BOOLEAN /* 2 */: {
-                        val = null;
-                        adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert opaque data to boolean ' + JSON.stringify(pVarbind));
-                        break;
-                    }
-                    case F_JSON /* 3 */: {
-                        val = JSON.stringify(pVarbind.value);
-                        break;
-                    }
-                    default:{
-                        val = null;
-                        adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert opaque data ' + JSON.stringify(pVarbind));
-                        break;
-                    }
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.Integer32:{
-            valTypeStr = 'Integer32';
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = pVarbind.value.toString();
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = parseInt(pVarbind.value.toString, 10);
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value.toString, 10) !== 0;
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = JSON.stringify(pVarbind.value);
-                    break;
-                }
-                default:{
-                    val = pVarbind.value.toString();
-                    break;
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.Counter32:{
-            valTypeStr = 'Counter32';
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = pVarbind.value.toString();
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = parseInt(pVarbind.value.toString, 10);
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value.toString, 10) !== 0;
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = JSON.stringify(pVarbind.value);
-                    break;
-                }
-                default:{
-                    val = pVarbind.value.toString();
-                    break;
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.Gauge32:{
-            valTypeStr = 'Gauge32';
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = pVarbind.value.toString();
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = parseInt(pVarbind.value.toString, 10);
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value.toString, 10) !== 0;
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = JSON.stringify(pVarbind.value);
-                    break;
-                }
-                default:{
-                    val = pVarbind.value.toString();
-                    break;
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.Unsigned32:{
-            valTypeStr = 'Unsigned32';
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = pVarbind.value.toString();
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = parseInt(pVarbind.value.toString, 10);
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = parseInt(pVarbind.value.toString, 10) !== 0;
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = JSON.stringify(pVarbind.value);
-                    break;
-                }
-                default:{
-                    val = pVarbind.value.toString();
-                    break;
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.Counter64:{
-            valTypeStr = 'Counter64';
-            // convert buffer to string using bigin
-            let value = BigInt(0); //bigint constant
-            for (let ii= 0; ii<pVarbind.value.length; ii++){
-                value=value*BigInt(256) + BigInt(pVarbind.value[ii]);
-            }
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = value.toString();
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = value;
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = value !== 0;
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = JSON.stringify(pVarbind.value);
-                    break;
-                }
-                default:{
-                    val = value.toString();
-                    break;
-                }
-            }
-            break;
-        }
-        case snmp.ObjectType.NoSuchObject:{
-            valTypeStr = 'NoSuchObject';
-            val = null;
-            break;
-        }
-        case snmp.ObjectType.NoSuchInstance:{
-            valTypeStr = 'NoSuchInstance';
-            val = null;
-            break;
-        }
-        case snmp.ObjectType.EndOfMibView:{
-            valTypeStr = 'EndOfMibView';
-            val = null;
-            break;
-        }
-        default:{
-            valTypeStr = 'Unknown (' + pVarbind.type.toString + ')';
-            switch (oidFormat) {
-                case F_TEXT /* 0 */: {
-                    val = pVarbind.value.toString();
-                    break;
-                }
-                case F_NUMERIC /* 1 */: {
-                    val = null;
-                    adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert unknown data to numeric ' + JSON.stringify(pVarbind));
-                    break;
-                }
-                case F_BOOLEAN /* 2 */: {
-                    val = null;
-                    adapter.log.warn('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ' cannot convert unknown data to boolean ' + JSON.stringify(pVarbind));
-                    break;
-                }
-                case F_JSON /* 3 */: {
-                    val = null;
-                    break;
-                }
-                default:{
-                    val = pVarbind.value.toString();
-                    break;
-                }
-            }
-            break;
-        }
-    }
-    adapter.log.debug('[' + pId + '] ' + pCTX.chunks[pChunkIdx].ids[pIdx] + '(' + valTypeStr + ')' + JSON.stringify(pVarbind));
-    adapter.log.debug('[' + pId + '] update ' + pCTX.chunks[pChunkIdx].ids[pIdx] + ': ' + val);
+    const state = varbindDecode(pVarbind, pFormat, devId, pStateId);
+
+    adapter.log.debug(`[${devId}] ${pStateId} (${state.typeStr})` + JSON.stringify(pVarbind));
+    adapter.log.debug(`[${devId}] update ${pStateId}: ${state.val}`);
 
     // data OK
     await initObject({
-        _id: pCTX.chunks[pChunkIdx].ids[pIdx],
+        _id: pStateId,
         type: 'state',
         common: {
-            name: pId,
-            write: !!OID.oidWriteable, //## TODO
+            name: devId,
+            write: !!pWriteable,
             read: true,
-            type: oidFormat2StateType(pCTX.chunks[pChunkIdx].OIDs[pIdx].oidFormat),
+            type: oidFormat2StateType(state.format),
             role: 'value'
         },
         native: {
         }
     });
-    adapter.setState(pCTX.chunks[pChunkIdx].ids[pIdx], val, true);
-    adapter.setState(pCTX.chunks[pChunkIdx].ids[pIdx]+'-type', pVarbind.type + ': '+valTypeStr, true);
+
+    await setStates( pStateId,{ ack: true, q:state.qual},
+        { val: state.val, type: pVarbind.type + ': '+state.typeStr, json: JSON.stringify(pVarbind) } );
+
+    /*
+    await adapter.setStateAsync(pStateId, state.val, true);
+    if (adapter.config.opttypeStates){
+        await adapter.setStateAsync(pStateId+'-type', pVarbind.type + ': '+state.typeStr, true);
+    }
     if (adapter.config.optRawStates){
-        adapter.setState(pCTX.chunks[pChunkIdx].ids[pIdx]+'-raw', JSON.stringify(pVarbind), true);
+        await adapter.setStateAsync(pStateId+'-raw', JSON.stringify(pVarbind), true);
+    }
+    */
+
+    if ( pWriteable ) {
+        STATEs[fullId] = {
+            CTX: pCTX,
+            stateId: pStateId,
+            format: pFormat
+        };
+        STATEs[fullId].varbind = {
+            oid: pVarbind.oid,
+            type: pVarbind.type,
+            value: null
+        };
     }
     return;
 }
@@ -1154,81 +1623,51 @@ async function processVarbind(pCTX, pChunkIdx, pId, pIdx, pVarbind) {
 async function readChunkOids(pCTX, pIdx) {
     adapter.log.debug('readChunkOIDs - device "' + pCTX.name + '" (' + pCTX.ipAddr + '), chunk idx ' + pIdx);
 
-    return new Promise((resolve,_reject)=>{
-        const session = pCTX.session;
-        const id = pCTX.id;
-        const oids = pCTX.chunks[pIdx].oids;
-        // const ids = pCTX.chunks[pIdx].ids;
+    const devId = pCTX.id;
+    const oids = pCTX.chunks[pIdx].oids;
 
-        if (! session) {
-            // issue #151 - the session object might get deleted during prosessing of get loop
-            adapter.log.debug( 'session vanished, skipping get oparation');
-            resolve();
+    if (! pCTX.sessCtx){
+        adapter.log.debug('[' + devId + '] session.get - session context is null, skip processing');
+        return;
+    }
+
+    const result = await snmpSessionGetAsync( pCTX.sessCtx.session, oids);
+    adapter.log.debug('[' + devId + '] session.get completed for chunk index ' + pIdx );
+    if (result.err) {
+        // error
+        adapter.log.debug('[' + devId + '] session.get: ' + result.err.toString());
+        if (result.err.toString() === 'RequestTimedOutError: Request timed out') {
+            // timeout error
+            for (let ii = 0; ii < pCTX.chunks[pIdx].ids.length; ii++) {
+                await setStates( pCTX.chunks[pIdx].ids[ii], {ack: true, q:0x02} ); // connection problem
+            }
+            await setOnlineState( pCTX, false, 'request timeout', null); // log info only
         } else {
-            session.get(oids, (err, varbinds) => {
-                adapter.log.debug('[' + id + '] session.get completed for chunk index ' + pIdx );
-                if (err) {
-                    // error occured
-                    adapter.log.debug('[' + id + '] session.get: ' + err.toString());
-                    if (err.toString() === 'RequestTimedOutError: Request timed out') {
-                        // timeout error
-                        for (let ii = 0; ii < pCTX.chunks[pIdx].ids.length; ii++) {
-                            adapter.setState(pCTX.chunks[pIdx].ids[ii], {q:0x02} ); // connection problem
-                            adapter.setState(pCTX.chunks[pIdx].ids[ii]+'-type', {q:0x02} ); // connection problem
-                        }
-                        if (!pCTX.inactive || !pCTX.initialized) {
-                            adapter.log.info('[' + id + '] device disconnected - request timout');
-                            pCTX.inactive = true;
-                            setImmediate(handleConnectionInfo);
-                        }
-                    } else {
-                        // other error
-                        for (let ii = 0; ii < pCTX.chunks[pIdx].ids.length; ii++) {
-                            adapter.setState(pCTX.chunks[pIdx].ids[ii], {val: null, ack: true, q:0x44} ); // device reports error
-                            adapter.setState(pCTX.chunks[pIdx].ids[ii]+'-type', {val: null, ack: true, q:0x44} ); // device reports error
-                        }
-                        if (!pCTX.inactive || !pCTX.initialized) {
-                            adapter.log.error('[' + id + '] session.get: ' + err.toString());
-                            adapter.log.info('[' + id + '] device disconnected');
-                            pCTX.inactive = true;
-                            setImmediate(handleConnectionInfo);
-                        }
-                    }
-                    adapter.setState(id + '.online', false, true);
-                } else {
-                    // success
-                    if (pCTX.inactive) {
-                        adapter.log.info('[' + id + '] device (re)connected');
-                        pCTX.inactive = false;
-                        setImmediate(handleConnectionInfo);
-                    }
-                    adapter.setState(id + '.online', true, true);
-
-                    // process returned values
-                    for (let ii = 0; ii < varbinds.length; ii++) {
-                        if (snmp.isVarbindError(varbinds[ii])) {
-                            if ( ! pCTX.chunks[pIdx].OIDs[ii].oidOptional ||
-                                ! snmp.varbindError(varbinds[ii]).startsWith('NoSuchInstance:') ) {
-                                adapter.log.error('[' + id + '] session.get: ' + snmp.varbindError(varbinds[ii]));
-                            }
-                            adapter.setState(pCTX.chunks[pIdx].ids[ii], { val: null, ack: true, q: 0x84}); // sensor reports error
-                            adapter.setState(pCTX.chunks[pIdx].ids[ii]+'-type', { val: null, ack: true, q: 0x84}); // sensor reports error
-                        } else {
-                            //adapter.log.debug('[' + id + '] update ' + pCTX.ids[ii] + ': ' + varbinds[ii].value.toString());
-                            //adapter.setState(pCTX.ids[ii], varbinds[ii].value.toString(), true); // data OK
-                            processVarbind(pCTX, pIdx, id, ii, varbinds[ii]);
-                        }
-                    }
-                }
-
-                if (!pCTX.initialized) {
-                    pCTX.initialized = true;
-                    setImmediate(handleConnectionInfo);
-                }
-                resolve();
-            });
+            // other error
+            for (let ii = 0; ii < pCTX.chunks[pIdx].ids.length; ii++) {
+                await setStates(pCTX.chunks[pIdx].ids[ii], {val: null, ack: true, q:0x44} ); // device reports error
+            }
+            await setOnlineState( pCTX, false, null, 'session.get: ' + result.err.toString()); // log an error
         }
-    });
+    } else {
+        // success
+        await setOnlineState( pCTX, true, null, null);
+
+        // process returned values
+        for (let ii = 0; ii < result.varbinds.length; ii++) {
+            if (snmp.isVarbindError(result.varbinds[ii])) {
+                if ( ! pCTX.chunks[pIdx].OIDs[ii].oidOptional ||
+                    ! snmp.varbindError(result.varbinds[ii]).startsWith('NoSuchInstance:') ) {
+                    adapter.log.error('[' + devId + '] session.get: ' + snmp.varbindError(result.varbinds[ii]));
+                }
+                await setStates(pCTX.chunks[pIdx].ids[ii], {val: null, ack: true, q:0x84} ); // sensor reports error
+            } else {
+                const OID = pCTX.chunks[pIdx].OIDs[ii];
+                const stateId = pCTX.chunks[pIdx].ids[ii];
+                processVarbind(pCTX, stateId, OID.oidFormat, OID.oidWriteable, result.varbinds[ii]);
+            }
+        }
+    }
 }
 
 /**
@@ -1242,25 +1681,24 @@ async function readOids(pCTX) {
     adapter.log.debug('readOIDs - device "' + pCTX.name + '" (' + pCTX.ipAddr + ')');
 
     //const session = pCTX.session;
-    const id = pCTX.id;
+    const devId = pCTX.id;
 
     for (let cc = 0; cc < pCTX.chunks.length; cc++) {
-        adapter.log.debug('[' + id + '] processing oid chunk index ' + cc );
+        adapter.log.debug('[' + devId + '] processing oid chunk index ' + cc );
         await readChunkOids( pCTX, cc);
-        adapter.log.debug('[' + id + '] processing oid chunk index ' + cc + ' completed' );
+        adapter.log.debug('[' + devId + '] processing oid chunk index ' + cc + ' completed' );
     }
 }
 
+
 // #################### general housekeeping functions ####################
 
-function handleConnectionInfo() {
+async function handleConnectionInfo() {
     adapter.log.debug('handleConnectionInfo');
 
     let haveConnection = false;
     for (let ii = 0; ii < CTXs.length; ii++) {
-        if (!CTXs[ii].inactive) {
-            haveConnection = true;
-        }
+        if (CTXs[ii].online) haveConnection = true;
     }
 
     if (g_isConnected !== haveConnection) {
@@ -1272,8 +1710,9 @@ function handleConnectionInfo() {
         g_isConnected = haveConnection;
 
         adapter.log.debug('info.connection set to ' + g_isConnected);
-        adapter.setState('info.connection', g_isConnected, true);
     }
+
+    await adapter.setStateAsync('info.connection', g_isConnected, true);
 }
 
 /**
@@ -1291,9 +1730,9 @@ function validateConfig() {
 
     adapter.log.debug('validateConfig - verifying oid-sets');
 
-    if ( adapter.config.optUseName ) {
-        adapter.log.warn('Option compatibility mode has been deprecated; please consider to adapt config.');
-    }
+    // if ( adapter.config.optUseName ) {
+    //    adapter.log.warn('Option compatibility mode has been deprecated; please consider to adapt config.');
+    // }
 
     // ensure that at least empty config exists
     adapter.config.oids = adapter.config.oids || [];
@@ -1338,6 +1777,10 @@ function validateConfig() {
         }
         if (oid.oidName === 'online') {
             adapter.log.error('oid "' + oid.oidName + '"is invalid. Name "online" is reserved. Please correct configuration.');
+            ok = false;
+        }
+        if (oid.oidName.startsWith('info.')) {
+            adapter.log.error('oid "' + oid.oidName + '"is invalid. Folder "info" is reserved. Please correct configuration.');
             ok = false;
         }
 
@@ -1568,10 +2011,10 @@ function validateConfig() {
  *		ipStr		string	ip address of target device with invalid chars removed
  *		OIDs		array of OID objects
  *		oids		array of oid strings (used for snmp call)
- *		ids			array of id strings (index syncet o oids array)
+ *		ids			array of iod id strings (index synced with oids array)
  * 		authId 	    string 	snmp community (snmp V1, V2 only)
  *		initialized	boolean	true if connection is initialized
- *		inactive	boolean	true if connection to device is active
+ *		online	    boolean	true if connection to device is active
  */
 function setupContices() {
     adapter.log.debug('setupContices - initializing contices');
@@ -1661,7 +2104,8 @@ function setupContices() {
 
         CTXs[jj].pollTimer = null;  // poll intervall timer
         CTXs[jj].session = null;    // snmp session
-        CTXs[jj].inactive = true;   // connection status of device
+        CTXs[jj].initialized = false;   // connection initialization status of device
+        CTXs[jj].online = false;   // connection status of device
 
         let cIdx = -1;    // chunk index
         let cCnt = 0;     // chunk element count
@@ -1764,6 +2208,9 @@ async function onReady() {
         return;
     }
 
+    // cleanup states
+    await cleanupStates();
+
     // read global config
     g_chunkSize = adapter.config.optChunkSize || 20;
     adapter.log.info('adapter initializing, chunk size set to ' + g_chunkSize);
@@ -1776,11 +2223,14 @@ async function onReady() {
 
     adapter.log.debug('initialization completed');
 
+    // cleanup states
+    await cleanupStates();
+
     // start one reader thread per device
     adapter.log.debug('starting reader threads');
     for (let ii = 0; ii < CTXs.length; ii++) {
         const CTX = CTXs[ii];
-        createSession(CTX);
+        createReaderSession(CTX);
     }
 
     // start connection info updater
@@ -1792,6 +2242,79 @@ async function onReady() {
 }
 
 /**
+ * onStateChange - called when any state changes
+ *
+ * @param   {string}    pId     id of device
+ * @param   {object}    pState  state object of device
+ * @return
+ *
+ */
+async function onStateChange (pFullId, pState) {
+    adapter.log.debug(`onStateChange triggered - id ${pFullId}`);
+
+    if ( ! pState || pState.ack ) return;
+
+    adapter.log.debug(`onStateChange - state id ${pFullId} set to ${pState.val}`);
+
+    if ( (typeof(STATEs[pFullId]) === 'undefined') || (typeof(STATEs[pFullId].varbind) === 'undefined') ) {
+        adapter.log.warn(`cannot write to uninitialized state ${pFullId}`);
+        return;
+    }
+
+    const CTX = STATEs[pFullId].CTX;
+    const devId = CTX.id;
+    const format = STATEs[pFullId].format;
+    const stateId = STATEs[pFullId].stateId;
+
+    // TODO: if state is set but no connetion is possible, errors occure every x seconds ...
+    //       Read erroro trigger onStateChange with ACK-false - must be filtered somehow
+    //       Set state only if something hanges (incl. quality) ???
+
+    // prepare varbind to be written
+    const varbind = varbindEncode( STATEs[pFullId], pState.val, devId, stateId );
+
+    let sessCtx = await snmpCreateSession(CTX);
+
+    if (varbind.value) {
+        const resultSet = await snmpSessionSetAsync(sessCtx.session, [varbind]);
+        if (resultSet.err) {
+            adapter.log.error('[' + devId + '] session.set: ' + resultSet.err.toString());
+        } else {
+            adapter.log.debug('[' + devId + '] session.set: success');
+        }
+    }
+
+    // reread data of device
+    const resultGet = await snmpSessionGetAsync(sessCtx.session, [varbind.oid]);
+    if ( resultGet.varbinds.length === 1) { /* should be always one */
+        if (snmp.isVarbindError(resultGet.varbinds[0])) {
+            adapter.log.error('[' + devId + '] session.get: ' + snmp.varbindError(resultGet.varbinds[0]));
+
+            await setStates(stateId, {val: null, ack: true, q:0x84} ); // sensor reports error
+            /*
+            await adapter.setStateAsync(stateId, { val: null, ack: true, q: 0x84}); // sensor reports error
+            if (adapter.config.optTypeStates){
+                await adapter.setStateAsync(stateId+'-type', { val: null, ack: true, q: 0x84}); // sensor reports error
+            }
+            if (adapter.config.optRawStates){
+                await adapter.setStateAsync(stateId+'-raw', {val: null, ack: true, q:0x84} ); //sensor reports error
+            }
+            */
+        } else {
+            processVarbind(CTX, stateId, format, true, resultGet.varbinds[0]);
+        }
+    } else {
+        adapter.log.error(`[${devId}] session.set: invalid number of varbinds returned (${resultGet.varbinds.length})`);
+    }
+
+    if (sessCtx) {
+        await snmpCloseSession (sessCtx);
+        sessCtx=null;
+    }
+}
+
+
+/**
  * onUnload - called when adapter shuts down
  *
  * @param {callback} callback 	callback function
@@ -1801,12 +2324,15 @@ async function onReady() {
 function onUnload(callback) {
     adapter.log.debug('onUnload triggered');
 
+    g_shutdownInProgress = true;
+
     for (let ii = 0; ii < CTXs.length; ii++) {
         const CTX = CTXs[ii];
 
         // (re)set device online status
         try {
-            adapter.setState(CTX.id + '.online', false, true);
+            adapter.setState(CTX.id + '.info.error', {val: false, ack: true, q:0x00});
+            adapter.setState(CTX.id + '.info.online', {val: false, ack: true, q:0x00});
         } catch (e) { /* */ }
 
         // close session if one exists
@@ -1817,13 +2343,9 @@ function onUnload(callback) {
             CTX.pollTimer = null;
         }
 
-        if (CTX.session) {
-            try {
-                CTX.session.on('error', null); // avoid nesting callbacks
-                CTX.session.on('close', null); // avoid nesting callbacks
-                CTX.session.close();
-            } catch (e) { /* */ }
-            CTX.session = null;
+        if (CTX.sessCtx) {
+            snmpCloseSession(CTX.sessCtx);
+            CTX.sessCtx = null;
         }
     }
 

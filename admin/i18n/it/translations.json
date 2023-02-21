@@ -52,5 +52,9 @@
     "ttOptChunkSize": "Numero massimo di oid all'interno di una richiesta",
     "ttOptRawStates": "Crea stati contenenti dati non elaborati codificati come json.",
     "ttOptUseIp": "Contrassegna per utilizzare l'indirizzo IP per gli ID di stato",
-    "warnAuthUnused": "Nota: la configurazione in questo pannello non verrà attualmente utilizzata poiché nessun dispositivo utilizza il protocollo SNMPv3."
+    "warnAuthUnused": "Nota: la configurazione in questo pannello non verrà attualmente utilizzata poiché nessun dispositivo utilizza il protocollo SNMPv3.",
+    "hlpOptTypeStates": "La selezione di questa opzione consente la creazione di stati contenenti dati di tipo.",
+    "lblOptTypeStates": "Aggiungi stati di tipo",
+    "ttOptTypeStates": "Crea stati contenenti dati di tipo di oids.",
+    "lblAutomatic": "Automatico"
 }

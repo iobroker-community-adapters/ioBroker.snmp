@@ -52,5 +52,9 @@
     "ttOptChunkSize": "Recuento máximo de oid dentro de una solicitud",
     "ttOptRawStates": "Cree estados que contengan datos sin procesar codificados como json.",
     "ttOptUseIp": "Marque para usar la dirección IP para las identificaciones de estado",
-    "warnAuthUnused": "Nota: La configuración en este panel no se usará actualmente ya que ningún dispositivo usa el protocolo SNMPv3."
+    "warnAuthUnused": "Nota: La configuración en este panel no se usará actualmente ya que ningún dispositivo usa el protocolo SNMPv3.",
+    "hlpOptTypeStates": "Al seleccionar esta opción, se habilita la creación de estados que contienen datos de tipo.",
+    "lblOptTypeStates": "Agregar estados de tipo",
+    "ttOptTypeStates": "Cree estados que contengan datos de tipo de oids.",
+    "lblAutomatic": "Automático"
 }

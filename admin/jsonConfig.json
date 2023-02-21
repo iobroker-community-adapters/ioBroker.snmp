@@ -116,9 +116,10 @@
                                 { "label": "lblString", "value": 0}, 
                                 { "label": "lblNumber", "value": 1},
                                 { "label": "lblBoolean", "value": 2},
-                                { "label": "lblJson", "value": 3}
+                                { "label": "lblJson", "value": 3},
+                                { "label": "lblAutomatic", "value": 99}
                             ],
-                            "default": 0
+                            "default": 99
                         },
                         {
                             "type": "checkbox",
@@ -344,10 +345,14 @@
                             "filter": false,
                             "sort": false,
                             "options": [
-                                { "label": "md5", "value": 1}, 
-                                { "label": "sha", "value": 2}
-                            ],
-                            "default": "1"
+                                { "label": "md5",    "value": 1}, 
+                                { "label": "sha",    "value": 2},
+                                { "label": "sha224", "value": 3},
+                                { "label": "sha256", "value": 4},
+                                { "label": "sha384", "value": 5},
+                                { "label": "sha512", "value": 6}
+                                ],
+                            "default": 1
                         },
                         {
                             "type": "password",
@@ -423,6 +428,14 @@
                     "default": false,
                     "tooltip": "ttOptRawStates",
                     "help": "hlpOptRawStates"
+                },
+				"optTypeStates": 	{
+                    "type": "checkbox",
+                    "label": "lblOptTypeStates",
+					"newLine": true,
+                    "default": false,
+                    "tooltip": "ttOptTypeStates",
+                    "help": "hlpOptTypeStates"
                 }
             }
 		}        

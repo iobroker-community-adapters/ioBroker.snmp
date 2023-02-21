@@ -18,15 +18,26 @@ This adapter can be used to poll information from devices like printers, network
 ## Changelog
 
 <!--
-## __WORK IN PROGRESS__
+### __WORK IN PROGRESS__
 -->
+### __WORK IN PROGRESS__
+* (McM1957) Support to write data to oids has been implemented. (#150)
+* (McM1957) Major parts of code have been rewritten so support oid writing.
+* (McM1957) States containing type information can be disabled now. (#218)
+* (McM1957) States indicating online and error status of devices have been added. State 'online' has been moved to folder info.
+* (McM1957) Devicestatus is now displayed at object view using colour and icons.
+* (McM1957) Data type 'automatic' has been added to oid states datatype selector.
+* (McM1957) A problem reported by sentry has been fixed. (#224)
+* (McM1957) An incorrect setting of ack flags has been corrected. (#225)
+* (McM1957) Support for sha224, sha256, sha384 and sha512 message authentication has been added (#210)
+
 ### 2.3.0 (2022-12-13)
 * (McM1957) Add support for using native datatypes for states. (#143)
 * (McM1957) Support has been added to store binary oid data as json. (#188)
 * (McM1957) Incorrect setting of write mode has been fixed. (#191)
 * (McM1957) Tables within german documentation have been fixed. (#192)
 * (McM1957) Naming an oid with the reserved name 'online' has been blocked. (#203)
-* (McM1957) Some changes related to code quality have been implemnted. (#201, #190)
+* (McM1957) Some changes related to code quality have been implemented. (#201, #190)
 
 ### 2.2.1 (2022-10-18)
 * (McM1957) Fixed an error within io-package.json.
