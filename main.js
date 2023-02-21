@@ -132,11 +132,12 @@ let didInstall = false;
 // #################### global variables ####################
 let adapter;    // adapter instance - @type {ioBroker.Adapter}
 
-const CTXs = [];		    // see description at header of file
-const STATEs = [];          // states cache, index by full id
-let g_isConnected = false; 	// local copy of info.connection state
+const CTXs = [];		            // see description at header of file
+const STATEs = [];                  // states cache, index by full id
+let g_isConnected = false; 	        // local copy of info.connection state
+let g_shutdownInProgress = false;   // maximum number of OIDs per request
 let g_connUpdateTimer = null;
-let g_chunkSize = 3;         // maximum number of OIDs per request
+let g_chunkSize = 3;                // maximum number of OIDs per request
 
 /**
  * Start the adapter instance
@@ -1380,10 +1381,12 @@ async function onReaderSessionClose(pCTX) {
         pCTX.sessCtx = null;
     }
 
-    pCTX.retryTimer = adapter.setTimeout((pCTX) => {
-        pCTX.retryTimer = null;
-        createReaderSession(pCTX);
-    }, pCTX.retryIntvl, pCTX);
+    if (!g_shutdownInProgress) {
+        pCTX.retryTimer = adapter.setTimeout((pCTX) => {
+            pCTX.retryTimer = null;
+            createReaderSession(pCTX);
+        }, pCTX.retryIntvl, pCTX);
+    }
 }
 
 /**
@@ -1404,11 +1407,12 @@ async function onReaderSessionError(pCTX, pErr) {
     pCTX.sessCtx.session = null;
     pCTX.sessCtx = null;
 
-    pCTX.retryTimer = adapter.setTimeout((pCTX) => {
-        pCTX.retryTimer = null;
-        createReaderSession(pCTX);
-    }, pCTX.retryIntvl, pCTX);
-
+    if (!g_shutdownInProgress) {
+        pCTX.retryTimer = adapter.setTimeout((pCTX) => {
+            pCTX.retryTimer = null;
+            createReaderSession(pCTX);
+        }, pCTX.retryIntvl, pCTX);
+    }
 }
 
 /**
@@ -1440,6 +1444,12 @@ async function createReaderSession(pCTX) {
     if (pCTX.sessCtx) {
         await snmpCloseSession(pCTX.sessCtx);
         pCTX.sessCtx = null;
+    }
+
+    // do NOT create any new session if already shutting down
+    if (g_shutdownInProgress) {
+        adapter.log.warn('session for device "' + pCTX.name + '" (' + pCTX.ipAddr + ') NOT created as instance is shutting down');
+        return;
     }
 
     // create snmp session for device
@@ -2313,6 +2323,8 @@ async function onStateChange (pFullId, pState) {
  */
 function onUnload(callback) {
     adapter.log.debug('onUnload triggered');
+
+    g_shutdownInProgress = true;
 
     for (let ii = 0; ii < CTXs.length; ii++) {
         const CTX = CTXs[ii];
