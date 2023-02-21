@@ -344,7 +344,11 @@ async function initObject(pObj) {
 
         if ( STATEs[fullId].commonType !== pObj.common.type ) {
             try {
-                adapter.log.info('reinitializing obj "' + pObj._id + '" state-type change '+STATEs[fullId].commonType+' -> '+pObj.common.type);
+                if ( STATEs[fullId].commonType === 'mixed') {
+                    adapter.log.debug('reinitializing obj "' + pObj._id + '" state-type change '+STATEs[fullId].commonType+' -> '+pObj.common.type);
+                } else {
+                    adapter.log.info('reinitializing obj "' + pObj._id + '" state-type change '+STATEs[fullId].commonType+' -> '+pObj.common.type);
+                }
                 await adapter.extendObjectAsync(pObj._id, {common: { type: pObj.common.type }});
                 STATEs[fullId].commonType = pObj.common.type;
             } catch (e) {
