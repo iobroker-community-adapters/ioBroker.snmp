@@ -119,7 +119,7 @@
                                 { "label": "lblJson", "value": 3},
                                 { "label": "lblAutomatic", "value": 99}
                             ],
-                            "default": 0
+                            "default": 99
                         },
                         {
                             "type": "checkbox",
