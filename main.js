@@ -1570,7 +1570,7 @@ async function processVarbind(pCTX, pStateId, pFormat, pWriteable, pVarbind) {
     });
 
     await setStates( pStateId,{ ack: true, q:state.qual},
-        { val: state.val, type: pVarbind.type + ': '+state.typeSt, json: JSON.stringify(pVarbind) } );
+        { val: state.val, type: pVarbind.type + ': '+state.typeStr, json: JSON.stringify(pVarbind) } );
 
     /*
     await adapter.setStateAsync(pStateId, state.val, true);
