@@ -20,10 +20,8 @@ This adapter can be used to poll information from devices like printers, network
 <!--
 ## __WORK IN PROGRESS__
 -->
-
-### __WORK IN PROGRESS__
+### 2.4.1 (2023-02-22)
 * (McM1957) An error at configuration pages has been corrected. (#228)
-
 
 ### 2.4.0 (2023-02-21)
 * (McM1957) Support to write data to oids has been implemented. (#150)

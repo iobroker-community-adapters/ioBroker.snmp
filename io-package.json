@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "snmp",
-    "version": "2.4.0",
+    "version": "2.4.1",
     "news": {
+      "2.4.1": {
+        "en": "An error at configuration pages has been corrected. (#228)",
+        "de": "Ein Fehler auf Konfigurationsseiten wurde korrigiert. (#228)",
+        "ru": "Исправлена ошибка на страницах конфигурации. (#228)",
+        "pt": "Foi corrigido um erro nas páginas de configuração. (#228)",
+        "nl": "Een fout in configuration pagina's is gecorrigeerd. ( 228)",
+        "fr": "Une erreur sur les pages de configuration a été corrigée. (#228)",
+        "it": "È stato corretto un errore nelle pagine di configurazione. (#228)",
+        "es": "Se ha corregido un error en las páginas de configuración. (#228)",
+        "pl": "Nieprawidłowe błędy na stronach konfiguracji zostały poprawione. (#228)",
+        "uk": "Виправлено помилку на сторінках конфігурації. (#228)",
+        "zh-cn": "对组合页的错误进行了纠正。 (第228号)"
+      },
       "2.4.0": {
         "en": "Support to write data to oids has been implemented. (#150)\nMajor parts of code have been rewritten so support oid writing.\nStates containing type information can be disabled now. (#218)\nStates indicating online and error status of devices have been added. State 'online' has been moved to folder info.\nDevicestatus is now displayed at object view using colour and icons.\nData type 'automatic' has been added to oid states datatype selector.\nA problem reported by sentry has been fixed. (#224)\nAn incorrect setting of ack flags has been corrected. (#225)\nSupport for sha224, sha256, sha384 and sha512 message authentication has been added (#210)",
         "de": "Unterstützung zum Schreiben von Daten an OIDs wurde implementiert. (#150)\nGrößere Teile des Codes wurden neu geschrieben um die Unterstützung des Schreiben von OIDs umzusetzen.\nZustände mit Typinformationen können jetzt deaktiviert werden (#218)\nZustände, die den Online- und Fehlerstatus von Geräten anzeigen, wurden hinzugefügt. Der Zustand 'online' wurde in den Ordner 'info' verschoben.\nDer Devicestatus wird nun in der Objektansicht farbig und mit Symbolen angezeigt.\nDer Datentyp 'automatisch' wurde zur OID Zustands-Datatypauswahl hinzugefügt.\nEs wurde ein Problem behoben, das von sentry gemeldet wurde. (#224)\nEine falsche Erstellung von ack-Flags wurde korrigiert. (#225)\nUnterstützung für die Nachrichten-Authentifizierung mittels sha224, sha256, sha384 und sha512 wurde hinzugefügt (#210)",
@@ -80,19 +93,6 @@
         "pl": "Wsparcie (IPv4) zostało odczytane (#165)\nUrządzenia bez żadnej aktywnej oidy nie powodują już błędu, ale tylko ocenił ostrzeżenie (#155)\nWartość Timeru jest teraz prawidłowa (#156, #164)\nCzęść z nich została ustalona (#167)\npakiety zewnętrzne zostały zaktualizowane w zależności od bota",
         "zh-cn": "对(IPv4)域名的支助(第165号)\n无任何积极无效的人不再造成致命错误,只是警告(第155号)\n时间价值现在更严格(第156号,第164号)\n一些发货人的事故已经确定(第167号)\n外部包件经过依赖性更新。",
         "uk": "Прочитано підтримку доменних імен (IPv4) (#165)\nПристрої без жодного активного oid більше не викликають фатальну помилку, а лише реєструють попередження (#155)\nЗначення таймера тепер перевіряються суворіше (#156, #164)\nДеякі збої, про які повідомляє sentry, виправлено (#167)\nзовнішні пакунки були оновлені dependabot"
-      },
-      "2.1.8": {
-        "en": "HOTFIX: Parameter \"community\" has not been migrated when updating to version v2.x.x from previous releases. (#163)",
-        "de": "HOTFIX: Der Parameter \"community\" wurde bei der Aktualisierung der Version v2.x.x aus früheren Versionen nicht migriert. (#163)",
-        "ru": "HOTFIX: Параметр сообщество не было мигрировано при обновлении версии v2.x.x из предыдущих релизов. (#163)",
-        "pt": "HOTFIX: A comunidade de parâmetros não foi migrada ao atualizar para a versão v2.x.x de versões anteriores. (#163)",
-        "nl": "De parametergemeenschap is niet gemigreerd als je aan het opvoeden bent naar versie V2.x van eerdere vrijlating. (163)",
-        "fr": "HOTFIX : La communauté de paramètres n'a pas été migrée lors de la mise à jour de la version v2.x.x des versions précédentes. (#163)",
-        "it": "HOTFIX: La comunità dei parametri non è stata migrata durante l'aggiornamento alla versione v2.x.x.x dalle versioni precedenti. (#163)",
-        "es": "HOTFIX: La comunidad del parámetro no ha sido migrada al actualizar a versión v2.x.x de versiones anteriores. (#163)",
-        "pl": "HOTFIX: Parameter community nie zostało migrowane, gdy dodano do wersji v2.x.x. (2)",
-        "zh-cn": "HOTFIX:在从以前的释放中更新到第2.x.x号时,没有移居第二线社区。 (第163号)",
-        "uk": "ВИПРАВЛЕННЯ: параметр «community» не було перенесено під час оновлення до версії v2.x.x із попередніх випусків. (#163)"
       }
     },
     "title": "SNMP",
