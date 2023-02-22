@@ -79,7 +79,7 @@ jobs:
         # Then uncomment and customize the following block:
           sentry: true
           sentry-token: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          sentry-project: "iobroker-nsclient"
-          sentry-version-prefix: "iobroker.nsclient"
+          sentry-project: "iobroker-snmp"
+          sentry-version-prefix: "iobroker.snmp"
           # If your sentry project is linked to a GitHub repository, you can enable the following option
           sentry-github-integration: true
