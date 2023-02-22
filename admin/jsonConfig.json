@@ -290,7 +290,7 @@
                "oidsInfo_2":{
 					"type": "staticText",
 					"text": "warnAuthUnused",
-					"hidden": "for(let ii=0; ii<data.devs.length; ii++) {if (data.devs[ii].snmpversion == 3){return 1;}}; return 0;",
+					"hidden": "for(let ii=0; ii<data.devs.length; ii++) {if (data.devs[ii].devSnmpVers == 3){return 1;}}; return 0;",
 					"style": {
 						"fontSize": 16
 					}
