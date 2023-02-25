@@ -31,7 +31,7 @@ This adapter can be used to poll information from devices like printers, network
 <!--
 ## __WORK IN PROGRESS__
 -->
-### __WORK IN PROGRESS__
+### 2.4.2 (2023-02-25)
 * (McM1957) A problem reported by sentry has been fixed. (#230)
 
 ### 2.4.1 (2023-02-22)

@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "snmp",
-    "version": "2.4.1",
+    "version": "2.4.2",
     "news": {
+      "2.4.2": {
+        "en": "A problem reported by sentry has been fixed. (#230)",
+        "de": "Es wurde ein Problem behoben, das von sentry gemeldet wurde. (#230)",
+        "ru": "Проблема, сообщенная судоходством, была исправлена. (#230)",
+        "pt": "Um problema relatado por sentinela foi corrigido. (#230)",
+        "nl": "Een probleem gemeld door sentiment is opgelost. (230)",
+        "fr": "Un problème signalé par la sentinelle a été corrigé. (#230)",
+        "it": "Un problema segnalato dalla sentinella è stato risolto. (#230)",
+        "es": "Se ha solucionado un problema reportado por centinela. (#230)",
+        "pl": "Problem doniesiony przez sentry został ustalony. (#230)",
+        "uk": "Зафіксовано проблему, яку було відправлено. (#230)",
+        "zh-cn": "传发器所报告的问题已经确定。 (第230号)"
+      },
       "2.4.1": {
         "en": "An error at configuration pages has been corrected. (#228)",
         "de": "Ein Fehler auf Konfigurationsseiten wurde korrigiert. (#228)",
@@ -80,19 +93,6 @@
         "pl": "Obserwacje OID i nazwy urządzenie zostały poprawione przez przesyłkę (#169)",
         "zh-cn": "已经加强了OID和装置名称的撤销,发送的事故报告(第169号)",
         "uk": "Покращено перевірку OID і назв пристроїв, вартовий повідомив про збій (#169)"
-      },
-      "2.1.9": {
-        "en": "Support for (IPv4) domainnames has been readded (#165)\nDevices without any active oid do no longer cause an fatal error but only log a warning (#155)\nTimervalues are now validated more strictly (#156, #164)\nSome crashes reported by sentry have been fixed (#167)\nexternal packages have been updated by dependabot",
-        "de": "Unterstützung für (IPv4) Domainnamen wurde wieder hinzugefügt (#165)\nGeräte ohne aktive OIDs verursachen keinen fatalen Fehler mehr, sondern protokollieren nur eine Warnung (#155)\nTimervalues werden nun strenger validiert (#156, #164)\nEinige Abstürze, die von Sentry gemeldet wurden, wurden behoben (#167)\nexterne Pakete wurden aktualisiert",
-        "ru": "Добавлена поддержка (IPv4) доменных имен (#165)\nУстройства без какого-либо активного не допуска больше не вызывают смертельной ошибки, но только регистрируют предупреждение (#155)\nTimervalues теперь действует более строго (#156, #164)\nНекоторые сбои, сообщаемые судоходством, были зафиксированы (#167)\nвнешние пакеты были обновлены в зависимости от",
-        "pt": "Suporte para (IPv4) nomes de domínio foi adicionado (#165)\nDispositivos sem qualquer oide ativo não causam mais um erro fatal, mas apenas registram um aviso (#155)\nValores de tempo são agora validados mais estritamente (#156, #164)\nAlgumas falhas relatadas por sentinela foram corrigidas (#167)\npacotes externos foram atualizados por dependeabot",
-        "nl": "Vertaling:\nVerdedigingen zonder actieve leegte veroorzaken geen fatale fouten meer, maar alleen een waarschuwing inloggen\nTimervalues zijn nu meer strikt (156, #164)\nSommige crashes gemeld door sentimenten zijn gerepareerd\nvertaling:",
-        "fr": "Support pour (IPv4) noms de domaine a été lue (#165)\nLes appareils sans oid actif ne provoquent plus une erreur fatale mais ne enregistrent qu'un avertissement (#155)\nLes valeurs temporelles sont maintenant validées plus strictement (#156, #164)\nCertains accidents signalés par la sentinelle ont été corrigés (#167)\ndes paquets externes ont été mis à jour par dependabot",
-        "it": "Supporto per (IPv4) nomi di dominio è stato letto (#165)\nI dispositivi senza oid attivo non causano più un errore fatale ma registrano solo un avviso (#155)\nI valori temporali sono ora convalidati più rigorosamente (#156, #164)\nAlcuni crash segnalati dalla sentinella sono stati fissati (#167)\npacchetti esterni sono stati aggiornati da dipendeabot",
-        "es": "Se ha leído el soporte para (IPv4) nombres de dominio (#165)\nLos dispositivos sin oid activo ya no causan un error mortal, pero solo registran una advertencia (#155)\nLos valores temporales se validan más estrictamente (#156, #164)\nAlgunos accidentes reportados por centinela han sido fijos (#167)\npaquetes externos han sido actualizados por dependabot",
-        "pl": "Wsparcie (IPv4) zostało odczytane (#165)\nUrządzenia bez żadnej aktywnej oidy nie powodują już błędu, ale tylko ocenił ostrzeżenie (#155)\nWartość Timeru jest teraz prawidłowa (#156, #164)\nCzęść z nich została ustalona (#167)\npakiety zewnętrzne zostały zaktualizowane w zależności od bota",
-        "zh-cn": "对(IPv4)域名的支助(第165号)\n无任何积极无效的人不再造成致命错误,只是警告(第155号)\n时间价值现在更严格(第156号,第164号)\n一些发货人的事故已经确定(第167号)\n外部包件经过依赖性更新。",
-        "uk": "Прочитано підтримку доменних імен (IPv4) (#165)\nПристрої без жодного активного oid більше не викликають фатальну помилку, а лише реєструють попередження (#155)\nЗначення таймера тепер перевіряються суворіше (#156, #164)\nДеякі збої, про які повідомляє sentry, виправлено (#167)\nзовнішні пакунки були оновлені dependabot"
       }
     },
     "title": "SNMP",
