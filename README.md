@@ -1,23 +1,23 @@
 ![Logo](admin/snmp.png)
 # ioBroker.snmp
 
-[![GitHub license](https://img.shields.io/github/license/iobroker-community-adapters/ioBroker.logparser)](https://github.com/iobroker-community-adapters/ioBroker.logparser/blob/main/LICENSE)
-[![Downloads](https://img.shields.io/npm/dm/iobroker.logparser.svg)](https://www.npmjs.com/package/iobroker.logparser)
-![GitHub repo size](https://img.shields.io/github/repo-size/iobroker-community-adapters/ioBroker.logparser)
-[![Translation status](https://weblate.iobroker.net/widgets/adapters/-/logparser/svg-badge.svg)](https://weblate.iobroker.net/engage/adapters/?utm_source=widget)</br>
-![GitHub commit activity](https://img.shields.io/github/commit-activity/m/iobroker-community-adapters/ioBroker.logparser)
-![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/iobroker-community-adapters/ioBroker.logparser/latest)
-![GitHub last commit](https://img.shields.io/github/last-commit/iobroker-community-adapters/ioBroker.logparser)
-![GitHub issues](https://img.shields.io/github/issues/iobroker-community-adapters/ioBroker.logparser)
+[![GitHub license](https://img.shields.io/github/license/iobroker-community-adapters/ioBroker.snmp)](https://github.com/iobroker-community-adapters/ioBroker.snmp/blob/main/LICENSE)
+[![Downloads](https://img.shields.io/npm/dm/iobroker.snmp.svg)](https://www.npmjs.com/package/iobroker.snmp)
+![GitHub repo size](https://img.shields.io/github/repo-size/iobroker-community-adapters/ioBroker.snmp)
+[![Translation status](https://weblate.iobroker.net/widgets/adapters/-/snmp/svg-badge.svg)](https://weblate.iobroker.net/engage/adapters/?utm_source=widget)</br>
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/iobroker-community-adapters/ioBroker.snmp)
+![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/iobroker-community-adapters/ioBroker.snmp/latest)
+![GitHub last commit](https://img.shields.io/github/last-commit/iobroker-community-adapters/ioBroker.snmp)
+![GitHub issues](https://img.shields.io/github/issues/iobroker-community-adapters/ioBroker.snmp)
 </br>
 **Version:** </br>
-[![NPM version](http://img.shields.io/npm/v/iobroker.logparser.svg)](https://www.npmjs.com/package/iobroker.logparser)
-![Current version in stable repository](https://iobroker.live/badges/logparser-stable.svg)
-![Number of Installations](https://iobroker.live/badges/logparser-installed.svg)
+[![NPM version](http://img.shields.io/npm/v/iobroker.snmp.svg)](https://www.npmjs.com/package/iobroker.snmp)
+![Current version in stable repository](https://iobroker.live/badges/snmp-stable.svg)
+![Number of Installations](https://iobroker.live/badges/snmp-installed.svg)
 </br>
 **Tests:** </br>
-[![Test and Release](https://github.com/iobroker-community-adapters/ioBroker.logparser/actions/workflows/test-and-release.yml/badge.svg)](https://github.com/iobroker-community-adapters/ioBroker.logparser/actions/workflows/test-and-release.yml)
-[![CodeQL](https://github.com/iobroker-community-adapters/ioBroker.logparser/actions/workflows/codeql.yml/badge.svg)](https://github.com/iobroker-community-adapters/ioBroker.logparser/actions/workflows/codeql.yml)
+[![Test and Release](https://github.com/iobroker-community-adapters/ioBroker.snmp/actions/workflows/test-and-release.yml/badge.svg)](https://github.com/iobroker-community-adapters/ioBroker.snmp/actions/workflows/test-and-release.yml)
+[![CodeQL](https://github.com/iobroker-community-adapters/ioBroker.snmp/actions/workflows/codeql.yml/badge.svg)](https://github.com/iobroker-community-adapters/ioBroker.snmp/actions/workflows/codeql.yml)
 
 
 **This adapter uses Sentry libraries to automatically report exceptions and code errors to the developers.**
