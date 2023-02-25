@@ -1,13 +1,24 @@
 ![Logo](admin/snmp.png)
 # ioBroker.snmp
 
-![Number of Installations](http://iobroker.live/badges/snmp-installed.svg)
-![Number of Installations](http://iobroker.live/badges/snmp-stable.svg)
-[![NPM version](http://img.shields.io/npm/v/iobroker.snmp.svg)](https://www.npmjs.com/package/iobroker.snmp)
+[![GitHub license](https://img.shields.io/github/license/iobroker-community-adapters/ioBroker.logparser)](https://github.com/iobroker-community-adapters/ioBroker.logparser/blob/main/LICENSE)
+[![Downloads](https://img.shields.io/npm/dm/iobroker.logparser.svg)](https://www.npmjs.com/package/iobroker.logparser)
+![GitHub repo size](https://img.shields.io/github/repo-size/iobroker-community-adapters/ioBroker.logparser)
+[![Translation status](https://weblate.iobroker.net/widgets/adapters/-/logparser/svg-badge.svg)](https://weblate.iobroker.net/engage/adapters/?utm_source=widget)</br>
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/iobroker-community-adapters/ioBroker.logparser)
+![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/iobroker-community-adapters/ioBroker.logparser/latest)
+![GitHub last commit](https://img.shields.io/github/last-commit/iobroker-community-adapters/ioBroker.logparser)
+![GitHub issues](https://img.shields.io/github/issues/iobroker-community-adapters/ioBroker.logparser)
+</br>
+**Version:** </br>
+[![NPM version](http://img.shields.io/npm/v/iobroker.logparser.svg)](https://www.npmjs.com/package/iobroker.logparser)
+![Current version in stable repository](https://iobroker.live/badges/logparser-stable.svg)
+![Number of Installations](https://iobroker.live/badges/logparser-installed.svg)
+</br>
+**Tests:** </br>
+[![Test and Release](https://github.com/iobroker-community-adapters/ioBroker.logparser/actions/workflows/test-and-release.yml/badge.svg)](https://github.com/iobroker-community-adapters/ioBroker.logparser/actions/workflows/test-and-release.yml)
+[![CodeQL](https://github.com/iobroker-community-adapters/ioBroker.logparser/actions/workflows/codeql.yml/badge.svg)](https://github.com/iobroker-community-adapters/ioBroker.logparser/actions/workflows/codeql.yml)
 
-![Test and Release](https://github.com/iobroker-community-adapters/iobroker.snmp/workflows/Test%20and%20Release/badge.svg)
-[![Translation status](https://weblate.iobroker.net/widgets/adapters/-/snmp/svg-badge.svg)](https://weblate.iobroker.net/engage/adapters/?utm_source=widget)
-[![Downloads](https://img.shields.io/npm/dm/iobroker.snmp.svg)](https://www.npmjs.com/package/iobroker.snmp)
 
 **This adapter uses Sentry libraries to automatically report exceptions and code errors to the developers.**
 For more details and for information how to disable the error reporting see [Sentry-Plugin Documentation](https://github.com/ioBroker/plugin-sentry#plugin-sentry)! Sentry reporting is used starting with js-controller 3.0.
@@ -20,6 +31,9 @@ This adapter can be used to poll information from devices like printers, network
 <!--
 ## __WORK IN PROGRESS__
 -->
+### __WORK IN PROGRESS__
+* (McM1957) A problem reported by sentry has been fixed. (#230)
+
 ### 2.4.1 (2023-02-22)
 * (McM1957) An error at configuration pages has been corrected. (#228)
 

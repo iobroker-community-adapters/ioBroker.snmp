@@ -1376,6 +1376,7 @@ async function onReaderSessionClose(pCTX) {
 
     adapter.clearInterval(pCTX.pollTimer);
     pCTX.pollTimer = null;
+
     if( pCTX.sessCtx ) {
         pCTX.sessCtx.session = null;
         pCTX.sessCtx = null;
@@ -1404,8 +1405,11 @@ async function onReaderSessionError(pCTX, pErr) {
 
     adapter.clearInterval(pCTX.pollTimer);
     pCTX.pollTimer = null;
-    pCTX.sessCtx.session = null;
-    pCTX.sessCtx = null;
+
+    if( pCTX.sessCtx ) {
+        pCTX.sessCtx.session = null;
+        pCTX.sessCtx = null;
+    }
 
     if (!g_shutdownInProgress) {
         pCTX.retryTimer = adapter.setTimeout((pCTX) => {
