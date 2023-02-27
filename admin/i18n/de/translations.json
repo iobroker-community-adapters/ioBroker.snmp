@@ -2,7 +2,7 @@
     "errOidEmpty": "OID-Feld darf nicht leer sein",
     "errOidGrpEmpty": "OID-Gruppenfelder dürfen nicht leer sein",
     "errOidGrpMissing": "Mindestens eine OID-Gruppe ist erforderlich",
-    "hlpOptChunkSize": "Dieser Parameter gibt die maximale OID-Anzahl innerhalb einer Anfrage an.",
+    "hlpOptChunkSize": "Dieser Parameter gibt die maximale OID-Anzahl innerhalb einer Abfrage an.",
     "hlpOptRawStates": "Die Auswahl dieser Option aktiviert die Erstellung von Zuständen, die Rohdaten enthalten.",
     "hlpOptUseIp": "Wenn Sie diese Option auswählen, wird die IP-Adresse für Zustand-IDs wie in früheren Versionen verwendet.",
     "infoAuth": "Dieses Panel ermöglicht die Konfiguration von Autorisierungsdaten für die Verwendung mit SNMP v3. Jeder Satz von Autorisierungsdaten kann am Panel Geräte verwendet und durch seine ID referenziert werden.",
