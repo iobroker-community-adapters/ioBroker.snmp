@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "snmp",
-    "version": "2.4.2",
+    "version": "2.4.3",
     "news": {
+      "2.4.3": {
+        "en": "Translations and dependencies have been updated.",
+        "de": "Übersetzungen und Abhängigkeiten wurden aktualisiert.",
+        "ru": "Обновлены переводы и зависимости.",
+        "pt": "Traduções e dependências foram atualizadas.",
+        "nl": "Vertaling en afhankelijkheid zijn geüpdateerd.",
+        "fr": "Les traductions et les dépendances ont été mises à jour.",
+        "it": "Traduzioni e dipendenze sono state aggiornate.",
+        "es": "Se han actualizado las traducciones y dependencias.",
+        "pl": "Tłumaczenia i zależności zostały zaktualizowane.",
+        "uk": "Оновлено переклади та залежності.",
+        "zh-cn": "翻译和档案已经更新。."
+      },
       "2.4.2": {
         "en": "A problem reported by sentry has been fixed. (#230)",
         "de": "Es wurde ein Problem behoben, das von sentry gemeldet wurde. (#230)",
