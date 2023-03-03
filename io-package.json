@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "snmp",
-    "version": "2.4.3",
+    "version": "2.4.4",
     "news": {
+      "2.4.4": {
+        "en": "Fixed: crash reported by sentry (#235)",
+        "de": "Behoben: Absturz, der von Sentry gemeldet wurde (#235)",
+        "ru": "Исправлено: сбой, сообщенный судоходством (#235)",
+        "pt": "Corrigido: acidente relatado por sentinela (#235)",
+        "nl": "Vertaling:",
+        "fr": "Correction : crash signalé par sentinelle (#235)",
+        "it": "Risolto: crash segnalato dalla sentinella (#235)",
+        "es": "Corregido: accidente reportado por centinela (#235)",
+        "pl": "W: rozbicie odnotowane przez przesyłkę (#235)",
+        "uk": "Виправлено: аварійне повідомлення від відправника (#235)",
+        "zh-cn": "固定:发送的事故(第235)"
+      },
       "2.4.3": {
         "en": "Translations and dependencies have been updated.",
         "de": "Übersetzungen und Abhängigkeiten wurden aktualisiert.",
