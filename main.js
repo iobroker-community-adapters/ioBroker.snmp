@@ -1277,19 +1277,19 @@ async function snmpCreateSession(pCTX) {
                 snmpAuthProtocol = snmp.AuthProtocols.md5;
                 break;
             case SHA:
-                snmpAuthProtocol = snmp.AuthProtocols.SHA;
+                snmpAuthProtocol = snmp.AuthProtocols.sha;
                 break;
             case SHA224:
-                snmpAuthProtocol = snmp.AuthProtocols.SHA224;
+                snmpAuthProtocol = snmp.AuthProtocols.sha224;
                 break;
             case SHA256:
-                snmpAuthProtocol = snmp.AuthProtocols.SHA256;
+                snmpAuthProtocol = snmp.AuthProtocols.sha256;
                 break;
             case SHA384:
-                snmpAuthProtocol = snmp.AuthProtocols.SHA384;
+                snmpAuthProtocol = snmp.AuthProtocols.sha384;
                 break;
             case SHA512:
-                snmpAuthProtocol = snmp.AuthProtocols.SHA512;
+                snmpAuthProtocol = snmp.AuthProtocols.sha512;
                 break;
         }
 
@@ -1299,9 +1299,9 @@ async function snmpCreateSession(pCTX) {
         } else if ( pCTX.authEncProto == AES ) {
             snmpPrivProtocol = snmp.PrivProtocols.aes; // AES encryption
         } else if ( pCTX.authEncProto == AES256B ) {
-            snmpPrivProtocol = snmp.PrivProtocols.SecLvlAES256B; // AES encryption
+            snmpPrivProtocol = snmp.PrivProtocols.aes256b; // AES encryption
         } else if ( pCTX.authEncProto == AES256R ) {
-            snmpPrivProtocol = snmp.PrivProtocols.AES256R; // AES encryption
+            snmpPrivProtocol = snmp.PrivProtocols.aes256r; // AES encryption
         }
 
         const snmpUser = {
