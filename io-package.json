@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "snmp",
-    "version": "2.4.4",
+    "version": "2.4.5",
     "news": {
+      "2.4.5": {
+        "en": "Fixed: SNMPv3 crash when using SHA authentication (#236)",
+        "de": "Behoben: SNMPv3 Crash bei Verwendung von SHA-Authentifizierung (#236)",
+        "ru": "Исправлено: SNMPv3 аварии при использовании SHA аутентификации (#236)",
+        "pt": "Corrigido: SNMPv3 acidente ao usar a autenticação SHA (#236)",
+        "nl": "SNMPV3 crash als je SHA authenticatie gebruikt",
+        "fr": "Correction : SNMPv3 crash lors de l'authentification SHA (#236)",
+        "it": "Fisso: crash SNMPv3 quando si utilizza l'autenticazione SHA (#236)",
+        "es": "Arreglado: choque SNMPv3 cuando se utiliza la autenticación SHA (#236)",
+        "pl": "Fixed: SNMPv3 – katastrofa typu SHA (#236) ",
+        "uk": "Виправлено: СНМПВ3 збиток при використанні SHA-автентифікації (#236)",
+        "zh-cn": "固定:SNMPv3crash在使用SHA核证时(第236)"
+      },
       "2.4.4": {
         "en": "Fixed: crash reported by sentry (#235)",
         "de": "Behoben: Absturz, der von Sentry gemeldet wurde (#235)",
