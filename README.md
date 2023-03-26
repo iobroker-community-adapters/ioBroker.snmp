@@ -31,6 +31,9 @@ This adapter can be used to poll information from devices like printers, network
 <!--
 ## __WORK IN PROGRESS__
 -->
+### __WORK IN PROGRESS__
+* (McM1957) Fixed: SNMP set did not work for numeric value 0 (#240)
+
 ### 2.4.5 (2023-03-20)
 * (McM1957) Fixed: SNMPv3 crash when using SHA authentication (#236)
 

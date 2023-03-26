@@ -2279,13 +2279,15 @@ async function onStateChange (pFullId, pState) {
 
     let sessCtx = await snmpCreateSession(CTX);
 
-    if (varbind.value) {
+    if (varbind.value !== null) {
         const resultSet = await snmpSessionSetAsync(sessCtx.session, [varbind]);
         if (resultSet.err) {
             adapter.log.error('[' + devId + '] session.set: ' + resultSet.err.toString());
         } else {
             adapter.log.debug('[' + devId + '] session.set: success');
         }
+    } else {
+        adapter.log.warn('[' + devId + '] data could not be converted - no data sent');
     }
 
     // reread data of device
