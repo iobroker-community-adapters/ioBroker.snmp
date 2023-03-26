@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "snmp",
-    "version": "2.4.5",
+    "version": "2.4.6",
     "news": {
+      "2.4.6": {
+        "en": "Fixed: SNMP set did not work for numeric value 0 (#240)",
+        "de": "Behoben: SNMP-Set funktionierte nicht für Zahlenwert 0 (#240)",
+        "ru": "Исправлено: SNMP set не работает для числового значения 0 (#240)",
+        "pt": "Corrigido: SNMP set não funcionou para o valor numérico 0 (#240)",
+        "nl": "SNMP heeft niet gewerkt voor numerieke waarde 0-240",
+        "fr": "Fixed: SNMP set n'a pas fonctionné pour la valeur numérique 0 (#240)",
+        "it": "Fisso: il set SNMP non ha funzionato per il valore numerico 0 (#240)",
+        "es": "Fijo: el conjunto SNMP no funcionó para el valor numérico 0 (#240)",
+        "pl": "Fixed: SNMP nie pracował dla wartości liczbowej 0 (#240)",
+        "uk": "Виправлено: набір SNMP не працює для числового значення 0 (#240)",
+        "zh-cn": "固定:SNMP编没有为数字价值0.(240#)做准备。"
+      },
       "2.4.5": {
         "en": "Fixed: SNMPv3 crash when using SHA authentication (#236)",
         "de": "Behoben: SNMPv3 Crash bei Verwendung von SHA-Authentifizierung (#236)",

@@ -31,7 +31,7 @@ This adapter can be used to poll information from devices like printers, network
 <!--
 ## __WORK IN PROGRESS__
 -->
-### __WORK IN PROGRESS__
+### 2.4.6 (2023-03-26)
 * (McM1957) Fixed: SNMP set did not work for numeric value 0 (#240)
 
 ### 2.4.5 (2023-03-20)
