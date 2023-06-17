@@ -133,3 +133,8 @@ Synology: By default, SNMP is disabled on Synology Diskstations and must be enab
 
 https://global.download.synology.com/download/Document/MIBGuide/Synology_DiskStation_MIB_Guide.pdf
 
+### USV 
+
+For APC USVs you could check https://www.opsview.com/resources/monitoring/blog/apc-ups-monitoring-useful-oids
+
+
