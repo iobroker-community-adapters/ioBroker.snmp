@@ -747,13 +747,13 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
                     retval.format = F_TEXT;
                     break;
                 case F_NUMERIC /* 1 */: {
-                    const valint = parseInt(pVarbind.value.toString, 10);
+                    const valint = parseInt(pVarbind.value.toString(), 10);
                     retval.val = valint;
                     if (isNaN (valint)) retval.qual=0x01; // general error
                     break;
                 }
                 case F_BOOLEAN /* 2 */: {
-                    const valint = parseInt(pVarbind.value.toString, 10);
+                    const valint = parseInt(pVarbind.value.toString(), 10);
                     retval.val = valint !== 0;
                     if (isNaN (valint)) retval.qual=0x01; // general error
                     break;
@@ -967,7 +967,9 @@ function varbindEncode( pState, pData, pDevId, pStateId ) {
         value:      null
     };
 
-    let dataType = typeof(pData);
+    let dataType;
+    dataType = typeof(pData);
+
     switch (dataType) {
         case 'boolean':
         case 'number':
@@ -1051,10 +1053,10 @@ function varbindEncode( pState, pData, pDevId, pStateId ) {
                     retval.value = pData;
                     break;
                 case 'number':
-                    retval.value = pData.toString;
+                    retval.value = pData.toString();
                     break;
                 case 'boolean':
-                    retval.value = pData.toString;
+                    retval.value = pData.toString();
                     break;
                 case 'json':
                     retval.value = json2buffer(pData);
@@ -1399,9 +1401,9 @@ async function onReaderSessionClose(pCTX) {
  *
  */
 async function onReaderSessionError(pCTX, pErr) {
-    adapter.log.debug('onReaderSessionError - device ' + pCTX.name + ' (' + pCTX.ipAddr + ') - ' + pErr.toString);
+    adapter.log.debug('onReaderSessionError - device ' + pCTX.name + ' (' + pCTX.ipAddr + ') - ' + pErr.toString());
 
-    adapter.log.warn(`device ${pCTX.name} (${pCTX.ipAddr}) reported error ${pErr.toString}`);
+    adapter.log.warn(`device ${pCTX.name} (${pCTX.ipAddr}) reported error ${pErr.toString()}`);
 
     adapter.clearInterval(pCTX.pollTimer);
     pCTX.pollTimer = null;
