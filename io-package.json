@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "snmp",
-    "version": "2.4.7",
+    "version": "2.4.8",
     "news": {
+      "2.4.8": {
+        "en": "fixed: UDP ports got lost during error handling (#282)\nfixed: Incorrect toString() syntax caused several issues, i.e. missing error output (#283)\nDependencies have been updated",
+        "de": "behoben: UDP-Ports gingen während einer Fehlerbehandlung verloren (#282)\nbehoben: Falsche toString() Syntax verursachte mehrere Probleme, z.B. fehlende Fehlerausgaben (#283)\nAbhängigkeiten wurden aktualisiert",
+        "ru": "исправлено: UDP порты потеряли при обработке ошибок #(282)\nисправлено: Неправильный кString)( синтаксис вызвал несколько проблем, т.е. отсутствует ошибка вывода #(283)\nВ зависимости были обновлены",
+        "pt": "corrigido: As portas UDP foram perdidas durante o manuseio de erros #(282)\ncorrigido: Incorreto toString)( sintaxe causou vários problemas, ou seja, falta de saída de erro #(283)\nAs dependências foram atualizadas",
+        "nl": "uDP havens zijn verdwaald tijdens de fout\nincorrect toString ( syntax veroorzaakte verschillende problemen, ik miste fouten uitput ♪\nAfhankelijkheid",
+        "fr": "fixes: les ports UDP ont été perdus lors de la manipulation d'erreur #(282)\ncorrigé: Incorrect toString)( syntaxe causée plusieurs problèmes, c.-à-d. sortie d'erreur manquante #(283)\nLes dépendances ont été mises à jour",
+        "it": "fisso: le porte UDP si sono perse durante la gestione degli errori #(282)\nfisso: non corretto toString)( la sintassi ha causato diversi problemi, cioè l'uscita di errore mancante #(283)\nLe dipendenze sono state aggiornate",
+        "es": "fijo: los puertos UDP se perdieron durante el manejo de errores #(282)\nfijo: Incorrect toString)( Syntax causó varios problemas, es decir, falta de salida de error #(283)\nSe han actualizado las dependencias",
+        "pl": "uDP straciła w wyniku przetargu na błędy\nstosowana: Incorrect toString (String)(składnia spowodowała kilka problemów, tzn. brak błędu wyjściowego #(283)\nZależności zostały zaktualizowane",
+        "uk": "виправлено: УДП порти втратили під час обробки помилок #(282)\nвиправлено: Невірно доString)( синтаксис викликало кілька питань, тобто відсутній вихід помилок #(283)\nОновлено залежність",
+        "zh-cn": "固定:在错误处理第(2)82号错误时,联发办港口损失\n固定:不正确地进入(综合税)造成若干问题,即失踪产出(283)\n已更新了属地"
+      },
       "2.4.7": {
         "en": "changed: several externalmodules including net-snmp have been updated",
         "de": "geändert: mehrere externe Module einschließlich net-snmp wurden aktualisiert",
@@ -80,19 +93,6 @@
         "pl": "Problem doniesiony przez sentry został ustalony. (#230)",
         "uk": "Зафіксовано проблему, яку було відправлено. (#230)",
         "zh-cn": "传发器所报告的问题已经确定。 (第230号)"
-      },
-      "2.4.1": {
-        "en": "An error at configuration pages has been corrected. (#228)",
-        "de": "Ein Fehler auf Konfigurationsseiten wurde korrigiert. (#228)",
-        "ru": "Исправлена ошибка на страницах конфигурации. (#228)",
-        "pt": "Foi corrigido um erro nas páginas de configuração. (#228)",
-        "nl": "Een fout in configuration pagina's is gecorrigeerd. ( 228)",
-        "fr": "Une erreur sur les pages de configuration a été corrigée. (#228)",
-        "it": "È stato corretto un errore nelle pagine di configurazione. (#228)",
-        "es": "Se ha corregido un error en las páginas de configuración. (#228)",
-        "pl": "Nieprawidłowe błędy na stronach konfiguracji zostały poprawione. (#228)",
-        "uk": "Виправлено помилку на сторінках конфігурації. (#228)",
-        "zh-cn": "对组合页的错误进行了纠正。 (第228号)"
       }
     },
     "title": "SNMP",

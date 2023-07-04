@@ -42,8 +42,7 @@ For destails see documentation referenced below.
 <!--
 ## __WORK IN PROGRESS__
 -->
-
-### __WORK IN PROGRESS__
+### 2.4.8 (2023-07-04)
 * (McM1957) fixed: UDP ports got lost during error handling (#282)
 * (McM1957) fixed: Incorrect toString() syntax caused several issues, i.e. missing error output (#283)
 * (McM1957) Dependencies have been updated
