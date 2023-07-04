@@ -35,7 +35,7 @@ For destails see documentation referenced below.
 
 [english documentation](docs/en/snmp.md)<br>
 [deutsche Dokumentation](docs/de/snmp.md)<br>
-[russian Dokumentation](docs/ru/snmp.md)
+[russian documentation](docs/ru/snmp.md)
 
 ## Changelog
 
