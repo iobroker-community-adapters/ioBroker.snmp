@@ -311,7 +311,7 @@ async function cleanupStates() {
  *		overrides object data otherwise
  *		waits for action to complete using await
  *
- * @param {obj}     pObj    objectstructure
+ * @param {object}     pObj    objectstructure
  * @return
  *
  */
@@ -456,7 +456,7 @@ async function initDeviceObjects(pId, pIp) {
 /**
  * initOidObjects - initializes objects for one OID
  *
- * @param   {string}    id  if of object
+ * @param   {string}    pId  if of object
  * @return
  *
  * ASSERTION: root device object is already created
@@ -570,7 +570,7 @@ async function initAllObjects() {
 /**
  * oidObjType2Text - translate oid object type into textual string
  *
- * @param   {integer}   pOidObjType    oid object type
+ * @param   {number}    pOidObjType    oid object type
  * @return  {string}    textual representation of object type
  *
  */
@@ -605,7 +605,7 @@ function oidObjType2Text( pOidObjType ) {
  * varbindDecode - convert varbind data to native data
  *
  * @param   {object}    pVarbind    varbind to decode
- * @param   {integer}   pFormat     format constant
+ * @param   {number}    pFormat     format constant
  * @param   {string}    pDevId      id of device
  * @param   {string}    pStateId    id of state
  * @return  {object}    state object containing val, typestr and qual values
@@ -951,7 +951,7 @@ function json2number(pJson){
 /**
  * varbindEncode - convert native data to varbind data
  *
- * @param   {object}    pVarbind    varbind template
+ * @param   {object}    pState      state object
  * @param   {any}       pData       data to store in varbind
  * @param   {string}    pDevId      id of device
  * @param   {string}    pStateId    id of state
@@ -1157,7 +1157,7 @@ function varbindEncode( pState, pData, pDevId, pStateId ) {
  * @param   {object}    pSession    snmp session refernece
  * @param   {object}    pOids       snmp oids array
  *
- * @return  {object}                object containing { error, varbinds } as returned by snmp.session.get
+ * @return                          object containing { error, varbinds } as returned by snmp.session.get
  *
  */
 
@@ -1188,7 +1188,7 @@ async function snmpSessionGetAsync( pSession, pOids) {
  * @param   {object}    pSession    snmp session refernece
  * @param   {object}    pVarbinds   snmp varbinds array
  *
- * @return  {object}                object containing { error, varbinds } as returned by snmp.session.set
+ * @return                          object containing { error, varbinds } as returned by snmp.session.set
  *
  */
 async function snmpSessionSetAsync( pSession, pVarbinds) {
@@ -1215,9 +1215,9 @@ async function snmpSessionSetAsync( pSession, pVarbinds) {
 /**
  * snmpCreateSession - initializes a snmp session
  *
- * @param   {CTX object}    pCTX    CTX object
+ * @param   {object}    pCTX    CTX object
  *
- * @return  {object}                session
+ * @return                      session object
  *
 var options = {
     port: 161,
@@ -1344,7 +1344,7 @@ async function snmpCreateSession(pCTX) {
 /**
  * snmpCloseSession - close a snmp session
  *
- * @param   {object}    pSessionCTX    session object
+ * @param   {object}    pSessCtx    session object
  *
  * @return  nothing
  *
@@ -1395,8 +1395,8 @@ async function onReaderSessionClose(pCTX) {
 /**
  * onReaderSessionError - callback called whenever a reader session encounters an error
  *
- * @param {CTX object} 	pCTX    CTX object
- * @param {object}      pErr    error object
+ * @param {object} 	pCTX    CTX object
+ * @param {object}  pErr    error object
  * @return
  *
  */
@@ -1404,21 +1404,20 @@ async function onReaderSessionError(pCTX, pErr) {
     adapter.log.debug('onReaderSessionError - device ' + pCTX.name + ' (' + pCTX.ipAddr + ') - ' + pErr.toString());
 
     adapter.log.warn(`device ${pCTX.name} (${pCTX.ipAddr}) reported error ${pErr.toString()}`);
+    adapter.log.debug(`error dump\n${JSON.stringify(pErr)}`);
 
     adapter.clearInterval(pCTX.pollTimer);
     pCTX.pollTimer = null;
 
-    if( pCTX.sessCtx ) {
-        pCTX.sessCtx.session = null;
-        pCTX.sessCtx = null;
-    }
+    await snmpCloseSession(pCTX.sessCtx);
+    /* NOTE: this will trigger onReaderSessionClose which will open a new session */
 
-    if (!g_shutdownInProgress) {
-        pCTX.retryTimer = adapter.setTimeout((pCTX) => {
-            pCTX.retryTimer = null;
-            createReaderSession(pCTX);
-        }, pCTX.retryIntvl, pCTX);
-    }
+//    if (!g_shutdownInProgress) {
+//        pCTX.retryTimer = adapter.setTimeout((pCTX) => {
+//            pCTX.retryTimer = null;
+//            createReaderSession(pCTX);
+//        }, pCTX.retryIntvl, pCTX);
+//    }
 }
 
 /**
@@ -1492,7 +1491,7 @@ async function createReaderSession(pCTX) {
 /**
  * setStates - set all states related to one oid
  *
- * @param   {string}    pVarbind    (base) state id
+ * @param   {string}    pStateId    (base) state id
  * @param   {object}    pOptions    options object as definded by adapter.setState
  * @param   {object}    pValues     (optional) values object containing values for base, type and json states
  *
@@ -1556,7 +1555,7 @@ async function setOnlineState (pCTX, pOnline, pMsg, pErr){
 /**
  * processVarbind - process single varbind
  *
- * @param {pVarbind} snmp varbind object
+ * @param {object} pVarbind snmp varbind object
  * @return string
  *
  */
@@ -1620,8 +1619,8 @@ async function processVarbind(pCTX, pStateId, pFormat, pWriteable, pVarbind) {
 /**
  * readChunkOids - read all oids within one chunk from a specific target device
  *
- * @param {pCtx} specific context
- * @param {pIdx} chunk index
+ * @param {object} pCTX specific context
+ * @param {number} pIdx chunk index
  * @return
  *
  */
@@ -1679,7 +1678,7 @@ async function readChunkOids(pCTX, pIdx) {
 /**
  * readOids - read all oids from a specific target device
  *
- * @param {IP} IP object
+ * @param {object} pCTX CTX object
  * @return
  *
  */
@@ -1724,7 +1723,6 @@ async function handleConnectionInfo() {
 /**
  * validateConfig - scan and validate config data
  *
- * @param
  * @return
  *
  */
@@ -2008,7 +2006,6 @@ function validateConfig() {
 /**
  * setupContices - setup contices for worker threads
  *
- * @param
  * @return
  *
  *	CTX		object containing data for one device
@@ -2154,7 +2151,6 @@ function setupContices() {
 /**
  * onReady - will be called as soon as adapter is ready
  *
- * @param
  * @return
  *
  */
@@ -2250,8 +2246,8 @@ async function onReady() {
 /**
  * onStateChange - called when any state changes
  *
- * @param   {string}    pId     id of device
- * @param   {object}    pState  state object of device
+ * @param   {string}    pFullId     id of device
+ * @param   {object}    pState      state object of device
  * @return
  *
  */
