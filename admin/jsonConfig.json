@@ -421,6 +421,14 @@
                     "tooltip": "ttOptUseIp",
                     "help": "hlpOptUseIp"
                 },
+				"optNoCloseOnError": 	{
+                    "type": "checkbox",
+                    "label": "lblOptNoCloseOnError",
+					"newLine": true,
+                    "default": false,
+                    "tooltip": "ttOptNoCloseOnError",
+                    "help": "hlpOptNoCloseOnError"
+                },
 				"optRawStates": 	{
                     "type": "checkbox",
                     "label": "lblOptRawStates",

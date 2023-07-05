@@ -1406,18 +1406,13 @@ async function onReaderSessionError(pCTX, pErr) {
     adapter.log.warn(`device ${pCTX.name} (${pCTX.ipAddr}) reported error ${pErr.toString()}`);
     adapter.log.debug(`error dump: {JSON.stringify(pErr)}`);
 
-    adapter.clearInterval(pCTX.pollTimer);
-    pCTX.pollTimer = null;
+    if (! adapter.config.optNoCloseOnError) {
+        adapter.clearInterval(pCTX.pollTimer);
+        pCTX.pollTimer = null;
 
-    await snmpCloseSession(pCTX.sessCtx);
-    /* NOTE: this will trigger onReaderSessionClose which will open a new session */
-
-//    if (!g_shutdownInProgress) {
-//        pCTX.retryTimer = adapter.setTimeout((pCTX) => {
-//            pCTX.retryTimer = null;
-//            createReaderSession(pCTX);
-//        }, pCTX.retryIntvl, pCTX);
-//    }
+        await snmpCloseSession(pCTX.sessCtx);
+        /* NOTE: this will trigger onReaderSessionClose which will open a new session */
+    }
 }
 
 /**
