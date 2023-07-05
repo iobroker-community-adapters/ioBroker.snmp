@@ -42,6 +42,10 @@ For destails see documentation referenced below.
 <!--
 ## __WORK IN PROGRESS__
 -->
+### __WORK IN PROGRESS__
+* (McM1957) An option to disable closing of reader session in case of an error has been added.
+* (McM1957) Logging in case of errors hase been enhanced when debug log enabled.
+
 ### 2.4.8 (2023-07-04)
 * (McM1957) fixed: UDP ports got lost during error handling (#282)
 * (McM1957) fixed: Incorrect toString() syntax caused several issues, i.e. missing error output (#283)
