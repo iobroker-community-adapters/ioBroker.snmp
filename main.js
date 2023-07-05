@@ -1404,7 +1404,7 @@ async function onReaderSessionError(pCTX, pErr) {
     adapter.log.debug('onReaderSessionError - device ' + pCTX.name + ' (' + pCTX.ipAddr + ') - ' + pErr.toString());
 
     adapter.log.warn(`device ${pCTX.name} (${pCTX.ipAddr}) reported error ${pErr.toString()}`);
-    adapter.log.debug(`error dump\n${JSON.stringify(pErr)}`);
+    adapter.log.debug(`error dump: {JSON.stringify(pErr)}`);
 
     adapter.clearInterval(pCTX.pollTimer);
     pCTX.pollTimer = null;
