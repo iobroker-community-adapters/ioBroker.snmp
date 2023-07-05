@@ -1,304 +1,304 @@
 {
-    "common": {
-        "name": "snmp",
-        "version": "2.4.8",
-        "news": {
-            "2.4.8": {
-                "en": "fixed: UDP ports got lost during error handling (#282)\nfixed: Incorrect toString() syntax caused several issues, i.e. missing error output (#283)\nDependencies have been updated",
-                "de": "behoben: UDP-Ports gingen während einer Fehlerbehandlung verloren (#282)\nbehoben: Falsche toString() Syntax verursachte mehrere Probleme, z.B. fehlende Fehlerausgaben (#283)\nAbhängigkeiten wurden aktualisiert",
-                "ru": "исправлено: UDP порты потеряли при обработке ошибок #(282)\nисправлено: Неправильный кString)( синтаксис вызвал несколько проблем, т.е. отсутствует ошибка вывода #(283)\nВ зависимости были обновлены",
-                "pt": "corrigido: As portas UDP foram perdidas durante o manuseio de erros #(282)\ncorrigido: Incorreto toString)( sintaxe causou vários problemas, ou seja, falta de saída de erro #(283)\nAs dependências foram atualizadas",
-                "nl": "uDP havens zijn verdwaald tijdens de fout\nincorrect toString ( syntax veroorzaakte verschillende problemen, ik miste fouten uitput ♪\nAfhankelijkheid",
-                "fr": "fixes: les ports UDP ont été perdus lors de la manipulation d'erreur #(282)\ncorrigé: Incorrect toString)( syntaxe causée plusieurs problèmes, c.-à-d. sortie d'erreur manquante #(283)\nLes dépendances ont été mises à jour",
-                "it": "fisso: le porte UDP si sono perse durante la gestione degli errori #(282)\nfisso: non corretto toString)( la sintassi ha causato diversi problemi, cioè l'uscita di errore mancante #(283)\nLe dipendenze sono state aggiornate",
-                "es": "fijo: los puertos UDP se perdieron durante el manejo de errores #(282)\nfijo: Incorrect toString)( Syntax causó varios problemas, es decir, falta de salida de error #(283)\nSe han actualizado las dependencias",
-                "pl": "uDP straciła w wyniku przetargu na błędy\nstosowana: Incorrect toString (String)(składnia spowodowała kilka problemów, tzn. brak błędu wyjściowego #(283)\nZależności zostały zaktualizowane",
-                "uk": "виправлено: УДП порти втратили під час обробки помилок #(282)\nвиправлено: Невірно доString)( синтаксис викликало кілька питань, тобто відсутній вихід помилок #(283)\nОновлено залежність",
-                "zh-cn": "固定:在错误处理第(2)82号错误时,联发办港口损失\n固定:不正确地进入(综合税)造成若干问题,即失踪产出(283)\n已更新了属地"
-            },
-            "2.4.7": {
-                "en": "changed: several externalmodules including net-snmp have been updated",
-                "de": "geändert: mehrere externe Module einschließlich net-snmp wurden aktualisiert",
-                "ru": "изменено: были обновлены несколько внешних модулей, включая net-snmp",
-                "pt": "alterado: vários módulos externos incluindo net-snmp foram atualizados",
-                "nl": "vertaling:",
-                "fr": "changé: plusieurs modes externes, y compris net-snmp, ont été mis à jour",
-                "it": "cambiato: sono stati aggiornati diversi moduli esterni, tra cui il net-snmp",
-                "es": "cambiado: se han actualizado varios módulos externos, incluidos los bancos netos",
-                "pl": "zmieniono kilka zewnętrznych modułów, w tym sieć-snmp",
-                "uk": "змінено: кілька зовнішніхмодулів, включаючи net-snmp",
-                "zh-cn": "修改:更新了包括净经验在内的几个外部摩托尔。"
-            },
-            "2.4.6": {
-                "en": "Fixed: SNMP set did not work for numeric value 0 (#240)",
-                "de": "Behoben: SNMP-Set funktionierte nicht für Zahlenwert 0 (#240)",
-                "ru": "Исправлено: SNMP set не работает для числового значения 0 (#240)",
-                "pt": "Corrigido: SNMP set não funcionou para o valor numérico 0 (#240)",
-                "nl": "SNMP heeft niet gewerkt voor numerieke waarde 0-240",
-                "fr": "Fixed: SNMP set n'a pas fonctionné pour la valeur numérique 0 (#240)",
-                "it": "Fisso: il set SNMP non ha funzionato per il valore numerico 0 (#240)",
-                "es": "Fijo: el conjunto SNMP no funcionó para el valor numérico 0 (#240)",
-                "pl": "Fixed: SNMP nie pracował dla wartości liczbowej 0 (#240)",
-                "uk": "Виправлено: набір SNMP не працює для числового значення 0 (#240)",
-                "zh-cn": "固定:SNMP编没有为数字价值0.(240#)做准备。"
-            },
-            "2.4.5": {
-                "en": "Fixed: SNMPv3 crash when using SHA authentication (#236)",
-                "de": "Behoben: SNMPv3 Crash bei Verwendung von SHA-Authentifizierung (#236)",
-                "ru": "Исправлено: SNMPv3 аварии при использовании SHA аутентификации (#236)",
-                "pt": "Corrigido: SNMPv3 acidente ao usar a autenticação SHA (#236)",
-                "nl": "SNMPV3 crash als je SHA authenticatie gebruikt",
-                "fr": "Correction : SNMPv3 crash lors de l'authentification SHA (#236)",
-                "it": "Fisso: crash SNMPv3 quando si utilizza l'autenticazione SHA (#236)",
-                "es": "Arreglado: choque SNMPv3 cuando se utiliza la autenticación SHA (#236)",
-                "pl": "Fixed: SNMPv3 – katastrofa typu SHA (#236) ",
-                "uk": "Виправлено: СНМПВ3 збиток при використанні SHA-автентифікації (#236)",
-                "zh-cn": "固定:SNMPv3crash在使用SHA核证时(第236)"
-            },
-            "2.4.4": {
-                "en": "Fixed: crash reported by sentry (#235)",
-                "de": "Behoben: Absturz, der von Sentry gemeldet wurde (#235)",
-                "ru": "Исправлено: сбой, сообщенный судоходством (#235)",
-                "pt": "Corrigido: acidente relatado por sentinela (#235)",
-                "nl": "Vertaling:",
-                "fr": "Correction : crash signalé par sentinelle (#235)",
-                "it": "Risolto: crash segnalato dalla sentinella (#235)",
-                "es": "Corregido: accidente reportado por centinela (#235)",
-                "pl": "W: rozbicie odnotowane przez przesyłkę (#235)",
-                "uk": "Виправлено: аварійне повідомлення від відправника (#235)",
-                "zh-cn": "固定:发送的事故(第235)"
-            },
-            "2.4.3": {
-                "en": "Translations and dependencies have been updated.",
-                "de": "Übersetzungen und Abhängigkeiten wurden aktualisiert.",
-                "ru": "Обновлены переводы и зависимости.",
-                "pt": "Traduções e dependências foram atualizadas.",
-                "nl": "Vertaling en afhankelijkheid zijn geüpdateerd.",
-                "fr": "Les traductions et les dépendances ont été mises à jour.",
-                "it": "Traduzioni e dipendenze sono state aggiornate.",
-                "es": "Se han actualizado las traducciones y dependencias.",
-                "pl": "Tłumaczenia i zależności zostały zaktualizowane.",
-                "uk": "Оновлено переклади та залежності.",
-                "zh-cn": "翻译和档案已经更新。."
-            },
-            "2.4.2": {
-                "en": "A problem reported by sentry has been fixed. (#230)",
-                "de": "Es wurde ein Problem behoben, das von sentry gemeldet wurde. (#230)",
-                "ru": "Проблема, сообщенная судоходством, была исправлена. (#230)",
-                "pt": "Um problema relatado por sentinela foi corrigido. (#230)",
-                "nl": "Een probleem gemeld door sentiment is opgelost. (230)",
-                "fr": "Un problème signalé par la sentinelle a été corrigé. (#230)",
-                "it": "Un problema segnalato dalla sentinella è stato risolto. (#230)",
-                "es": "Se ha solucionado un problema reportado por centinela. (#230)",
-                "pl": "Problem doniesiony przez sentry został ustalony. (#230)",
-                "uk": "Зафіксовано проблему, яку було відправлено. (#230)",
-                "zh-cn": "传发器所报告的问题已经确定。 (第230号)"
-            }
-        },
-        "title": "SNMP",
-        "titleLang": {
-            "en": "SNMP",
-            "de": "SNMP",
-            "ru": "SNMP",
-            "pt": "SNMP",
-            "nl": "SNMP",
-            "fr": "SNMP",
-            "it": "SNMP",
-            "es": "SNMP",
-            "pl": "SNMP",
-            "zh-cn": "SNMP",
-            "uk": "SNMP"
-        },
-        "desc": {
-            "en": "Allows to poll SNMP OIDs in ioBroker",
-            "de": "Ermöglicht das Polling von SNMP Objekten im ioBroker",
-            "ru": "Позволяет считывать SNPM объекты по OID в ioBroker",
-            "pt": "ioBroker SNMP-OID Adapter",
-            "fr": "ioBroker SNMP-OID Adapter",
-            "nl": "ioBroker SNMP-OID Adapter",
-            "it": "Consente di eseguire il polling degli OID SNMP in ioBroker",
-            "es": "Permite sondear los OID de SNMP en ioBroker",
-            "pl": "Umożliwia odpytywanie identyfikatorów SNMP OID w ioBroker",
-            "zh-cn": "允许在 ioBroker 中轮询 SNMP OID",
-            "uk": "Дозволяє опитувати SNMP OID в ioBroker"
-        },
-        "license": "MIT",
-        "platform": "Javascript/Node.js",
-        "icon": "snmp.png",
-        "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.snmp/master/admin/snmp.png",
-        "keywords": [
-            "SNMP-OID"
-        ],
-        "readme": "https://github.com/mcm1957/ioBroker.snmp/blob/master/README.md",
-        "loglevel": "info",
-        "mode": "daemon",
-        "type": "infrastructure",
-        "connectionType": "local",
-        "dataSource": "poll",
-        "compact": true,
-        "authors": [
-            {
-                "name": "Marcolotti",
-                "email": "info@ct-j.de"
-            },
-            {
-                "name": "mcm1957",
-                "email": "mcm57@gmx.at"
-            }
-        ],
-        "adminUI": {
-            "config": "json"
-        },
-        "stopBeforeUpdate": "true",
-        "plugins": {
-            "sentry": {
-                "dsn": "https://621ac710b70445f8b170cbb783045988@sentry.iobroker.net/181"
-            }
-        },
-        "globalDependencies": [
-            {
-                "admin": ">=5.1.28"
-            }
-        ],
-        "dependencies": [
-            {
-                "js-controller": ">=3.3.22"
-            }
-        ],
-        "messages": [
-            {
-                "condition": {
-                    "operand": "and",
-                    "rules": [
-                        "oldVersion<2.0.0",
-                        "newVersion>=2.0.0"
-                    ]
-                },
-                "title": {
-                    "en": "Important notice!",
-                    "de": "Wichtiger Hinweis!",
-                    "ru": "Важное замечание!",
-                    "pt": "Notícia importante!",
-                    "nl": "Belangrijke mededeling!",
-                    "fr": "Avis important!",
-                    "it": "Avviso IMPORTANTE!",
-                    "es": "Noticia importante!",
-                    "pl": "Ważna uwaga!",
-                    "zh-cn": "重要通知!",
-                    "uk": "Важливе повідомлення!"
-                },
-                "text": {
-                    "en": "Configuration data has been changed for version 2.0.0 (and newer). Installation will try to migrate data but there is a chance that this fails. Please ensure that you have a backup and a external documention of your configuration before upgrading to version 2.0.0 or newer.",
-                    "de": "Konfigurationsdaten wurden für Version 2.0.0 (und neuer) geändert. Die Installation wird versuchen, Daten zu migrieren, aber es gibt eine Chance, dass dies versagt. Bitte stellen Sie sicher, dass Sie ein Backup und eine externe Dokumentation Ihrer Konfiguration vor dem Upgrade auf Version 2.0.0 oder neuer haben.",
-                    "ru": "Данные конфигурации были изменены для версии 2.0.0 (и новее). Установка будет пытаться перенести данные, но есть шанс, что это не работает. Пожалуйста, убедитесь, что у вас есть резервное копирование и внешний документирование вашей конфигурации перед обновлением до версии 2.0.0 или новее.",
-                    "pt": "Os dados de configuração foram alterados para a versão 2.0.0 (e mais recente). A instalação tentará migrar dados, mas há uma chance de que isso falha. Certifique-se de ter um backup e uma documentação externa de sua configuração antes de atualizar para a versão 2.0.0 ou mais recente.",
-                    "nl": "Vermoedende data is veranderd voor versie 2.0. Installatie zal proberen data te verminderen maar er is een kans dat dit mislukt. Zorg ervoor dat je een back-up hebt en een externe documentie van je zelfvertrouwen voordat je verstoort naar versie 2.0 of nieuwer.",
-                    "fr": "Les données de configuration ont été modifiées pour la version 2.0.0 (et plus récente). L'installation tentera de migrer les données, mais il y a une chance que cela échoue. Assurez-vous d'avoir une sauvegarde et une documentation externe de votre configuration avant de passer à la version 2.0.0 ou plus récente.",
-                    "it": "I dati di configurazione sono stati modificati per la versione 2.0.0 (e più recente). L'installazione cercherà di migrare i dati, ma c'è la possibilità che questo fallisca. Si prega di assicurarsi di avere un backup e un documento esterno della configurazione prima di aggiornare alla versione 2.0.0 o più recente.",
-                    "es": "Los datos de configuración se han modificado para la versión 2.0.0 (y más reciente). La instalación intentará migrar datos pero hay una posibilidad de que esto falle. Por favor, asegúrese de tener una copia de seguridad y una documentación externa de su configuración antes de actualizar a la versión 2.0.0 o más reciente.",
-                    "pl": "Dane konfiguracyjne zostały zmienione na wersję 2.0.0 (i nowszą). Instalacja stara się wyemitować dane, ale istnieje szansa, że to się nie udaje. Zapewniajcie, że mamy backup i zewnętrzną dokumentację twojej wersji 2.0.0 lub nowszego.",
-                    "zh-cn": "对2.0.0版本(和新版)的合并数据进行了修改。 绝大部分将试图迁移数据,但有失败的机会。 请确保在更新至2.0.0或新版之前,对你的配置进行反馈和外部记录。.",
-                    "uk": "Дані конфігурації змінено для версії 2.0.0 (і новішої). Інсталяція спробує перенести дані, але існує ймовірність, що це не вдасться. Переконайтеся, що у вас є резервна копія та зовнішня документація вашої конфігурації перед оновленням до версії 2.0.0 або новішої."
-                },
-                "link": "https://github.com/iobroker-community-adapters/ioBroker.snmp#changelog",
-                "level": "warn",
-                "linkText": {
-                    "en": "Changelog",
-                    "de": "Änderungsprotokoll",
-                    "ru": "Список изменений",
-                    "pt": "Registro de alterações",
-                    "nl": "Wijzigingslog",
-                    "fr": "Journal des modifications",
-                    "it": "Registro delle modifiche",
-                    "es": "registro de cambios",
-                    "pl": "Dziennik zmian",
-                    "zh-cn": "变更日志",
-                    "uk": "Журнал змін"
-                },
-                "buttons": [
-                    "agree",
-                    "cancel"
-                ]
-            },
-            {
-                "condition": {
-                    "operand": "and",
-                    "rules": [
-                        "oldVersion<1.0.0",
-                        "newVersion>=1.0.0"
-                    ]
-                },
-                "title": {
-                    "en": "Important notice!",
-                    "de": "Wichtiger Hinweis!",
-                    "ru": "Важное замечание!",
-                    "pt": "Notícia importante!",
-                    "nl": "Belangrijke mededeling!",
-                    "fr": "Avis important!",
-                    "it": "Avviso IMPORTANTE!",
-                    "es": "Noticia importante!",
-                    "pl": "Ważna uwaga!",
-                    "zh-cn": "重要通知!",
-                    "uk": "Важливе повідомлення!"
-                },
-                "text": {
-                    "en": "Version 1.0.0 will change the names of objects containing special characters like \\\".\\\", \\\"-\\\" or spaces! Please delete the old objects manually if needed.",
-                    "de": "Version 1.0.0 ändert die Namen von Objekten, die spezielle Zeichen wie \\\"\\\", \\\"-\\\" oder Leerzeichen enthalten! Bitte löschen Sie die alten Objekte bei Bedarf manuell.",
-                    "ru": "Версия 1.0.0 изменит имена объектов, содержащих специальные символы, такие как \\\".\\\", \\\"-\\\" или пространства! Пожалуйста, удалите старые объекты вручную, если это необходимо.",
-                    "pt": "A versão 1.0.0 mudará os nomes de objetos contendo caracteres especiais como \\\".\\\", \\\"-\\\" ou espaços! Por favor, exclua os objetos antigos manualmente, se necessário.",
-                    "nl": "Version 1.0.0 zal de namen veranderen van objecten met speciale personages zoals . Verwijder de oude objecten handmatig als het nodig is.",
-                    "fr": "La version 1.0.0 va changer les noms des objets contenant des caractères spéciaux comme \\\".\\\", \\\"-\\\" ou des espaces! Veuillez supprimer les anciens objets manuellement si nécessaire.",
-                    "it": "La versione 1.0.0 cambierà i nomi di oggetti contenenti caratteri speciali come \\\", \\\"-\\\" o spazi! Si prega di eliminare i vecchi oggetti manualmente se necessario.",
-                    "es": "Versión 1.0.0 cambiará los nombres de objetos que contienen caracteres especiales como \\\".\\\", \\\"-\\\" o espacios! Por favor, borre los viejos objetos manualmente si es necesario.",
-                    "pl": "Wersja 1.0.0 zmienia nazwę obiektów o specjalnych postaciach, takich jak: \\, \\ lub przestrzeni! Okazuje się, że stare obiekty ręcznie będą potrzebne.",
-                    "zh-cn": "Version1.0.0将改变含有特殊特性的物体的名称,如乙型号、乙型号或空间。 请在必要时删除旧物体。.",
-                    "uk": "Версія 1.0.0 змінить назви об'єктів, які містять спеціальні символи, такі як \\\".\\\", \\\"-\\\" або пробіли! За потреби видаліть старі об’єкти вручну."
-                },
-                "link": "https://github.com/iobroker-community-adapters/ioBroker.snmp#changelog",
-                "level": "warn",
-                "linkText": {
-                    "en": "Changelog",
-                    "de": "Änderungsprotokoll",
-                    "ru": "Список изменений",
-                    "pt": "Registro de alterações",
-                    "nl": "Wijzigingslog",
-                    "fr": "Journal des modifications",
-                    "it": "Registro delle modifiche",
-                    "es": "registro de cambios",
-                    "pl": "Dziennik zmian",
-                    "zh-cn": "变更日志",
-                    "uk": "Журнал змін"
-                },
-                "buttons": [
-                    "agree",
-                    "cancel"
-                ]
-            }
-        ]
+  "common": {
+    "name": "snmp",
+    "version": "2.4.9",
+    "news": {
+      "2.4.9": {
+        "en": "An option to disable closing of reader session in case of an error has been added.\nLogging in case of errors hase been enhanced when debug log enabled.",
+        "de": "Es wurde eine Möglichkeit hinzugefügt, das Schließen der Lesesitzung bei einem Fehler zu deaktivieren.\nDas Logging bei Fehlern wurde verbessert, wenn das Debug-Log aktiviert ist.",
+        "ru": "Добавлена возможность отключить закрытие читателя в случае ошибки.\nЗапись в случае ошибок была улучшена при разрешении отладки.",
+        "pt": "Uma opção para desativar o fechamento da sessão do leitor no caso de um erro foi adicionado.\nLogging em caso de erros foi aprimorado quando o log de depuração ativado.",
+        "nl": "Een optie om het sluiten van de lezersessie uit te schakelen in geval van een fout is toegevoegd.\nIn het geval van fouten is verbeterd als debug log in staat was.",
+        "fr": "Une option pour désactiver la fermeture de la session de lecteur en cas d'erreur a été ajoutée.\nL'enregistrement en cas d'erreur a été amélioré lorsque le journal de débogage a été activé.",
+        "it": "È stata aggiunta un'opzione per disabilitare la chiusura della sessione del lettore in caso di errore.\nLa registrazione in caso di errori è stata migliorata quando il registro di debug è abilitato.",
+        "es": "Se ha añadido una opción para desactivar el cierre de la sesión de lectores en caso de error.\nLogging in case of errors hase been enhanced when debug log enabled.",
+        "pl": "Dodano możliwość zamknięcia sesji czytelnika w przypadku błędu.\nUmożliwia to, że błędy zostały poprawione, gdy logowanie debugowe umożliwiało.",
+        "uk": "Додана можливість відключити закриття сеансу зчитувача при похибці помилки.\nУ разі виникнення помилок було розширено при ввімкненні з'єднання.",
+        "zh-cn": "在出现错误的情况下,添加了一种可更改读者届会的备选办法。.\n出现错误时,由于黑暗的缘故,加重了损失。."
+      },
+      "2.4.8": {
+        "en": "fixed: UDP ports got lost during error handling (#282)\nfixed: Incorrect toString() syntax caused several issues, i.e. missing error output (#283)\nDependencies have been updated",
+        "de": "behoben: UDP-Ports gingen während einer Fehlerbehandlung verloren (#282)\nbehoben: Falsche toString() Syntax verursachte mehrere Probleme, z.B. fehlende Fehlerausgaben (#283)\nAbhängigkeiten wurden aktualisiert",
+        "ru": "исправлено: UDP порты потеряли при обработке ошибок #(282)\nисправлено: Неправильный кString)( синтаксис вызвал несколько проблем, т.е. отсутствует ошибка вывода #(283)\nВ зависимости были обновлены",
+        "pt": "corrigido: As portas UDP foram perdidas durante o manuseio de erros #(282)\ncorrigido: Incorreto toString)( sintaxe causou vários problemas, ou seja, falta de saída de erro #(283)\nAs dependências foram atualizadas",
+        "nl": "uDP havens zijn verdwaald tijdens de fout\nincorrect toString ( syntax veroorzaakte verschillende problemen, ik miste fouten uitput ♪\nAfhankelijkheid",
+        "fr": "fixes: les ports UDP ont été perdus lors de la manipulation d'erreur #(282)\ncorrigé: Incorrect toString)( syntaxe causée plusieurs problèmes, c.-à-d. sortie d'erreur manquante #(283)\nLes dépendances ont été mises à jour",
+        "it": "fisso: le porte UDP si sono perse durante la gestione degli errori #(282)\nfisso: non corretto toString)( la sintassi ha causato diversi problemi, cioè l'uscita di errore mancante #(283)\nLe dipendenze sono state aggiornate",
+        "es": "fijo: los puertos UDP se perdieron durante el manejo de errores #(282)\nfijo: Incorrect toString)( Syntax causó varios problemas, es decir, falta de salida de error #(283)\nSe han actualizado las dependencias",
+        "pl": "uDP straciła w wyniku przetargu na błędy\nstosowana: Incorrect toString (String)(składnia spowodowała kilka problemów, tzn. brak błędu wyjściowego #(283)\nZależności zostały zaktualizowane",
+        "uk": "виправлено: УДП порти втратили під час обробки помилок #(282)\nвиправлено: Невірно доString)( синтаксис викликало кілька питань, тобто відсутній вихід помилок #(283)\nОновлено залежність",
+        "zh-cn": "固定:在错误处理第(2)82号错误时,联发办港口损失\n固定:不正确地进入(综合税)造成若干问题,即失踪产出(283)\n已更新了属地"
+      },
+      "2.4.7": {
+        "en": "changed: several externalmodules including net-snmp have been updated",
+        "de": "geändert: mehrere externe Module einschließlich net-snmp wurden aktualisiert",
+        "ru": "изменено: были обновлены несколько внешних модулей, включая net-snmp",
+        "pt": "alterado: vários módulos externos incluindo net-snmp foram atualizados",
+        "nl": "vertaling:",
+        "fr": "changé: plusieurs modes externes, y compris net-snmp, ont été mis à jour",
+        "it": "cambiato: sono stati aggiornati diversi moduli esterni, tra cui il net-snmp",
+        "es": "cambiado: se han actualizado varios módulos externos, incluidos los bancos netos",
+        "pl": "zmieniono kilka zewnętrznych modułów, w tym sieć-snmp",
+        "uk": "змінено: кілька зовнішніхмодулів, включаючи net-snmp",
+        "zh-cn": "修改:更新了包括净经验在内的几个外部摩托尔。"
+      },
+      "2.4.6": {
+        "en": "Fixed: SNMP set did not work for numeric value 0 (#240)",
+        "de": "Behoben: SNMP-Set funktionierte nicht für Zahlenwert 0 (#240)",
+        "ru": "Исправлено: SNMP set не работает для числового значения 0 (#240)",
+        "pt": "Corrigido: SNMP set não funcionou para o valor numérico 0 (#240)",
+        "nl": "SNMP heeft niet gewerkt voor numerieke waarde 0-240",
+        "fr": "Fixed: SNMP set n'a pas fonctionné pour la valeur numérique 0 (#240)",
+        "it": "Fisso: il set SNMP non ha funzionato per il valore numerico 0 (#240)",
+        "es": "Fijo: el conjunto SNMP no funcionó para el valor numérico 0 (#240)",
+        "pl": "Fixed: SNMP nie pracował dla wartości liczbowej 0 (#240)",
+        "uk": "Виправлено: набір SNMP не працює для числового значення 0 (#240)",
+        "zh-cn": "固定:SNMP编没有为数字价值0.(240#)做准备。"
+      },
+      "2.4.5": {
+        "en": "Fixed: SNMPv3 crash when using SHA authentication (#236)",
+        "de": "Behoben: SNMPv3 Crash bei Verwendung von SHA-Authentifizierung (#236)",
+        "ru": "Исправлено: SNMPv3 аварии при использовании SHA аутентификации (#236)",
+        "pt": "Corrigido: SNMPv3 acidente ao usar a autenticação SHA (#236)",
+        "nl": "SNMPV3 crash als je SHA authenticatie gebruikt",
+        "fr": "Correction : SNMPv3 crash lors de l'authentification SHA (#236)",
+        "it": "Fisso: crash SNMPv3 quando si utilizza l'autenticazione SHA (#236)",
+        "es": "Arreglado: choque SNMPv3 cuando se utiliza la autenticación SHA (#236)",
+        "pl": "Fixed: SNMPv3 – katastrofa typu SHA (#236) ",
+        "uk": "Виправлено: СНМПВ3 збиток при використанні SHA-автентифікації (#236)",
+        "zh-cn": "固定:SNMPv3crash在使用SHA核证时(第236)"
+      },
+      "2.4.4": {
+        "en": "Fixed: crash reported by sentry (#235)",
+        "de": "Behoben: Absturz, der von Sentry gemeldet wurde (#235)",
+        "ru": "Исправлено: сбой, сообщенный судоходством (#235)",
+        "pt": "Corrigido: acidente relatado por sentinela (#235)",
+        "nl": "Vertaling:",
+        "fr": "Correction : crash signalé par sentinelle (#235)",
+        "it": "Risolto: crash segnalato dalla sentinella (#235)",
+        "es": "Corregido: accidente reportado por centinela (#235)",
+        "pl": "W: rozbicie odnotowane przez przesyłkę (#235)",
+        "uk": "Виправлено: аварійне повідомлення від відправника (#235)",
+        "zh-cn": "固定:发送的事故(第235)"
+      },
+      "2.4.3": {
+        "en": "Translations and dependencies have been updated.",
+        "de": "Übersetzungen und Abhängigkeiten wurden aktualisiert.",
+        "ru": "Обновлены переводы и зависимости.",
+        "pt": "Traduções e dependências foram atualizadas.",
+        "nl": "Vertaling en afhankelijkheid zijn geüpdateerd.",
+        "fr": "Les traductions et les dépendances ont été mises à jour.",
+        "it": "Traduzioni e dipendenze sono state aggiornate.",
+        "es": "Se han actualizado las traducciones y dependencias.",
+        "pl": "Tłumaczenia i zależności zostały zaktualizowane.",
+        "uk": "Оновлено переклади та залежності.",
+        "zh-cn": "翻译和档案已经更新。."
+      }
     },
-    "native": {},
-    "objects": [],
-    "instanceObjects": [
-        {
-            "_id": "info",
-            "type": "channel",
-            "common": {
-                "name": "Information"
-            },
-            "native": {}
+    "title": "SNMP",
+    "titleLang": {
+      "en": "SNMP",
+      "de": "SNMP",
+      "ru": "SNMP",
+      "pt": "SNMP",
+      "nl": "SNMP",
+      "fr": "SNMP",
+      "it": "SNMP",
+      "es": "SNMP",
+      "pl": "SNMP",
+      "zh-cn": "SNMP",
+      "uk": "SNMP"
+    },
+    "desc": {
+      "en": "Allows to poll SNMP OIDs in ioBroker",
+      "de": "Ermöglicht das Polling von SNMP Objekten im ioBroker",
+      "ru": "Позволяет считывать SNPM объекты по OID в ioBroker",
+      "pt": "ioBroker SNMP-OID Adapter",
+      "fr": "ioBroker SNMP-OID Adapter",
+      "nl": "ioBroker SNMP-OID Adapter",
+      "it": "Consente di eseguire il polling degli OID SNMP in ioBroker",
+      "es": "Permite sondear los OID de SNMP en ioBroker",
+      "pl": "Umożliwia odpytywanie identyfikatorów SNMP OID w ioBroker",
+      "zh-cn": "允许在 ioBroker 中轮询 SNMP OID",
+      "uk": "Дозволяє опитувати SNMP OID в ioBroker"
+    },
+    "license": "MIT",
+    "platform": "Javascript/Node.js",
+    "icon": "snmp.png",
+    "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.snmp/master/admin/snmp.png",
+    "keywords": [
+      "SNMP-OID"
+    ],
+    "readme": "https://github.com/mcm1957/ioBroker.snmp/blob/master/README.md",
+    "loglevel": "info",
+    "mode": "daemon",
+    "type": "infrastructure",
+    "connectionType": "local",
+    "dataSource": "poll",
+    "compact": true,
+    "authors": [
+      {
+        "name": "Marcolotti",
+        "email": "info@ct-j.de"
+      },
+      {
+        "name": "mcm1957",
+        "email": "mcm57@gmx.at"
+      }
+    ],
+    "adminUI": {
+      "config": "json"
+    },
+    "stopBeforeUpdate": "true",
+    "plugins": {
+      "sentry": {
+        "dsn": "https://621ac710b70445f8b170cbb783045988@sentry.iobroker.net/181"
+      }
+    },
+    "globalDependencies": [
+      {
+        "admin": ">=5.1.28"
+      }
+    ],
+    "dependencies": [
+      {
+        "js-controller": ">=3.3.22"
+      }
+    ],
+    "messages": [
+      {
+        "condition": {
+          "operand": "and",
+          "rules": [
+            "oldVersion<2.0.0",
+            "newVersion>=2.0.0"
+          ]
         },
-        {
-            "_id": "info.connection",
-            "type": "state",
-            "common": {
-                "role": "indicator.connected",
-                "name": "If connected to device",
-                "type": "boolean",
-                "read": true,
-                "write": false,
-                "def": false
-            },
-            "native": {}
-        }
+        "title": {
+          "en": "Important notice!",
+          "de": "Wichtiger Hinweis!",
+          "ru": "Важное замечание!",
+          "pt": "Notícia importante!",
+          "nl": "Belangrijke mededeling!",
+          "fr": "Avis important!",
+          "it": "Avviso IMPORTANTE!",
+          "es": "Noticia importante!",
+          "pl": "Ważna uwaga!",
+          "zh-cn": "重要通知!",
+          "uk": "Важливе повідомлення!"
+        },
+        "text": {
+          "en": "Configuration data has been changed for version 2.0.0 (and newer). Installation will try to migrate data but there is a chance that this fails. Please ensure that you have a backup and a external documention of your configuration before upgrading to version 2.0.0 or newer.",
+          "de": "Konfigurationsdaten wurden für Version 2.0.0 (und neuer) geändert. Die Installation wird versuchen, Daten zu migrieren, aber es gibt eine Chance, dass dies versagt. Bitte stellen Sie sicher, dass Sie ein Backup und eine externe Dokumentation Ihrer Konfiguration vor dem Upgrade auf Version 2.0.0 oder neuer haben.",
+          "ru": "Данные конфигурации были изменены для версии 2.0.0 (и новее). Установка будет пытаться перенести данные, но есть шанс, что это не работает. Пожалуйста, убедитесь, что у вас есть резервное копирование и внешний документирование вашей конфигурации перед обновлением до версии 2.0.0 или новее.",
+          "pt": "Os dados de configuração foram alterados para a versão 2.0.0 (e mais recente). A instalação tentará migrar dados, mas há uma chance de que isso falha. Certifique-se de ter um backup e uma documentação externa de sua configuração antes de atualizar para a versão 2.0.0 ou mais recente.",
+          "nl": "Vermoedende data is veranderd voor versie 2.0. Installatie zal proberen data te verminderen maar er is een kans dat dit mislukt. Zorg ervoor dat je een back-up hebt en een externe documentie van je zelfvertrouwen voordat je verstoort naar versie 2.0 of nieuwer.",
+          "fr": "Les données de configuration ont été modifiées pour la version 2.0.0 (et plus récente). L'installation tentera de migrer les données, mais il y a une chance que cela échoue. Assurez-vous d'avoir une sauvegarde et une documentation externe de votre configuration avant de passer à la version 2.0.0 ou plus récente.",
+          "it": "I dati di configurazione sono stati modificati per la versione 2.0.0 (e più recente). L'installazione cercherà di migrare i dati, ma c'è la possibilità che questo fallisca. Si prega di assicurarsi di avere un backup e un documento esterno della configurazione prima di aggiornare alla versione 2.0.0 o più recente.",
+          "es": "Los datos de configuración se han modificado para la versión 2.0.0 (y más reciente). La instalación intentará migrar datos pero hay una posibilidad de que esto falle. Por favor, asegúrese de tener una copia de seguridad y una documentación externa de su configuración antes de actualizar a la versión 2.0.0 o más reciente.",
+          "pl": "Dane konfiguracyjne zostały zmienione na wersję 2.0.0 (i nowszą). Instalacja stara się wyemitować dane, ale istnieje szansa, że to się nie udaje. Zapewniajcie, że mamy backup i zewnętrzną dokumentację twojej wersji 2.0.0 lub nowszego.",
+          "zh-cn": "对2.0.0版本(和新版)的合并数据进行了修改。 绝大部分将试图迁移数据,但有失败的机会。 请确保在更新至2.0.0或新版之前,对你的配置进行反馈和外部记录。.",
+          "uk": "Дані конфігурації змінено для версії 2.0.0 (і новішої). Інсталяція спробує перенести дані, але існує ймовірність, що це не вдасться. Переконайтеся, що у вас є резервна копія та зовнішня документація вашої конфігурації перед оновленням до версії 2.0.0 або новішої."
+        },
+        "link": "https://github.com/iobroker-community-adapters/ioBroker.snmp#changelog",
+        "level": "warn",
+        "linkText": {
+          "en": "Changelog",
+          "de": "Änderungsprotokoll",
+          "ru": "Список изменений",
+          "pt": "Registro de alterações",
+          "nl": "Wijzigingslog",
+          "fr": "Journal des modifications",
+          "it": "Registro delle modifiche",
+          "es": "registro de cambios",
+          "pl": "Dziennik zmian",
+          "zh-cn": "变更日志",
+          "uk": "Журнал змін"
+        },
+        "buttons": [
+          "agree",
+          "cancel"
+        ]
+      },
+      {
+        "condition": {
+          "operand": "and",
+          "rules": [
+            "oldVersion<1.0.0",
+            "newVersion>=1.0.0"
+          ]
+        },
+        "title": {
+          "en": "Important notice!",
+          "de": "Wichtiger Hinweis!",
+          "ru": "Важное замечание!",
+          "pt": "Notícia importante!",
+          "nl": "Belangrijke mededeling!",
+          "fr": "Avis important!",
+          "it": "Avviso IMPORTANTE!",
+          "es": "Noticia importante!",
+          "pl": "Ważna uwaga!",
+          "zh-cn": "重要通知!",
+          "uk": "Важливе повідомлення!"
+        },
+        "text": {
+          "en": "Version 1.0.0 will change the names of objects containing special characters like \\\".\\\", \\\"-\\\" or spaces! Please delete the old objects manually if needed.",
+          "de": "Version 1.0.0 ändert die Namen von Objekten, die spezielle Zeichen wie \\\"\\\", \\\"-\\\" oder Leerzeichen enthalten! Bitte löschen Sie die alten Objekte bei Bedarf manuell.",
+          "ru": "Версия 1.0.0 изменит имена объектов, содержащих специальные символы, такие как \\\".\\\", \\\"-\\\" или пространства! Пожалуйста, удалите старые объекты вручную, если это необходимо.",
+          "pt": "A versão 1.0.0 mudará os nomes de objetos contendo caracteres especiais como \\\".\\\", \\\"-\\\" ou espaços! Por favor, exclua os objetos antigos manualmente, se necessário.",
+          "nl": "Version 1.0.0 zal de namen veranderen van objecten met speciale personages zoals . Verwijder de oude objecten handmatig als het nodig is.",
+          "fr": "La version 1.0.0 va changer les noms des objets contenant des caractères spéciaux comme \\\".\\\", \\\"-\\\" ou des espaces! Veuillez supprimer les anciens objets manuellement si nécessaire.",
+          "it": "La versione 1.0.0 cambierà i nomi di oggetti contenenti caratteri speciali come \\\", \\\"-\\\" o spazi! Si prega di eliminare i vecchi oggetti manualmente se necessario.",
+          "es": "Versión 1.0.0 cambiará los nombres de objetos que contienen caracteres especiales como \\\".\\\", \\\"-\\\" o espacios! Por favor, borre los viejos objetos manualmente si es necesario.",
+          "pl": "Wersja 1.0.0 zmienia nazwę obiektów o specjalnych postaciach, takich jak: \\, \\ lub przestrzeni! Okazuje się, że stare obiekty ręcznie będą potrzebne.",
+          "zh-cn": "Version1.0.0将改变含有特殊特性的物体的名称,如乙型号、乙型号或空间。 请在必要时删除旧物体。.",
+          "uk": "Версія 1.0.0 змінить назви об'єктів, які містять спеціальні символи, такі як \\\".\\\", \\\"-\\\" або пробіли! За потреби видаліть старі об’єкти вручну."
+        },
+        "link": "https://github.com/iobroker-community-adapters/ioBroker.snmp#changelog",
+        "level": "warn",
+        "linkText": {
+          "en": "Changelog",
+          "de": "Änderungsprotokoll",
+          "ru": "Список изменений",
+          "pt": "Registro de alterações",
+          "nl": "Wijzigingslog",
+          "fr": "Journal des modifications",
+          "it": "Registro delle modifiche",
+          "es": "registro de cambios",
+          "pl": "Dziennik zmian",
+          "zh-cn": "变更日志",
+          "uk": "Журнал змін"
+        },
+        "buttons": [
+          "agree",
+          "cancel"
+        ]
+      }
     ]
+  },
+  "native": {},
+  "objects": [],
+  "instanceObjects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.connection",
+      "type": "state",
+      "common": {
+        "role": "indicator.connected",
+        "name": "If connected to device",
+        "type": "boolean",
+        "read": true,
+        "write": false,
+        "def": false
+      },
+      "native": {}
+    }
+  ]
 }
