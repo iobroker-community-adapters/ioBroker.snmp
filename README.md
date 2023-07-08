@@ -42,6 +42,9 @@ For destails see documentation referenced below.
 <!--
 ## __WORK IN PROGRESS__
 -->
+### __WORK IN PROGRESS__
+* (McM1957) Another typo at error output has been fixed
+
 ### 2.4.9 (2023-07-05)
 * (McM1957) An option to disable closing of reader session in case of an error has been added.
 * (McM1957) Logging in case of errors hase been enhanced when debug log enabled.
