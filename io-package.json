@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "snmp",
-    "version": "2.4.9",
+    "version": "2.4.10",
     "news": {
+      "2.4.10": {
+        "en": "Another typo at error output has been fixed",
+        "de": "Ein weiterer Tippfehler bei der Fehlerausgabe wurde behoben",
+        "ru": "Еще одна опечатка при выходе ошибки была исправлена",
+        "pt": "Outro tipo na saída de erro foi corrigido",
+        "nl": "Nog een typo bij fouten is gemaakt",
+        "fr": "Une autre typo à la sortie d'erreur a été corrigée",
+        "it": "Un altro tipo di errore è stato risolto",
+        "es": "Se ha fijado otro tipo de salida de error",
+        "pl": "Inna typacja na wyjściu błędów została naprawiona",
+        "uk": "Ще один тип на виході помилки було виправлено",
+        "zh-cn": "另一个错误产出的类型是固定的。"
+      },
       "2.4.9": {
         "en": "An option to disable closing of reader session in case of an error has been added.\nLogging in case of errors hase been enhanced when debug log enabled.",
         "de": "Es wurde eine Möglichkeit hinzugefügt, das Schließen der Lesesitzung bei einem Fehler zu deaktivieren.\nDas Logging bei Fehlern wurde verbessert, wenn das Debug-Log aktiviert ist.",
@@ -80,19 +93,6 @@
         "pl": "W: rozbicie odnotowane przez przesyłkę (#235)",
         "uk": "Виправлено: аварійне повідомлення від відправника (#235)",
         "zh-cn": "固定:发送的事故(第235)"
-      },
-      "2.4.3": {
-        "en": "Translations and dependencies have been updated.",
-        "de": "Übersetzungen und Abhängigkeiten wurden aktualisiert.",
-        "ru": "Обновлены переводы и зависимости.",
-        "pt": "Traduções e dependências foram atualizadas.",
-        "nl": "Vertaling en afhankelijkheid zijn geüpdateerd.",
-        "fr": "Les traductions et les dépendances ont été mises à jour.",
-        "it": "Traduzioni e dipendenze sono state aggiornate.",
-        "es": "Se han actualizado las traducciones y dependencias.",
-        "pl": "Tłumaczenia i zależności zostały zaktualizowane.",
-        "uk": "Оновлено переклади та залежності.",
-        "zh-cn": "翻译和档案已经更新。."
       }
     },
     "title": "SNMP",

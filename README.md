@@ -42,7 +42,7 @@ For destails see documentation referenced below.
 <!--
 ## __WORK IN PROGRESS__
 -->
-### __WORK IN PROGRESS__
+### 2.4.10 (2023-07-08)
 * (McM1957) Another typo at error output has been fixed
 
 ### 2.4.9 (2023-07-05)
