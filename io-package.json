@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "snmp",
-    "version": "2.4.10",
+    "version": "2.4.11",
     "news": {
+      "2.4.11": {
+        "en": "Node-net-snmp has been updated to improve uint32 handling (#282)\nSeveral other dependencies have been updated",
+        "de": "Node-net-snmp wurde aktualisiert, um uint32 Handling zu verbessern (#282)\nMehrere andere Abhängigkeiten wurden aktualisiert",
+        "ru": "Node-net-snmp был обновлен для улучшения обработки uint32 #(282)\nОбновлены несколько других зависимостей",
+        "pt": "Node-net-snmp foi atualizado para melhorar uint32 manipulação #(282)\nVárias outras dependências foram atualizadas",
+        "nl": "Node-net-snmp is geüpload om uint32 te verbeteren\nVerschillende andere afhankelijkheid is geüpload",
+        "fr": "Node-net-snmp a été mis à jour pour améliorer la manipulation uint32 #(282)\nPlusieurs autres dépendances ont été mises à jour",
+        "it": "Node-net-snmp è stato aggiornato per migliorare la gestione uint32 #(282)\nSono state aggiornate diverse altre dipendenze",
+        "es": "Node-net-snmp ha sido actualizado para mejorar el manejo uint32 #(282)\nSe han actualizado otras dependencias",
+        "pl": "Node-net-snmp został zaktualizowany w celu poprawy obsługi #(282)\nNiektóre inne zależności zostały zaktualizowane",
+        "uk": "#(282)\nБуло оновлено кілька інших залежностей",
+        "zh-cn": "已经更新了用于改进Suint32处理第(2)82号的网上经验。\n已更新了其他一些依赖性"
+      },
       "2.4.10": {
         "en": "Another typo at error output has been fixed",
         "de": "Ein weiterer Tippfehler bei der Fehlerausgabe wurde behoben",
@@ -80,19 +93,6 @@
         "pl": "Fixed: SNMPv3 – katastrofa typu SHA (#236) ",
         "uk": "Виправлено: СНМПВ3 збиток при використанні SHA-автентифікації (#236)",
         "zh-cn": "固定:SNMPv3crash在使用SHA核证时(第236)"
-      },
-      "2.4.4": {
-        "en": "Fixed: crash reported by sentry (#235)",
-        "de": "Behoben: Absturz, der von Sentry gemeldet wurde (#235)",
-        "ru": "Исправлено: сбой, сообщенный судоходством (#235)",
-        "pt": "Corrigido: acidente relatado por sentinela (#235)",
-        "nl": "Vertaling:",
-        "fr": "Correction : crash signalé par sentinelle (#235)",
-        "it": "Risolto: crash segnalato dalla sentinella (#235)",
-        "es": "Corregido: accidente reportado por centinela (#235)",
-        "pl": "W: rozbicie odnotowane przez przesyłkę (#235)",
-        "uk": "Виправлено: аварійне повідомлення від відправника (#235)",
-        "zh-cn": "固定:发送的事故(第235)"
       }
     },
     "title": "SNMP",
