@@ -42,7 +42,7 @@ For destails see documentation referenced below.
 <!--
 ## __WORK IN PROGRESS__
 -->
-### 2.4.10 (2023-07-08)
+### __WORK IN PROGRESS__
 * (McM1957) update node-net-snmp to improve uint32 handling (#282)
 * (McM1957) update several other dependencies
 
