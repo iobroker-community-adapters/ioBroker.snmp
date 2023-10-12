@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "snmp",
-    "version": "2.4.11",
+    "version": "3.0.0",
     "news": {
+      "3.0.0": {
+        "en": "updated packages. Minimal node.js version is 16",
+        "de": "aktualisierte Pakete. Minimal node.js version is 16",
+        "ru": "обновленные пакеты. Минимальная версия node.js 16",
+        "pt": "pacotes atualizados. A versão mínima do node.js é 16",
+        "nl": "verhoogde pakketten. Minimale node",
+        "fr": "des paquets mis à jour. Minimal node.js version est 16",
+        "it": "pacchetti aggiornati. Versione minimal node.js 16",
+        "es": "paquetes actualizados. Minimal node.js versión es 16",
+        "pl": "zaktualizowane pakiety. Wersja minimalna jest 16",
+        "uk": "оновлені пакети. Minimal node.js версія 16",
+        "zh-cn": "更新的一揽子计划。 米切尔·诺贝尔版本为16。"
+      },
       "2.4.11": {
         "en": "Node-net-snmp has been updated to improve uint32 handling (#282)\nSeveral other dependencies have been updated",
         "de": "Node-net-snmp wurde aktualisiert, um uint32 Handling zu verbessern (#282)\nMehrere andere Abhängigkeiten wurden aktualisiert",
@@ -80,19 +93,6 @@
         "pl": "Fixed: SNMP nie pracował dla wartości liczbowej 0 (#240)",
         "uk": "Виправлено: набір SNMP не працює для числового значення 0 (#240)",
         "zh-cn": "固定:SNMP编没有为数字价值0.(240#)做准备。"
-      },
-      "2.4.5": {
-        "en": "Fixed: SNMPv3 crash when using SHA authentication (#236)",
-        "de": "Behoben: SNMPv3 Crash bei Verwendung von SHA-Authentifizierung (#236)",
-        "ru": "Исправлено: SNMPv3 аварии при использовании SHA аутентификации (#236)",
-        "pt": "Corrigido: SNMPv3 acidente ao usar a autenticação SHA (#236)",
-        "nl": "SNMPV3 crash als je SHA authenticatie gebruikt",
-        "fr": "Correction : SNMPv3 crash lors de l'authentification SHA (#236)",
-        "it": "Fisso: crash SNMPv3 quando si utilizza l'autenticazione SHA (#236)",
-        "es": "Arreglado: choque SNMPv3 cuando se utiliza la autenticación SHA (#236)",
-        "pl": "Fixed: SNMPv3 – katastrofa typu SHA (#236) ",
-        "uk": "Виправлено: СНМПВ3 збиток при використанні SHA-автентифікації (#236)",
-        "zh-cn": "固定:SNMPv3crash在使用SHA核证时(第236)"
       }
     },
     "title": "SNMP",

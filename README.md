@@ -43,7 +43,7 @@ For details see documentation referenced below.
 <!--
    ### **WORK IN PROGRESS**
 -->
-### **WORK IN PROGRESS**
+### 3.0.0 (2023-10-12)
 * (bluefox) updated packages. Minimal node.js version is 16
 
 ### 2.4.11 (2023-07-13)
