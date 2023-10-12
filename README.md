@@ -27,9 +27,10 @@ For more details and for information how to disable the error reporting see [Sen
 This adapter can be used to poll information from devices like printers, network devices, etc. using SNMP protocol.
 
 ## Adapter-Configuration
-The adapter queries specified oids which are grouped within oid groups which in turn are assigned to devices. The configuration data is entered at several tabs. The adapter supports IPv4 adn IPv6 connections.
+The adapter queries specified OIDs which are grouped within oid groups which in turn are assigned to devices.
+The configuration data is entered at several tabs. The adapter supports IPv4 adn IPv6 connections.
 
-For destails see documentation referenced below.
+For details see documentation referenced below.
 
 ## Documentation
 
@@ -40,8 +41,11 @@ For destails see documentation referenced below.
 ## Changelog
 
 <!--
-## __WORK IN PROGRESS__
+   ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+* (bluefox) updated packages. Minimal node.js version is 16
+
 ### 2.4.11 (2023-07-13)
 * (McM1957) Node-net-snmp has been updated to improve uint32 handling (#282)
 * (McM1957) Several other dependencies have been updated
