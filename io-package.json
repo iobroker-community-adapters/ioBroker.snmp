@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "snmp",
-    "version": "3.0.0",
+    "version": "3.1.0",
     "news": {
+      "3.1.0": {
+        "en": "Requirements have been updated. Adapter requires node.js 18 or newer now\nPackages have been update to cleanup open dependabot PRs",
+        "de": "Die Anforderungen wurden aktualisiert. Adapter benötigt nun node.js 18 oder neuer\nPakete wurden aktualisiert, um offene dependabot PRs zu bereinigen",
+        "ru": "Требования были обновлены. Адаптер требует node.js 18 или новее сейчас\nПакеты были обновлены, чтобы очистить открытые иждивот PR",
+        "pt": "Os requisitos foram atualizados. Adaptador requer node.js 18 ou mais recente agora\nOs pacotes foram atualizados para limpar PRs de dependente aberto",
+        "nl": "Verzoeken zijn geüpdateerd. Adapter vereist node\nPackages zijn bijgewerkt om afhankelijke PR te reinigen",
+        "fr": "Les ressources nécessaires ont été actualisées. Adaptateur nécessite node.js 18 ou plus maintenant\nLes paquets ont été mis à jour pour nettoyer les fichiers de dépendance ouverts",
+        "it": "I requisiti sono stati aggiornati. Adattatore richiede node.js 18 o più nuovo ora\nI pacchetti sono stati aggiornati per pulire le PR di dipendenza aperte",
+        "es": "Se han actualizado las necesidades. Adaptador requiere node.js 18 o nuevo ahora\nLos paquetes han sido actualizados para limpiar las relaciones públicas de dependabot",
+        "pl": "Wymagania zostały zaktualizowane. Adapter wymaga węzła 18 lub nowszych\nPakiety zostały zaktualizowane w celu czyszczenia otwartego pakietu zależnego od PR",
+        "uk": "Вимоги було оновлено. Адаптер вимагає node.js 18 або новіший зараз\nПакети оновлені для очищення відкритої залежності",
+        "zh-cn": "已更新了要求。 现在需要第18或新的人员。\n已经更新了清洁的露天化验。"
+      },
       "3.0.0": {
         "en": "updated packages. Minimal node.js version is 16",
         "de": "Pakete aktualisiert. Minimal node.js Version ist nun 16",
@@ -80,19 +93,6 @@
         "pl": "zmieniono kilka zewnętrznych modułów, w tym sieć-snmp",
         "uk": "змінено: кілька зовнішніхмодулів, включаючи net-snmp",
         "zh-cn": "修改:更新了包括净经验在内的几个外部摩托尔。"
-      },
-      "2.4.6": {
-        "en": "Fixed: SNMP set did not work for numeric value 0 (#240)",
-        "de": "Behoben: SNMP-Set funktionierte nicht für Zahlenwert 0 (#240)",
-        "ru": "Исправлено: SNMP set не работает для числового значения 0 (#240)",
-        "pt": "Corrigido: SNMP set não funcionou para o valor numérico 0 (#240)",
-        "nl": "SNMP heeft niet gewerkt voor numerieke waarde 0-240",
-        "fr": "Fixed: SNMP set n'a pas fonctionné pour la valeur numérique 0 (#240)",
-        "it": "Fisso: il set SNMP non ha funzionato per il valore numerico 0 (#240)",
-        "es": "Fijo: el conjunto SNMP no funcionó para el valor numérico 0 (#240)",
-        "pl": "Fixed: SNMP nie pracował dla wartości liczbowej 0 (#240)",
-        "uk": "Виправлено: набір SNMP не працює для числового значення 0 (#240)",
-        "zh-cn": "固定:SNMP编没有为数字价值0.(240#)做准备。"
       }
     },
     "title": "SNMP",
