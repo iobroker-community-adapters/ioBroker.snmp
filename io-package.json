@@ -5,7 +5,7 @@
     "news": {
       "3.0.0": {
         "en": "updated packages. Minimal node.js version is 16",
-        "de": "aktualisierte Pakete. Minimal node.js version is 16",
+        "de": "Pakete aktualisiert. Minimal node.js Version ist nun 16",
         "ru": "обновленные пакеты. Минимальная версия node.js 16",
         "pt": "pacotes atualizados. A versão mínima do node.js é 16",
         "nl": "verhoogde pakketten. Minimale node",
@@ -162,7 +162,7 @@
     ],
     "dependencies": [
       {
-        "js-controller": ">=3.3.22"
+        "js-controller": ">=4.0.24"
       }
     ],
     "messages": [
