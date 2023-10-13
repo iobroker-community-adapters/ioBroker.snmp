@@ -43,6 +43,10 @@ For details see documentation referenced below.
 <!--
    ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+* (mcm1957) Requirements have been updated. Adapter requires node.js 18 or newer now
+* (mcm1957) Packages have been update to cleanup open dependabot PRs
+
 ### 3.0.0 (2023-10-12)
 * (bluefox) updated packages. Minimal node.js version is 16
 
