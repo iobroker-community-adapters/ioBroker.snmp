@@ -95,7 +95,6 @@
         "zh-cn": "修改:更新了包括净经验在内的几个外部摩托尔。"
       }
     },
-    "title": "SNMP",
     "titleLang": {
       "en": "SNMP",
       "de": "SNMP",
@@ -155,14 +154,14 @@
         "dsn": "https://621ac710b70445f8b170cbb783045988@sentry.iobroker.net/181"
       }
     },
+    "dependencies": [
+      {
+        "js-controller": ">=5.0.0"
+      }
+    ],
     "globalDependencies": [
       {
         "admin": ">=5.1.28"
-      }
-    ],
-    "dependencies": [
-      {
-        "js-controller": ">=4.0.24"
       }
     ],
     "messages": [

@@ -43,6 +43,10 @@ For details see documentation referenced below.
 <!--
    ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+* (mcm1957) Adapter requires node.js 18 and js-controller >= 5 now
+* (mcm1957) Dependencies have been updated
+
 ### 3.1.0 (2023-10-13)
 * (mcm1957) Requirements have been updated. Adapter requires node.js 18 or newer now
 * (mcm1957) Packages have been update to cleanup open dependabot PRs
