@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "snmp",
-    "version": "3.1.0",
+    "version": "3.2.0",
     "news": {
+      "3.2.0": {
+        "en": "Adapter requires node.js 18 and js-controller >= 5 now\nDependencies have been updated",
+        "de": "Adapter benötigt node.js 18 und js-controller >= 5 jetzt\nAbhängigkeiten wurden aktualisiert",
+        "ru": "Адаптер требует node.js 18 и js-controller >= 5 сейчас\nЗависимость обновлена",
+        "pt": "Adapter requer node.js 18 e js-controller >= 5 agora\nAs dependências foram atualizadas",
+        "nl": "Adapter vereist node.js 18 en js-controller Nu 5\nAfhankelijkheden zijn bijgewerkt",
+        "fr": "Adaptateur nécessite node.js 18 et js-controller >= 5 maintenant\nLes dépendances ont été actualisées",
+        "it": "Adattatore richiede node.js 18 e js-controller >= 5 ora\nLe dipendenze sono state aggiornate",
+        "es": "Adaptador requiere node.js 18 y js-controller √= 5 ahora\nSe han actualizado las dependencias",
+        "pl": "Adapter wymaga node.js 18 i sterownika js- > = 5 teraz\nZaktualizowano zależności",
+        "uk": "Адаптер вимагає node.js 18 і js-controller >= 5 тепер\nЗалежність було оновлено",
+        "zh-cn": "适配器需要节点.js 18和js控制器 QQ 现在5号\n依赖关系已更新"
+      },
       "3.1.0": {
         "en": "Requirements have been updated. Adapter requires node.js 18 or newer now\nPackages have been update to cleanup open dependabot PRs",
         "de": "Die Anforderungen wurden aktualisiert. Adapter benötigt nun node.js 18 oder neuer\nPakete wurden aktualisiert, um offene dependabot PRs zu bereinigen",
@@ -80,19 +93,6 @@
         "pl": "uDP straciła w wyniku przetargu na błędy\nstosowana: Incorrect toString (String)(składnia spowodowała kilka problemów, tzn. brak błędu wyjściowego #(283)\nZależności zostały zaktualizowane",
         "uk": "виправлено: УДП порти втратили під час обробки помилок #(282)\nвиправлено: Невірно доString)( синтаксис викликало кілька питань, тобто відсутній вихід помилок #(283)\nОновлено залежність",
         "zh-cn": "固定:在错误处理第(2)82号错误时,联发办港口损失\n固定:不正确地进入(综合税)造成若干问题,即失踪产出(283)\n已更新了属地"
-      },
-      "2.4.7": {
-        "en": "changed: several externalmodules including net-snmp have been updated",
-        "de": "geändert: mehrere externe Module einschließlich net-snmp wurden aktualisiert",
-        "ru": "изменено: были обновлены несколько внешних модулей, включая net-snmp",
-        "pt": "alterado: vários módulos externos incluindo net-snmp foram atualizados",
-        "nl": "vertaling:",
-        "fr": "changé: plusieurs modes externes, y compris net-snmp, ont été mis à jour",
-        "it": "cambiato: sono stati aggiornati diversi moduli esterni, tra cui il net-snmp",
-        "es": "cambiado: se han actualizado varios módulos externos, incluidos los bancos netos",
-        "pl": "zmieniono kilka zewnętrznych modułów, w tym sieć-snmp",
-        "uk": "змінено: кілька зовнішніхмодулів, включаючи net-snmp",
-        "zh-cn": "修改:更新了包括净经验在内的几个外部摩托尔。"
       }
     },
     "titleLang": {
