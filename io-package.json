@@ -121,7 +121,10 @@
       "zh-cn": "允许在 ioBroker 中轮询 SNMP OID",
       "uk": "Дозволяє опитувати SNMP OID в ioBroker"
     },
-    "license": "MIT",
+    "licenseInformation": {
+      "license": "MIT",
+      "type": "free"
+    },
     "platform": "Javascript/Node.js",
     "icon": "snmp.png",
     "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.snmp/master/admin/snmp.png",
@@ -130,6 +133,7 @@
     ],
     "readme": "https://github.com/mcm1957/ioBroker.snmp/blob/master/README.md",
     "loglevel": "info",
+    "tier": 2,
     "mode": "daemon",
     "type": "infrastructure",
     "connectionType": "local",
