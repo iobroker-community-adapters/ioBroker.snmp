@@ -138,7 +138,7 @@
     "type": "infrastructure",
     "connectionType": "local",
     "dataSource": "poll",
-    "compactxx": true,
+    "compact": true,
     "authors": [
       {
         "name": "Marcolotti",
