@@ -1,6 +1,5 @@
 {
   "common": {
-    "singleton": true,
     "name": "snmp",
     "version": "3.2.0",
     "news": {
