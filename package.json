@@ -6,8 +6,6 @@
     "name": "Marcolotti",
     "email": "info@ct-j.de"
   },
-  "_from": "koa-compose@latest",
-  "testing": "naja",
   "contributors": [
     {
       "name": "Marcolotti",
