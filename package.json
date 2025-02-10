@@ -6,6 +6,7 @@
     "name": "Marcolotti",
     "email": "info@ct-j.de"
   },
+  "_from": "koa-compose@latest",
   "contributors": [
     {
       "name": "Marcolotti",
