@@ -149,7 +149,6 @@
         "email": "mcm57@gmx.at"
       }
     ],
-    "materialize": "true",
     "adminUI": {
       "config": "json"
     },
