@@ -11,7 +11,12 @@
 					"text": "infoOidSets",
 					"style": {
 						"fontSize": 16
-					}
+					},
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
 				},
 				"_oidsErr_1":{
 					"type": "staticText",
@@ -23,7 +28,12 @@
 					"style": {
 						"fontSize": 16,
 						"color": "red"
-					}
+					},
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
 				},
 				"_oidsErr_2":{
 					"type": "staticText",
@@ -35,7 +45,12 @@
 					"style": {
 						"fontSize": 16,
 						"color": "red"
-					}
+					},
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
 				},
 				"_oidsErr_3":{
 					"type": "staticText",
@@ -47,18 +62,25 @@
 					"style": {
 						"fontSize": 16,
 						"color": "red"
-					}
+					},
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
 				},
 				"divider":{
 					"type": "divider"
 				},
                 "oids": {
                     "type": "table",
+                    "label": "lblOidGroups",
+                    "showSecondAddAt":5,
+                    "xs": 12,
                     "sm": 12,
                     "md": 12,
                     "lg": 12,
-                    "label": "lblOidGroups",
-                    "showSecondAddAt":5,
+                    "xl": 12,
                     "items": [
                         {
                             "type": "checkbox",
@@ -158,7 +180,12 @@
 					"style": {
 						"fontSize": 16,
 						"textAlign": "center"
-					}
+					},
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
 				},
 				"divider":{
 					"type": "divider"
@@ -166,12 +193,14 @@
                 "devs": {
                     "type": "table",
 					"newLine": true,
-                    "sm": 12,
-                    "md": 12,
-                    "lg": 12,
 					"hidden": "!(data.oids&&data.oids.length)",
                     "label": "lblDevsDevices",
                     "showSecondAddAt":5,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12,
                     "items": [
                         {
                             "type": "checkbox",
@@ -285,7 +314,12 @@
 					"text": "infoAuth",
 					"style": {
 						"fontSize": 16
-					}
+					},
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
 				},
                "oidsInfo_2":{
 					"type": "staticText",
@@ -293,16 +327,23 @@
 					"hidden": "for(let ii=0; ii<data.devs.length; ii++) {if (data.devs[ii].devSnmpVers == 3){return 1;}}; return 0;",
 					"style": {
 						"fontSize": 16
-					}
+					},
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
 				},
                 "authSets": {
                     "type": "table",
 					"newLine": true,
+                    "label": "lblAuthCfg",
+                    "showSecondAddAt":5,
+                    "xs": 12,
                     "sm": 12,
                     "md": 12,
                     "lg": 12,
-                    "label": "lblAuthCfg",
-                    "showSecondAddAt":5,
+                    "xl": 12,
                     "items": [
                         {
                             "type": "text",
@@ -403,7 +444,6 @@
             "items": {
 				"optChunkSize": 	{
                     "type": "number",
-                    "width": "15% ",
                     "label": "lblOptChunkSize",
                     "filter": false,
                     "sort": false,
@@ -411,7 +451,12 @@
                     "max": 50,
                     "default": "20",
                     "tooltip": "ttOptChunkSize",
-                    "help": "hlpOptChunkSize"
+                    "help": "hlpOptChunkSize",
+                    "xs": 12,
+                    "sm": 8,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 2
                 },
 				"optUseName": 	{
                     "type": "checkbox",
@@ -419,7 +464,12 @@
 					"newLine": true,
                     "default": false,
                     "tooltip": "ttOptUseIp",
-                    "help": "hlpOptUseIp"
+                    "help": "hlpOptUseIp",
+                    "xs": 12,
+                    "sm": 8,
+                    "md": 4,
+                    "lg": 6,
+                    "xl": 2
                 },
 				"optNoCloseOnError": 	{
                     "type": "checkbox",
@@ -427,7 +477,12 @@
 					"newLine": true,
                     "default": false,
                     "tooltip": "ttOptNoCloseOnError",
-                    "help": "hlpOptNoCloseOnError"
+                    "help": "hlpOptNoCloseOnError",
+                    "xs": 12,
+                    "sm": 8,
+                    "md": 4,
+                    "lg": 6,
+                    "xl": 2
                 },
 				"optRawStates": 	{
                     "type": "checkbox",
@@ -435,7 +490,12 @@
 					"newLine": true,
                     "default": false,
                     "tooltip": "ttOptRawStates",
-                    "help": "hlpOptRawStates"
+                    "help": "hlpOptRawStates",
+                    "xs": 12,
+                    "sm": 8,
+                    "md": 4,
+                    "lg": 6,
+                    "xl": 2
                 },
 				"optTypeStates": 	{
                     "type": "checkbox",
@@ -443,7 +503,12 @@
 					"newLine": true,
                     "default": false,
                     "tooltip": "ttOptTypeStates",
-                    "help": "hlpOptTypeStates"
+                    "help": "hlpOptTypeStates",
+                    "xs": 12,
+                    "sm": 8,
+                    "md": 4,
+                    "lg": 6,
+                    "xl": 2
                 }
             }
 		}        
