@@ -43,7 +43,7 @@ For details see documentation referenced below.
 <!--
    ### **WORK IN PROGRESS**
 -->
-### 3.3.0-alpha.0 (2025-08-17)
+### **WORK IN PROGRESS**
 * (mcm1957) Adapter requires node.js 20, js-controller >= 6.011 and admin >= 7.6.17 now.
 * (mcm1957) Dependencies have been updated
 
