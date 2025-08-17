@@ -1,32 +1,19 @@
 {
   "common": {
     "name": "snmp",
-    "version": "3.3.0-alpha.1",
+    "version": "3.3.0",
     "news": {
-      "3.3.0-alpha.1": {
-        "en": "Adapter requires node.js 20, js-controller >= 6.011 and admin >= 7.6.17 now.\nDependencies have been updated",
-        "de": "Adapter erfordert jetzt node.js 20, js-controller >= 6.011 und admin >= 7.6.17.\nAbhängigkeiten wurden aktualisiert",
-        "ru": "Адаптер требует node.js 20, js-контроллер >= 6.011 и админ >= 7.6.17 сейчас.\nЗависимости были обновлены",
-        "pt": "O adaptador requer nod.js 20, js-controller >= 6,011 e admin >= 7,617 agora.\nAs dependências foram atualizadas",
-        "nl": "Voor de adapter zijn node.js 20, js-controller < 6,011 en admin > 7.6.17 nodig.\nAfhankelijkheden zijn bijgewerkt",
-        "fr": "Adapter nécessite node.js 20, js-controller >= 6.011 et admin >= 7.6.17.\nLes dépendances ont été actualisées",
-        "it": "Adattatore richiede node.js 20, js-controller >= 6.011 e admin >= 7.6.17 ora.\nLe dipendenze sono state aggiornate",
-        "es": "Adaptador requiere node.js 20, js-controller н= 6.011 y admin= 7.6.17 ahora.\nSe han actualizado las dependencias",
-        "pl": "Adapter wymaga node.js 20, js- controller > = 6.011 i admin > = 7.6.17 teraz.\nZaktualizowano zależności",
-        "uk": "Адаптер вимагає node.js 20, js-controller >=6.011 і admin >=7.6.17 тепер.\nЗалежність було оновлено",
-        "zh-cn": "适配器需要节点.js 20,js控制器 >= 6.011和管理员 >= 7.6.17 现在.\n依赖关系已更新"
-      },
-      "3.3.0-alpha.0": {
-        "en": "Adapter requires node.js 20, js-controller >= 6.011 and admin >= 7.6.17 now.\nDependencies have been updated",
-        "de": "Adapter erfordert jetzt node.js 20, js-controller >= 6.011 und admin >= 7.6.17.\nAbhängigkeiten wurden aktualisiert",
-        "ru": "Адаптер требует node.js 20, js-контроллер >= 6.011 и админ >= 7.6.17 сейчас.\nЗависимости были обновлены",
-        "pt": "O adaptador requer nod.js 20, js-controller >= 6,011 e admin >= 7,617 agora.\nAs dependências foram atualizadas",
-        "nl": "Voor de adapter zijn node.js 20, js-controller < 6,011 en admin > 7.6.17 nodig.\nAfhankelijkheden zijn bijgewerkt",
-        "fr": "Adapter nécessite node.js 20, js-controller >= 6.011 et admin >= 7.6.17.\nLes dépendances ont été actualisées",
-        "it": "Adattatore richiede node.js 20, js-controller >= 6.011 e admin >= 7.6.17 ora.\nLe dipendenze sono state aggiornate",
-        "es": "Adaptador requiere node.js 20, js-controller н= 6.011 y admin= 7.6.17 ahora.\nSe han actualizado las dependencias",
-        "pl": "Adapter wymaga node.js 20, js- controller > = 6.011 i admin > = 7.6.17 teraz.\nZaktualizowano zależności",
-        "uk": "Адаптер вимагає node.js 20, js-controller >=6.011 і admin >=7.6.17 тепер.\nЗалежність було оновлено",
+      "3.3.0": {
+        "en": "Adapter requires node.js 20, js-controller >= 6.0.11 and admin >= 7.6.17 now.\nDependencies have been updated",
+        "de": "Adapter erfordert jetzt node.js 20, js-controller >= 6.0.11 und admin >= 7.6.17.\nAbhängigkeiten wurden aktualisiert",
+        "ru": "Адаптер требует node.js 20, js-контроллер >= 6.0.11 и админ >= 7.6.17 сейчас.\nЗависимости были обновлены",
+        "pt": "O adaptador requer nod.js 20, js-controller >= 6.0.11 e admin >= 7,617 agora.\nAs dependências foram atualizadas",
+        "nl": "Voor de adapter zijn node.js 20, js-controller >= 6.0.11 en admin >= 7.6.17 nodig.\nAfhankelijkheden zijn bijgewerkt",
+        "fr": "Adapter nécessite node.js 20, js-controller >= 6.0.11 et admin >= 7.6.17.\nLes dépendances ont été actualisées",
+        "it": "Adattatore richiede node.js 20, js-controller >= 6.0.11 e admin >= 7.6.17 ora.\nLe dipendenze sono state aggiornate",
+        "es": "Adaptador requiere node.js 20, js-controller >= 6.0.11 y admin >= 7.6.17 ahora.\nSe han actualizado las dependencias",
+        "pl": "Adapter wymaga node.js 20, js- controller > = 6.0.11 i admin > = 7.6.17 teraz.\nZaktualizowano zależności",
+        "uk": "Адаптер вимагає node.js 20, js-controller >=6.0.11 і admin >=7.6.17 тепер.\nЗалежність було оновлено",
         "zh-cn": "适配器需要节点.js 20,js控制器 >= 6.011和管理员 >= 7.6.17 现在.\n依赖关系已更新"
       },
       "3.2.0": {
@@ -80,19 +67,6 @@
         "pl": "Node-net-snmp został zaktualizowany w celu poprawy obsługi #(282)\nNiektóre inne zależności zostały zaktualizowane",
         "uk": "#(282)\nБуло оновлено кілька інших залежностей",
         "zh-cn": "已经更新了用于改进Suint32处理第(2)82号的网上经验。\n已更新了其他一些依赖性"
-      },
-      "2.4.10": {
-        "en": "Another typo at error output has been fixed",
-        "de": "Ein weiterer Tippfehler bei der Fehlerausgabe wurde behoben",
-        "ru": "Еще одна опечатка при выходе ошибки была исправлена",
-        "pt": "Outro tipo na saída de erro foi corrigido",
-        "nl": "Nog een typo bij fouten is gemaakt",
-        "fr": "Une autre typo à la sortie d'erreur a été corrigée",
-        "it": "Un altro tipo di errore è stato risolto",
-        "es": "Se ha fijado otro tipo de salida de error",
-        "pl": "Inna typacja na wyjściu błędów została naprawiona",
-        "uk": "Ще один тип на виході помилки було виправлено",
-        "zh-cn": "另一个错误产出的类型是固定的。"
       }
     },
     "titleLang": {
