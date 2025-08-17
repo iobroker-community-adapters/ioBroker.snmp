@@ -10,3 +10,5 @@ gulpfile.js
 !/LICENSE
 !/main.js
 !/README.md
+eslint.config.mjs
+prettier.config.mjs

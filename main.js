@@ -130,69 +130,70 @@ let doInstall = false;
 let didInstall = false;
 
 // #################### global variables ####################
-let adapter;    // adapter instance - @type {ioBroker.Adapter}
+let adapter; // adapter instance - @type {ioBroker.Adapter}
 
-const CTXs = [];		            // see description at header of file
-const STATEs = [];                  // states cache, index by full id
-let g_isConnected = false; 	        // local copy of info.connection state
-let g_shutdownInProgress = false;   // maximum number of OIDs per request
+const CTXs = []; // see description at header of file
+const STATEs = []; // states cache, index by full id
+let g_isConnected = false; // local copy of info.connection state
+let g_shutdownInProgress = false; // maximum number of OIDs per request
 let g_connUpdateTimer = null;
-let g_chunkSize = 3;                // maximum number of OIDs per request
+let g_chunkSize = 3; // maximum number of OIDs per request
 
 /**
  * Start the adapter instance
+ *
  * @param {Partial<utils.AdapterOptions>} [options]
  */
 function startAdapter(options) {
     // Create the adapter and define its methods
-    adapter = utils.adapter(Object.assign({}, options, {
-        name: 'snmp',
+    adapter = utils.adapter(
+        Object.assign({}, options, {
+            name: 'snmp',
 
-        // ready callback is called when databases are connected and adapter received configuration.
-        ready: onReady, // Main method defined below for readability
+            // ready callback is called when databases are connected and adapter received configuration.
+            ready: onReady, // Main method defined below for readability
 
-        // unload callback is called when adapter shuts down - callback has to be called under any circumstances!
-        unload: onUnload,
+            // unload callback is called when adapter shuts down - callback has to be called under any circumstances!
+            unload: onUnload,
 
-        // If you need to react to object changes, uncomment the following method.
-        // You also need to subscribe to the objects with `adapter.subscribeObjects`, similar to `adapter.subscribeStates`.
-        // objectChange: (id, obj) => {
-        // 	if (obj) {
-        // 		// The object was changed
-        // 		adapter.log.info(`object ${id} changed: ${JSON.stringify(obj)}`);
-        // 	} else {
-        // 		// The object was deleted
-        // 		adapter.log.info(`object ${id} deleted`);
-        // 	}
-        // },
+            // If you need to react to object changes, uncomment the following method.
+            // You also need to subscribe to the objects with `adapter.subscribeObjects`, similar to `adapter.subscribeStates`.
+            // objectChange: (id, obj) => {
+            // 	if (obj) {
+            // 		// The object was changed
+            // 		adapter.log.info(`object ${id} changed: ${JSON.stringify(obj)}`);
+            // 	} else {
+            // 		// The object was deleted
+            // 		adapter.log.info(`object ${id} deleted`);
+            // 	}
+            // },
 
-        // stateChange is called if a subscribed state changes
-        stateChange: onStateChange,
+            // stateChange is called if a subscribed state changes
+            stateChange: onStateChange,
 
-        // If you need to accept messages in your adapter, uncomment the following block.
-        // /**
-        //  * Some message was sent to this instance over message box. Used by email, pushover, text2speech, ...
-        //  * Using this method requires "common.messagebox" property to be set to true in io-package.json
-        //  */
-        // message: (obj) => {
-        // 	if (typeof obj === 'object' && obj.message) {
-        // 		if (obj.command === 'send') {
-        // 			// e.g. send email or pushover or whatever
-        // 			adapter.log.info('send command');
+            // If you need to accept messages in your adapter, uncomment the following block.
+            // /**
+            //  * Some message was sent to this instance over message box. Used by email, pushover, text2speech, ...
+            //  * Using this method requires "common.messagebox" property to be set to true in io-package.json
+            //  */
+            // message: (obj) => {
+            // 	if (typeof obj === 'object' && obj.message) {
+            // 		if (obj.command === 'send') {
+            // 			// e.g. send email or pushover or whatever
+            // 			adapter.log.info('send command');
 
-        // 			// Send response in callback if required
-        // 			if (obj.callback) adapter.sendTo(obj.from, obj.command, 'Message received', obj.callback);
-        // 		}
-        // 	}
-        // },
-    }));
+            // 			// Send response in callback if required
+            // 			if (obj.callback) adapter.sendTo(obj.from, obj.command, 'Message received', obj.callback);
+            // 		}
+            // 	}
+            // },
+        }),
+    );
 
     return adapter;
 }
 
 /* *** end of initialization section *** */
-
-
 
 // #################### general utility functions ####################
 
@@ -203,8 +204,7 @@ function startAdapter(options) {
  *		with an underscore ('_').
  *
  * @param   {string}    pName 	name of an object
- * @return  {string} 		    name of the object with all forbidden chars replaced
- *
+ * @returns  {string} 		    name of the object with all forbidden chars replaced
  */
 function name2id(pName) {
     return (pName || '').replace(adapter.FORBIDDEN_CHARS, '_').replace(/[-\s]/g, '_');
@@ -216,8 +216,7 @@ function name2id(pName) {
  *		This utility routine replaces any dots within an ip address with an underscore ('_').
  *
  * @param {string} 	ip 	ip string with standard foematting
- * @return {string} 	ipStr with all dots removed and useable as identifier
- *
+ * @returns {string} 	ipStr with all dots removed and useable as identifier
  */
 function ip2ipStr(ip) {
     return (ip || '').replace(/\./g, '_');
@@ -227,11 +226,10 @@ function ip2ipStr(ip) {
  * convert oid format to state format
  *
  * @param {number} 	    pOidFormat 	OID format code
- * @return {string} 	            state type
- *
+ * @returns {string} 	            state type
  */
-function oidFormat2StateType(pOidFormat){
-    switch (pOidFormat){
+function oidFormat2StateType(pOidFormat) {
+    switch (pOidFormat) {
         case F_TEXT /* 0 */: {
             return 'string';
         }
@@ -247,8 +245,8 @@ function oidFormat2StateType(pOidFormat){
         case F_AUTO /* 99 */: {
             return 'mixed';
         }
-        default:{
-            adapter.log.warn('oidFormat2StateType - unknown code ' + pOidFormat );
+        default: {
+            adapter.log.warn(`oidFormat2StateType - unknown code ${pOidFormat}`);
             return 'mixed';
         }
     }
@@ -260,21 +258,19 @@ function oidFormat2StateType(pOidFormat){
  * cleanupStates - cleanup unused states
  *
  * @param   {string}    pPattern    pattern to match state id
- *
- * @return  objects
- *
+ * @returns  objects
  */
-async function delStates( pPattern ) {
-    adapter.log.debug ( 'delStates ('+pPattern+')');
+async function delStates(pPattern) {
+    adapter.log.debug(`delStates (${pPattern})`);
 
-    const objs = await adapter.getForeignObjectsAsync( `${adapterName}.${adapter.instance}.${pPattern}` );
-    if (objs){
-        if ( Object.values(objs).length ) {
+    const objs = await adapter.getForeignObjectsAsync(`${adapterName}.${adapter.instance}.${pPattern}`);
+    if (objs) {
+        if (Object.values(objs).length) {
             adapter.log.info(`removing states ${pPattern}...`);
         }
         for (const obj of Object.values(objs)) {
             adapter.log.debug(`removing object ${obj._id}...`);
-            await adapter.delForeignObjectAsync( obj._id, {recursive: true} );
+            await adapter.delForeignObjectAsync(obj._id, { recursive: true });
         }
     }
 }
@@ -282,24 +278,20 @@ async function delStates( pPattern ) {
 /**
  * cleanupStates - cleanup unused states
  *
- * @return  nothing
- *
+ * @returns  nothing
  */
 async function cleanupStates() {
     adapter.log.debug('cleanupStates ');
 
     // delete -rap states if no lonager enabled
-    if ( ! adapter.config.optRawStates )
-    {
-        await delStates ( '*-raw' );
+    if (!adapter.config.optRawStates) {
+        await delStates('*-raw');
     }
 
     // delete -type states if no lonager enabled
-    if ( ! adapter.config.optTypeStates )
-    {
-        await delStates ( '*-type' );
+    if (!adapter.config.optTypeStates) {
+        await delStates('*-type');
     }
-
 }
 
 // #################### object initialization functions ####################
@@ -312,21 +304,20 @@ async function cleanupStates() {
  *		waits for action to complete using await
  *
  * @param {object}     pObj    objectstructure
- * @return
- *
+ * @returns
  */
 async function initObject(pObj) {
-    adapter.log.debug('initobject ' + pObj._id);
+    adapter.log.debug(`initobject ${pObj._id}`);
 
     const fullId = `${adapterName}.${adapter.instance}.${pObj._id}`;
 
-    if (typeof(STATEs[fullId]) === 'undefined') {
+    if (typeof STATEs[fullId] === 'undefined') {
         try {
-            adapter.log.debug('creating obj "' + pObj._id + '" with type ' + pObj.type);
+            adapter.log.debug(`creating obj "${pObj._id}" with type ${pObj.type}`);
             await adapter.setObjectNotExistsAsync(pObj._id, pObj);
             await adapter.extendObjectAsync(pObj._id, pObj);
         } catch (e) {
-            adapter.log.error('error initializing obj "' + pObj._id + '" ' + e.message);
+            adapter.log.error(`error initializing obj "${pObj._id}" ${e.message}`);
         }
         STATEs[fullId] = {
             type: pObj.type,
@@ -335,25 +326,28 @@ async function initObject(pObj) {
     }
 
     if (pObj.type === 'state') {
-        if ( (typeof (STATEs[fullId].commonType) === 'undefined' ) ||
-             (STATEs[fullId].commonType === null ) ) {
+        if (typeof STATEs[fullId].commonType === 'undefined' || STATEs[fullId].commonType === null) {
             const obj = await adapter.getObjectAsync(pObj._id);
             STATEs[fullId] = {
-                commonType: obj.common.type
+                commonType: obj.common.type,
             };
         }
 
-        if ( STATEs[fullId].commonType !== pObj.common.type ) {
+        if (STATEs[fullId].commonType !== pObj.common.type) {
             try {
-                if ( STATEs[fullId].commonType === 'mixed') {
-                    adapter.log.debug('reinitializing obj "' + pObj._id + '" state-type change '+STATEs[fullId].commonType+' -> '+pObj.common.type);
+                if (STATEs[fullId].commonType === 'mixed') {
+                    adapter.log.debug(
+                        `reinitializing obj "${pObj._id}" state-type change ${STATEs[fullId].commonType} -> ${pObj.common.type}`,
+                    );
                 } else {
-                    adapter.log.info('reinitializing obj "' + pObj._id + '" state-type change '+STATEs[fullId].commonType+' -> '+pObj.common.type);
+                    adapter.log.info(
+                        `reinitializing obj "${pObj._id}" state-type change ${STATEs[fullId].commonType} -> ${pObj.common.type}`,
+                    );
                 }
-                await adapter.extendObjectAsync(pObj._id, {common: { type: pObj.common.type }});
+                await adapter.extendObjectAsync(pObj._id, { common: { type: pObj.common.type } });
                 STATEs[fullId].commonType = pObj.common.type;
             } catch (e) {
-                adapter.log.error('error reinitializing obj "' + pObj._id + '" ' + e.message);
+                adapter.log.error(`error reinitializing obj "${pObj._id}" ${e.message}`);
             }
         }
     }
@@ -364,15 +358,16 @@ async function initObject(pObj) {
  *
  * @param   {string}    pId     id of device
  * @param   {string}    pIp     ip of device
- * @return
- *
+ * @returns
  */
 async function initDeviceObjects(pId, pIp) {
-    adapter.log.debug('initdeviceObjects (' + pId + '/' + pIp + ')');
+    adapter.log.debug(`initdeviceObjects (${pId}/${pIp})`);
 
     try {
-        await adapter.delForeignObjectAsync(`${adapterName}.${adapter.instance}.${pId}.online`, {recursive: false});
-    } catch (e) { /* */ }
+        await adapter.delForeignObjectAsync(`${adapterName}.${adapter.instance}.${pId}.online`, { recursive: false });
+    } catch {
+        /* */
+    }
 
     try {
         // create <ip> device object
@@ -383,73 +378,63 @@ async function initDeviceObjects(pId, pIp) {
                 name: pIp,
                 statusStates: {
                     onlineId: `${adapterName}.${adapter.instance}.${pId}.info.online`,
-                    errorId: `${adapterName}.${adapter.instance}.${pId}.info.error`
-                }
+                    errorId: `${adapterName}.${adapter.instance}.${pId}.info.error`,
+                },
             },
-            native: {
-            }
-        }
-        );
+            native: {},
+        });
 
         // create <ip>.online and .alarm state objects
         await initObject({
-            _id: pId + '.info',
+            _id: `${pId}.info`,
             type: 'folder',
             common: {
-                name:'',
-                desc: 'folder containing device status states'
+                name: '',
+                desc: 'folder containing device status states',
             },
-            native: {
-            }
-        }
-        );
+            native: {},
+        });
         await initObject({
-            _id: pId + '.info.online',
+            _id: `${pId}.info.online`,
             type: 'state',
             common: {
-                name: pId + '.info.online',
+                name: `${pId}.info.online`,
                 desc: 'true if device is reachable',
                 write: false,
                 read: true,
                 type: 'boolean',
-                role: 'indicator.reachable'
+                role: 'indicator.reachable',
             },
-            native: {
-            }
-        }
-        );
+            native: {},
+        });
         await initObject({
-            _id: pId + '.info.error',
+            _id: `${pId}.info.error`,
             type: 'state',
             common: {
-                name: pId + '.info.error',
+                name: `${pId}.info.error`,
                 desc: 'true if error occured',
                 write: false,
                 read: true,
                 type: 'boolean',
-                role: 'indicator.reachable'
+                role: 'indicator.reachable',
             },
-            native: {
-            }
-        }
-        );
+            native: {},
+        });
         await initObject({
-            _id: pId + '.info.error_text',
+            _id: `${pId}.info.error_text`,
             type: 'state',
             common: {
-                name: pId + '.info.error_text',
+                name: `${pId}.info.error_text`,
                 desc: 'text describing last error',
                 write: false,
                 read: true,
                 type: 'string',
-                role: 'text'
+                role: 'text',
             },
-            native: {
-            }
-        }
-        );
+            native: {},
+        });
     } catch (e) {
-        adapter.log.error('error creating objects for ip "' + pIp + '" (' + pId + '), ' + e.message);
+        adapter.log.error(`error creating objects for ip "${pIp}" (${pId}), ${e.message}`);
     }
 }
 
@@ -457,13 +442,14 @@ async function initDeviceObjects(pId, pIp) {
  * initOidObjects - initializes objects for one OID
  *
  * @param   {string}    pId  if of object
- * @return
+ * @param pOid
+ * @param pOID
+ * @returns
  *
  * ASSERTION: root device object is already created
- *
  */
 async function initOidObjects(pId, pOid, pOID) {
-    adapter.log.debug('initOidObjects (' + pId + ')');
+    adapter.log.debug(`initOidObjects (${pId})`);
 
     try {
         // create OID folder objects
@@ -471,15 +457,14 @@ async function initOidObjects(pId, pOid, pOID) {
         let partlyId = idArr[0];
         for (let ii = 1; ii < idArr.length - 1; ii++) {
             const el = idArr[ii];
-            partlyId += '.' + el;
+            partlyId += `.${el}`;
             await initObject({
                 _id: partlyId,
                 type: 'folder',
                 common: {
-                    name: ''
+                    name: '',
                 },
-                native: {
-                }
+                native: {},
             });
         }
 
@@ -495,61 +480,54 @@ async function initOidObjects(pId, pOid, pOID) {
                 write: !!pOID.oidWriteable,
                 read: true,
                 type: oidFormat2StateType(pOID.oidFormat),
-                role: 'value'
+                role: 'value',
             },
-            native: {
-            }
+            native: {},
         });
 
         if (pOID.oidWriteable) {
             const fullId = `${adapterName}.${adapter.instance}.${pId}`;
-            adapter.log.debug ( `subscribing state ${fullId}` );
-            await adapter.subscribeStatesAsync( fullId );
+            adapter.log.debug(`subscribing state ${fullId}`);
+            await adapter.subscribeStatesAsync(fullId);
         }
 
         if (adapter.config.optTypeStates) {
             await initObject({
-                _id: pId+'-type',
+                _id: `${pId}-type`,
                 type: 'state',
                 common: {
-                    name: pId+'-type',
+                    name: `${pId}-type`,
                     write: false,
                     read: true,
                     type: 'string',
-                    role: 'type.encoding'
+                    role: 'type.encoding',
                 },
-                native: {
-                }
+                native: {},
             });
         }
 
         // create OID state.raw objects
         if (adapter.config.optRawStates) {
             await initObject({
-                _id: pId+'-raw',
+                _id: `${pId}-raw`,
                 type: 'state',
                 common: {
-                    name: pId+'-raw',
+                    name: `${pId}-raw`,
                     write: false,
                     read: true,
                     type: 'string',
-                    role: 'json'
+                    role: 'json',
                 },
-                native: {
-                }
+                native: {},
             });
         }
     } catch (e) {
-        adapter.log.error('error processing oid id "' + pId + '" (oid "' + pOid + ') - ' + e.message);
+        adapter.log.error(`error processing oid id "${pId}" (oid "${pOid}) - ${e.message}`);
     }
 }
 
 /**
  * initAllObjects - initialize all objects
- *
- * @param
- * @return
- *
  */
 async function initAllObjects() {
     adapter.log.debug('initAllObjects - initializing objects');
@@ -559,43 +537,45 @@ async function initAllObjects() {
 
         for (let cc = 0; cc < CTXs[ii].chunks.length; cc++) {
             for (let jj = 0; jj < CTXs[ii].chunks[cc].ids.length; jj++) {
-                await initOidObjects(CTXs[ii].chunks[cc].ids[jj], CTXs[ii].chunks[cc].oids[jj], CTXs[ii].chunks[cc].OIDs[jj]);
+                await initOidObjects(
+                    CTXs[ii].chunks[cc].ids[jj],
+                    CTXs[ii].chunks[cc].oids[jj],
+                    CTXs[ii].chunks[cc].OIDs[jj],
+                );
             }
         }
     }
 }
-
 
 // #################### varbind convert functions ####################
 /**
  * oidObjType2Text - translate oid object type into textual string
  *
  * @param   {number}    pOidObjType    oid object type
- * @return  {string}    textual representation of object type
- *
+ * @returns  {string}    textual representation of object type
  */
-function oidObjType2Text( pOidObjType ) {
+function oidObjType2Text(pOidObjType) {
     adapter.log.debug('oidObjType2Text - stringify oid object type');
 
-    const OBJECT_TYPE ={
-        [snmp.ObjectType.Boolean]       : 'Boolean',
-        [snmp.ObjectType.Integer]       : 'Integer',
-        [snmp.ObjectType.OctetString]   : 'OctetString',
-        [snmp.ObjectType.Null]          : 'Null',
-        [snmp.ObjectType.OID]           : 'OID',
-        [snmp.ObjectType.IpAddress]     : 'IpAddress',
-        [snmp.ObjectType.Counter]       : 'Counter',
-        [snmp.ObjectType.Gauge]         : 'Gauge',
-        [snmp.ObjectType.TimeTicks]     : 'TimeTicks',
-        [snmp.ObjectType.Opaque]        : 'Opaque',
-        [snmp.ObjectType.Integer32]     : 'Integer32',
-        [snmp.ObjectType.Counter32]     : 'Counter32',
-        [snmp.ObjectType.Gauge32]       : 'Gauge32',
-        [snmp.ObjectType.Unsigned32]    : 'Unsigned32',
-        [snmp.ObjectType.Counter64]     : 'Counter64',
-        [snmp.ObjectType.NoSuchObject]  : 'NoSuchObject',
+    const OBJECT_TYPE = {
+        [snmp.ObjectType.Boolean]: 'Boolean',
+        [snmp.ObjectType.Integer]: 'Integer',
+        [snmp.ObjectType.OctetString]: 'OctetString',
+        [snmp.ObjectType.Null]: 'Null',
+        [snmp.ObjectType.OID]: 'OID',
+        [snmp.ObjectType.IpAddress]: 'IpAddress',
+        [snmp.ObjectType.Counter]: 'Counter',
+        [snmp.ObjectType.Gauge]: 'Gauge',
+        [snmp.ObjectType.TimeTicks]: 'TimeTicks',
+        [snmp.ObjectType.Opaque]: 'Opaque',
+        [snmp.ObjectType.Integer32]: 'Integer32',
+        [snmp.ObjectType.Counter32]: 'Counter32',
+        [snmp.ObjectType.Gauge32]: 'Gauge32',
+        [snmp.ObjectType.Unsigned32]: 'Unsigned32',
+        [snmp.ObjectType.Counter64]: 'Counter64',
+        [snmp.ObjectType.NoSuchObject]: 'NoSuchObject',
         [snmp.ObjectType.NoSuchInstance]: 'NoSuchInstance',
-        [snmp.ObjectType.EndOfMibView]  : 'EndOfMibView',
+        [snmp.ObjectType.EndOfMibView]: 'EndOfMibView',
     };
 
     return OBJECT_TYPE[pOidObjType] || `Unknown (${pOidObjType})`;
@@ -608,10 +588,9 @@ function oidObjType2Text( pOidObjType ) {
  * @param   {number}    pFormat     format constant
  * @param   {string}    pDevId      id of device
  * @param   {string}    pStateId    id of state
- * @return  {object}    state object containing val, typestr and qual values
- *
+ * @returns  {object}    state object containing val, typestr and qual values
  */
-function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
+function varbindDecode(pVarbind, pFormat, pDevId, pStateId) {
     adapter.log.debug('varbindDeode - decode varbind');
 
     // taken from https://github.com/markabrahams/node-net-snmp#oid-strings--varbinds
@@ -639,15 +618,15 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
     //
 
     const retval = {
-        val:        null,
-        typeStr:    oidObjType2Text(pVarbind.type),
-        qual:       0x00, // assume OK
-        format:     pFormat
+        val: null,
+        typeStr: oidObjType2Text(pVarbind.type),
+        qual: 0x00, // assume OK
+        format: pFormat,
     };
     //
 
     switch (pVarbind.type) {
-    // The JavaScript true and false keywords are used for the values of varbinds with type Boolean.
+        // The JavaScript true and false keywords are used for the values of varbinds with type Boolean.
         case snmp.ObjectType.Boolean: {
             switch (pFormat) {
                 case F_TEXT /* 0 */:
@@ -655,7 +634,7 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
                     retval.val = pVarbind.value.toString();
                     break;
                 case F_NUMERIC /* 1 */:
-                    retval.val = pVarbind.value?1:0;
+                    retval.val = pVarbind.value ? 1 : 0;
                     break;
                 case F_BOOLEAN /* 2 */:
                 case F_AUTO /* 99 */:
@@ -663,7 +642,7 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
                     retval.format = F_BOOLEAN;
                     break;
                 case F_JSON /* 3 */:
-                    retval.val = JSON.stringify({type: 'boolean', data: pVarbind.value});
+                    retval.val = JSON.stringify({ type: 'boolean', data: pVarbind.value });
                     break;
             }
             break;
@@ -687,17 +666,21 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
                 case F_AUTO /* 99 */:
                     //retval.val = parseInt(pVarbind.value.toString(), 10);
                     retval.val = pVarbind.value;
-                    if (isNaN(retval.val)) retval.qual=0x01; // general error
+                    if (isNaN(retval.val)) {
+                        retval.qual = 0x01;
+                    } // general error
                     retval.format = F_NUMERIC;
                     break;
                 case F_BOOLEAN /* 2 */: {
                     const valint = pVarbind.value;
                     retval.val = valint !== 0;
-                    if (isNaN (valint)) retval.qual=0x01; // general error
+                    if (isNaN(valint)) {
+                        retval.qual = 0x01;
+                    } // general error
                     break;
                 }
                 case F_JSON /* 3 */:
-                    retval.val = JSON.stringify({type: 'number', data: pVarbind.value});
+                    retval.val = JSON.stringify({ type: 'number', data: pVarbind.value });
                     break;
             }
             break;
@@ -706,11 +689,11 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
         // Since JavaScript does not offer full 64 bit integer support objects with type Counter64 cannot be supported in the same way
         // as other integer types, instead Node.js Buffer objects are used. Users are responsible for producing (i.e. for set() requests)
         // and consuming (i.e. the varbinds passed to callback functions) Buffer objects.
-        case snmp.ObjectType.Counter64:{
+        case snmp.ObjectType.Counter64: {
             // convert buffer to string using bigin
             let value = BigInt(0); //bigint constant
-            for (let ii= 0; ii<pVarbind.value.length; ii++){
-                value=value*BigInt(256) + BigInt(pVarbind.value[ii]);
+            for (let ii = 0; ii < pVarbind.value.length; ii++) {
+                value = value * BigInt(256) + BigInt(pVarbind.value[ii]);
             }
             switch (pFormat) {
                 case F_TEXT /* 0 */:
@@ -720,17 +703,21 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
                 case F_NUMERIC /* 1 */:
                 case F_AUTO /* 99 */:
                     retval.val = Number(value);
-                    if (isNaN(retval.val)) retval.qual=0x01; // general error
+                    if (isNaN(retval.val)) {
+                        retval.qual = 0x01;
+                    } // general error
                     retval.format = F_NUMERIC;
                     break;
                 case F_BOOLEAN /* 2 */: {
                     const valint = Number(value);
-                    retval.val =  valint !== 0;
-                    if (isNaN (valint)) retval.qual=0x01; // general error
+                    retval.val = valint !== 0;
+                    if (isNaN(valint)) {
+                        retval.qual = 0x01;
+                    } // general error
                     break;
                 }
                 case F_JSON /* 3 */:
-                    retval.val = JSON.stringify({type: 'number', data: pVarbind.value});
+                    retval.val = JSON.stringify({ type: 'number', data: pVarbind.value });
                     break;
             }
             break;
@@ -749,13 +736,17 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
                 case F_NUMERIC /* 1 */: {
                     const valint = parseInt(pVarbind.value.toString(), 10);
                     retval.val = valint;
-                    if (isNaN (valint)) retval.qual=0x01; // general error
+                    if (isNaN(valint)) {
+                        retval.qual = 0x01;
+                    } // general error
                     break;
                 }
                 case F_BOOLEAN /* 2 */: {
                     const valint = parseInt(pVarbind.value.toString(), 10);
                     retval.val = valint !== 0;
-                    if (isNaN (valint)) retval.qual=0x01; // general error
+                    if (isNaN(valint)) {
+                        retval.qual = 0x01;
+                    } // general error
                     break;
                 }
                 case F_JSON /* 3 */:
@@ -770,7 +761,7 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
             retval.val = null;
             retval.qual = 0x1; // general error
             retval.format = F_TEXT;
-            adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type null` + JSON.stringify(pVarbind));
+            adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type null${JSON.stringify(pVarbind)}`);
             break;
         }
 
@@ -786,12 +777,16 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
                 case F_NUMERIC /* 1 */:
                     retval.val = null;
                     retval.qual = 0x1; // general error
-                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type oid to numeric ` + JSON.stringify(pVarbind));
+                    adapter.log.warn(
+                        `[${pDevId}] ${pStateId} cannot convert data of type oid to numeric ${JSON.stringify(pVarbind)}`,
+                    );
                     break;
                 case F_BOOLEAN /* 2 */:
                     retval.val = null;
                     retval.qual = 0x1; // general error
-                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type oid to boolean ` + JSON.stringify(pVarbind));
+                    adapter.log.warn(
+                        `[${pDevId}] ${pStateId} cannot convert data of type oid to boolean ${JSON.stringify(pVarbind)}`,
+                    );
                     break;
                 case F_JSON /* 3 */:
                     retval.val = JSON.stringify(pVarbind.value); /* Buffer */
@@ -801,7 +796,7 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
         }
 
         // Dotted quad formatted strings are used for the values of varbinds with type IpAddress, e.g. 192.168.1.1.
-        case snmp.ObjectType.IpAddress:{
+        case snmp.ObjectType.IpAddress: {
             switch (pFormat) {
                 case F_TEXT /* 0 */:
                 case F_AUTO /* 99 */:
@@ -812,12 +807,16 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
                 case F_NUMERIC /* 1 */:
                     retval.val = null;
                     retval.qual = 0x1; // general error
-                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type ipaddress to numeric ` + JSON.stringify(pVarbind));
+                    adapter.log.warn(
+                        `[${pDevId}] ${pStateId} cannot convert data of type ipaddress to numeric ${JSON.stringify(pVarbind)}`,
+                    );
                     break;
                 case F_BOOLEAN /* 2 */:
                     retval.val = null;
                     retval.qual = 0x1; // general error
-                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data of type ipaddress to boolean ` + JSON.stringify(pVarbind));
+                    adapter.log.warn(
+                        `[${pDevId}] ${pStateId} cannot convert data of type ipaddress to boolean ${JSON.stringify(pVarbind)}`,
+                    );
                     break;
                 case F_JSON /* 3 */:
                     retval.val = JSON.stringify(pVarbind.value); /* Buffer */
@@ -828,11 +827,13 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
 
         // Node.js Buffer objects are used for the values of varbinds with type Opaque and OctetString.
         // NOTE: currently only a heuristic implementation for floating point number is implemented for formats other than json.
-        case snmp.ObjectType.Opaque:{
-            if ( pVarbind.value.length === 7 &&
+        case snmp.ObjectType.Opaque: {
+            if (
+                pVarbind.value.length === 7 &&
                 pVarbind.value[0] === 159 &&
                 pVarbind.value[1] === 120 &&
-                pVarbind.value[2] === 4 ) {
+                pVarbind.value[2] === 4
+            ) {
                 const value = pVarbind.value.readFloatBE(3);
                 switch (pFormat) {
                     case F_TEXT /* 0 */:
@@ -855,7 +856,7 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
                 retval.val = null;
                 retval.qual = 0x1; // general error
                 retval.format = F_TEXT;
-                adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert opaque data` + JSON.stringify(pVarbind));
+                adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert opaque data${JSON.stringify(pVarbind)}`);
             }
             break;
         }
@@ -867,7 +868,7 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
             retval.val = null;
             retval.qual = 0x1; // general error
             retval.format = F_TEXT;
-            adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data` + JSON.stringify(pVarbind));
+            adapter.log.warn(`[${pDevId}] ${pStateId} cannot convert data${JSON.stringify(pVarbind)}`);
             break;
     }
 
@@ -875,13 +876,14 @@ function varbindDecode( pVarbind, pFormat, pDevId, pStateId ) {
 }
 
 /**
-*/
-function json2buffer(pJson){
+ * @param pJson
+ */
+function json2buffer(pJson) {
     adapter.log.debug(`json2buffer - ${pJson}`);
 
     let json = {};
     try {
-        json=JSON.parse(pJson);
+        json = JSON.parse(pJson);
     } catch (e) {
         adapter.log.warn(`cannot parse json data ${e.error} - ${pJson}`);
         return null;
@@ -892,7 +894,7 @@ function json2buffer(pJson){
         return null;
     }
 
-    if (!json.data){
+    if (!json.data) {
         adapter.log.warn(`cannot convert json data, data element missing - ${pJson}`);
         return null;
     }
@@ -900,12 +902,12 @@ function json2buffer(pJson){
     return Buffer.from(json.data);
 }
 
-function json2boolean(pJson){
+function json2boolean(pJson) {
     adapter.log.debug(`json2buffer - ${pJson}`);
 
     let json = {};
     try {
-        json=JSON.parse(pJson);
+        json = JSON.parse(pJson);
     } catch (e) {
         adapter.log.warn(`cannot parse json data ${e.error} - ${pJson}`);
         return null;
@@ -916,7 +918,7 @@ function json2boolean(pJson){
         return null;
     }
 
-    if (!json.data){
+    if (!json.data) {
         adapter.log.warn(`cannot convert json data, data element missing - ${pJson}`);
         return null;
     }
@@ -924,12 +926,12 @@ function json2boolean(pJson){
     return Number(json.data) != 0;
 }
 
-function json2number(pJson){
+function json2number(pJson) {
     adapter.log.debug(`json2buffer - ${pJson}`);
 
     let json = {};
     try {
-        json=JSON.parse(pJson);
+        json = JSON.parse(pJson);
     } catch (e) {
         adapter.log.warn(`cannot parse json data ${e.error} - ${pJson}`);
         return null;
@@ -940,7 +942,7 @@ function json2number(pJson){
         return null;
     }
 
-    if (!json.data){
+    if (!json.data) {
         adapter.log.warn(`cannot convert json data, data element missing - ${pJson}`);
         return null;
     }
@@ -955,20 +957,19 @@ function json2number(pJson){
  * @param   {any}       pData       data to store in varbind
  * @param   {string}    pDevId      id of device
  * @param   {string}    pStateId    id of state
- * @return  {object}    varbind object containing data
- *
+ * @returns  {object}    varbind object containing data
  */
-function varbindEncode( pState, pData, pDevId, pStateId ) {
+function varbindEncode(pState, pData, pDevId, pStateId) {
     adapter.log.debug('varbindEncode - encode varbind');
 
     const retval = {
-        oid:        pState.varbind.oid,
-        type:       pState.varbind.type,
-        value:      null
+        oid: pState.varbind.oid,
+        type: pState.varbind.type,
+        value: null,
     };
 
     let dataType;
-    dataType = typeof(pData);
+    dataType = typeof pData;
 
     switch (dataType) {
         case 'boolean':
@@ -976,12 +977,14 @@ function varbindEncode( pState, pData, pDevId, pStateId ) {
             break; /* ok, we can handle it */
 
         case 'string':
-            if (pState.format === F_JSON) dataType='json'; /* json must be handled special */
+            if (pState.format === F_JSON) {
+                dataType = 'json';
+            } /* json must be handled special */
             break; /* ok, we can handle it */
 
         default:
             retval.value = null;
-            adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode data of type ${dataType} - ` + pData);
+            adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode data of type ${dataType} - ${pData}`);
             return retval;
     }
 
@@ -1018,14 +1021,16 @@ function varbindEncode( pState, pData, pDevId, pStateId ) {
                 case 'string': {
                     const valint = parseInt(pData, 10);
                     retval.value = valint;
-                    if (isNaN (valint)) retval.qual=0x01; // general error
+                    if (isNaN(valint)) {
+                        retval.qual = 0x01;
+                    } // general error
                     break;
                 }
                 case 'number':
                     retval.value = pData;
                     break;
                 case 'boolean': {
-                    retval.value = pData?1:0;
+                    retval.value = pData ? 1 : 0;
                     break;
                 }
                 case 'json':
@@ -1038,10 +1043,10 @@ function varbindEncode( pState, pData, pDevId, pStateId ) {
         // Since JavaScript does not offer full 64 bit integer support objects with type Counter64 cannot be supported in the same way
         // as other integer types, instead Node.js Buffer objects are used. Users are responsible for producing (i.e. for set() requests)
         // and consuming (i.e. the varbinds passed to callback functions) Buffer objects.
-        case snmp.ObjectType.Counter64:{
+        case snmp.ObjectType.Counter64: {
             // TODO
             retval.value = null;
-            adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode data (target counter64) - ` + pData);
+            adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode data (target counter64) - ${pData}`);
             break;
         }
 
@@ -1068,7 +1073,7 @@ function varbindEncode( pState, pData, pDevId, pStateId ) {
         // no dcumentation for type null available
         case snmp.ObjectType.Null: {
             retval.value = null;
-            adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode data (target Null) - ` + pData);
+            adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode data (target Null) - ${pData}`);
             break;
         }
 
@@ -1080,11 +1085,11 @@ function varbindEncode( pState, pData, pDevId, pStateId ) {
                     break;
                 case 'numeric':
                     retval.value = null;
-                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode NUMERIC data (target OID) - ` + pData);
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode NUMERIC data (target OID) - ${pData}`);
                     break;
                 case 'boolean':
                     retval.val = null;
-                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode BOOLEAN data (target OID) - ` + pData);
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode BOOLEAN data (target OID) - ${pData}`);
                     break;
                 case 'json':
                     retval.value = json2buffer(pData);
@@ -1094,18 +1099,18 @@ function varbindEncode( pState, pData, pDevId, pStateId ) {
         }
 
         // Dotted quad formatted strings are used for the values of varbinds with type IpAddress, e.g. 192.168.1.1.
-        case snmp.ObjectType.IpAddress:{
+        case snmp.ObjectType.IpAddress: {
             switch (dataType) {
                 case 'string':
                     retval.value = pData.toString();
                     break;
                 case 'numeric':
                     retval.value = null;
-                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode NUMERIC data (target IP) - ` + pData);
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode NUMERIC data (target IP) - ${pData}`);
                     break;
                 case 'boolean':
                     retval.value = null;
-                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode BOOLEAN data (target IP) - ` + pData);
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode BOOLEAN data (target IP) - ${pData}`);
                     break;
                 case 'json':
                     retval.value = json2buffer(pData);
@@ -1116,19 +1121,19 @@ function varbindEncode( pState, pData, pDevId, pStateId ) {
 
         // Node.js Buffer objects are used for the values of varbinds with type Opaque and OctetString. For varbinds with type
         // OctetString this module will accept JavaScript strings, but will always give back Buffer objects.
-        case snmp.ObjectType.Opaque:{
+        case snmp.ObjectType.Opaque: {
             switch (dataType) {
                 case 'string':
                     retval.value = null;
-                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode STRIMG data (target opaque) - ` + pData);
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode STRIMG data (target opaque) - ${pData}`);
                     break;
                 case 'numeric':
                     retval.value = null;
-                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode NUMERIC data (target opaque) - ` + pData);
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode NUMERIC data (target opaque) - ${pData}`);
                     break;
                 case 'boolean':
                     retval.value = null;
-                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode BOOLEAN data (target opaque) - ` + pData);
+                    adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode BOOLEAN data (target opaque) - ${pData}`);
                     break;
                 case 'json':
                     retval.value = json2buffer(pData);
@@ -1142,7 +1147,7 @@ function varbindEncode( pState, pData, pDevId, pStateId ) {
         case snmp.ObjectType.EndOfMibView:
         default: {
             retval.value = null;
-            adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode data (target default)` + pData);
+            adapter.log.warn(`[${pDevId}] ${pStateId} cannot encode data (target default)${pData}`);
             break;
         }
     }
@@ -1156,24 +1161,22 @@ function varbindEncode( pState, pData, pDevId, pStateId ) {
  *
  * @param   {object}    pSession    snmp session refernece
  * @param   {object}    pOids       snmp oids array
- *
- * @return                          object containing { error, varbinds } as returned by snmp.session.get
- *
+ * @returns                          object containing { error, varbinds } as returned by snmp.session.get
  */
 
-async function snmpSessionGetAsync( pSession, pOids) {
-    return new Promise((resolve,_reject)=>{
-        const ret={
+async function snmpSessionGetAsync(pSession, pOids) {
+    return new Promise((resolve, _reject) => {
+        const ret = {
             err: null,
-            varbinds: []
+            varbinds: [],
         };
 
-        if (! pSession) {
-            adapter.log.debug( 'session vanished, skipping get oparation');
+        if (!pSession) {
+            adapter.log.debug('session vanished, skipping get oparation');
             ret.err = 'no active session';
             resolve(ret);
         } else {
-            pSession.get (pOids, function (error, varbinds) {
+            pSession.get(pOids, function (error, varbinds) {
                 ret.err = error;
                 ret.varbinds = varbinds;
                 resolve(ret);
@@ -1187,23 +1190,21 @@ async function snmpSessionGetAsync( pSession, pOids) {
  *
  * @param   {object}    pSession    snmp session refernece
  * @param   {object}    pVarbinds   snmp varbinds array
- *
- * @return                          object containing { error, varbinds } as returned by snmp.session.set
- *
+ * @returns                          object containing { error, varbinds } as returned by snmp.session.set
  */
-async function snmpSessionSetAsync( pSession, pVarbinds) {
-    return new Promise((resolve,_reject)=>{
-        const ret={
+async function snmpSessionSetAsync(pSession, pVarbinds) {
+    return new Promise((resolve, _reject) => {
+        const ret = {
             err: null,
-            varbinds: null
+            varbinds: null,
         };
 
-        if (! pSession) {
-            adapter.log.debug( 'session vanished, skipping set operation');
+        if (!pSession) {
+            adapter.log.debug('session vanished, skipping set operation');
             ret.err = 'no active session';
             resolve(ret);
         } else {
-            pSession.set (pVarbinds, function (error, varbinds) {
+            pSession.set(pVarbinds, function (error, varbinds) {
                 ret.err = error;
                 ret.varbinds = varbinds;
                 resolve(ret);
@@ -1216,8 +1217,7 @@ async function snmpSessionSetAsync( pSession, pVarbinds) {
  * snmpCreateSession - initializes a snmp session
  *
  * @param   {object}    pCTX    CTX object
- *
- * @return                      session object
+ * @returns                      session object
  *
 var options = {
     port: 161,
@@ -1230,25 +1230,23 @@ var options = {
     backwardsGetNexts: true,
     idBitsSize: 32
 };
-*/
+ */
 async function snmpCreateSession(pCTX) {
-    adapter.log.debug('snmpCreateSession - device ' + pCTX.name + ' (' + pCTX.ipAddr + ')');
+    adapter.log.debug(`snmpCreateSession - device ${pCTX.name} (${pCTX.ipAddr})`);
 
     const ret = {
         session: null,
         name: pCTX.name,
-        ipAddr: pCTX.ipAddr
+        ipAddr: pCTX.ipAddr,
     };
 
     // create snmp session for device
-    if (pCTX.snmpVers == SNMP_V1 ||
-        pCTX.snmpVers == SNMP_V2c) {
-
+    if (pCTX.snmpVers == SNMP_V1 || pCTX.snmpVers == SNMP_V2c) {
         const snmpTransport = pCTX.isIPv6 ? 'udp6' : 'udp4';
-        const snmpVersion = (pCTX.snmpVers == SNMP_V1) ? snmp.Version1 : snmp.Version2c;
+        const snmpVersion = pCTX.snmpVers == SNMP_V1 ? snmp.Version1 : snmp.Version2c;
 
         ret.session = snmp.createSession(pCTX.ipAddr, pCTX.authId, {
-            port: pCTX.ipPort,   // default:161
+            port: pCTX.ipPort, // default:161
             retries: 1,
             timeout: pCTX.timeout,
             backoff: 1.0,
@@ -1256,22 +1254,20 @@ async function snmpCreateSession(pCTX) {
             //trapPort: 162,
             version: snmpVersion,
             backwardsGetNexts: true,
-            idBitsSize: 32
+            idBitsSize: 32,
         });
-
     } else if (pCTX.snmpVers == SNMP_V3) {
-
         let snmpSecurityLevel = 0;
-        if ( pCTX.authSecLvl == 1 ) {
+        if (pCTX.authSecLvl == 1) {
             snmpSecurityLevel = snmp.SecurityLevel.noAuthNoPriv; // no message authentication or encryption
-        } else if ( pCTX.authSecLvl == 2 ) {
-            snmpSecurityLevel = snmp.SecurityLevel.authNoPriv;  // message authentication and no encryption
-        } else if ( pCTX.authSecLvl == 3 ) {
-            snmpSecurityLevel = snmp.SecurityLevel.authPriv;    //for message authentication and encryption
+        } else if (pCTX.authSecLvl == 2) {
+            snmpSecurityLevel = snmp.SecurityLevel.authNoPriv; // message authentication and no encryption
+        } else if (pCTX.authSecLvl == 3) {
+            snmpSecurityLevel = snmp.SecurityLevel.authPriv; //for message authentication and encryption
         }
 
         let snmpAuthProtocol = 0;
-        switch (Number(pCTX.authAuthProto)) {   /* ensure numeric type */
+        switch (Number(pCTX.authAuthProto) /* ensure numeric type */) {
             default:
                 snmpAuthProtocol = 0;
                 break;
@@ -1296,13 +1292,13 @@ async function snmpCreateSession(pCTX) {
         }
 
         let snmpPrivProtocol = 0;
-        if ( pCTX.authEncProto == DES ) {
+        if (pCTX.authEncProto == DES) {
             snmpPrivProtocol = snmp.PrivProtocols.des; // DES encryption
-        } else if ( pCTX.authEncProto == AES ) {
+        } else if (pCTX.authEncProto == AES) {
             snmpPrivProtocol = snmp.PrivProtocols.aes; // AES encryption
-        } else if ( pCTX.authEncProto == AES256B ) {
+        } else if (pCTX.authEncProto == AES256B) {
             snmpPrivProtocol = snmp.PrivProtocols.aes256b; // AES encryption
-        } else if ( pCTX.authEncProto == AES256R ) {
+        } else if (pCTX.authEncProto == AES256R) {
             snmpPrivProtocol = snmp.PrivProtocols.aes256r; // AES encryption
         }
 
@@ -1312,7 +1308,7 @@ async function snmpCreateSession(pCTX) {
             authProtocol: snmpAuthProtocol,
             authKey: pCTX.authAuthKey,
             privProtocol: snmpPrivProtocol,
-            privKey: pCTX.authEncKey
+            privKey: pCTX.authEncKey,
         };
 
         const snmpTransport = pCTX.isIPv6 ? 'udp6' : 'udp4';
@@ -1320,7 +1316,7 @@ async function snmpCreateSession(pCTX) {
         // ??? engineID: "8000B98380XXXXXXXXXXXXXXXXXXXXXXXX", // where the X's are random hex digits
 
         ret.session = snmp.createV3Session(pCTX.ipAddr, snmpUser, {
-            port: pCTX.ipPort,   // default:161
+            port: pCTX.ipPort, // default:161
             retries: 1,
             timeout: pCTX.timeout,
             backoff: 1.0,
@@ -1329,13 +1325,13 @@ async function snmpCreateSession(pCTX) {
             version: snmpVersion,
             backwardsGetNexts: true,
             idBitsSize: 32,
-            context: ''
+            context: '',
         });
     } else {
-        adapter.log.error('unsupported snmp version code (' + pCTX.snmpVers + ') for device "' + pCTX.name + '" (' + pCTX.ip + ')');
+        adapter.log.error(`unsupported snmp version code (${pCTX.snmpVers}) for device "${pCTX.name}" (${pCTX.ip})`);
     }
 
-    adapter.log.debug('session for device "' + pCTX.name + '" (' + pCTX.ipAddr + ')' + (ret.session ? '' : ' NOT') + ' created');
+    adapter.log.debug(`session for device "${pCTX.name}" (${pCTX.ipAddr})${ret.session ? '' : ' NOT'} created`);
 
     return ret;
 }
@@ -1345,18 +1341,16 @@ async function snmpCreateSession(pCTX) {
  * snmpCloseSession - close a snmp session
  *
  * @param   {object}    pSessCtx    session object
- *
- * @return  nothing
- *
+ * @returns  nothing
  */
-async function snmpCloseSession(pSessCtx ) {
+async function snmpCloseSession(pSessCtx) {
     adapter.log.debug(`snmpCloseSession - device ${pSessCtx.name} (${pSessCtx.ipAddr}`);
 
     if (pSessCtx.session) {
         try {
             pSessCtx.session.close();
         } catch (e) {
-            adapter.log.warn('cannot close session for device "' + pSessCtx.name + '" (' + pSessCtx.ip + '), ' + e);
+            adapter.log.warn(`cannot close session for device "${pSessCtx.name}" (${pSessCtx.ip}), ${e}`);
         }
         pSessCtx.session = null;
     }
@@ -1365,30 +1359,33 @@ async function snmpCloseSession(pSessCtx ) {
 }
 
 /**
-
+ 
 /**
  * onReaderSessionClose - callback called whenever a reader session is closed
  *
  * @param {object}      pCTX    CTX object
- * @return
- *
+ * @returns
  */
 async function onReaderSessionClose(pCTX) {
-    adapter.log.debug('onReaderSessionClose - device ' + pCTX.name + ' (' + pCTX.ipAddr + ')');
+    adapter.log.debug(`onReaderSessionClose - device ${pCTX.name} (${pCTX.ipAddr})`);
 
     adapter.clearInterval(pCTX.pollTimer);
     pCTX.pollTimer = null;
 
-    if( pCTX.sessCtx ) {
+    if (pCTX.sessCtx) {
         pCTX.sessCtx.session = null;
         pCTX.sessCtx = null;
     }
 
     if (!g_shutdownInProgress) {
-        pCTX.retryTimer = adapter.setTimeout((pCTX) => {
-            pCTX.retryTimer = null;
-            createReaderSession(pCTX);
-        }, pCTX.retryIntvl, pCTX);
+        pCTX.retryTimer = adapter.setTimeout(
+            pCTX => {
+                pCTX.retryTimer = null;
+                createReaderSession(pCTX);
+            },
+            pCTX.retryIntvl,
+            pCTX,
+        );
     }
 }
 
@@ -1397,15 +1394,14 @@ async function onReaderSessionClose(pCTX) {
  *
  * @param {object} 	pCTX    CTX object
  * @param {object}  pErr    error object
- * @return
- *
+ * @returns
  */
 async function onReaderSessionError(pCTX, pErr) {
-    adapter.log.debug('onReaderSessionError - device ' + pCTX.name + ' (' + pCTX.ipAddr + ') - ' + pErr.toString());
+    adapter.log.debug(`onReaderSessionError - device ${pCTX.name} (${pCTX.ipAddr}) - ${pErr.toString()}`);
 
     adapter.log.warn(`device ${pCTX.name} (${pCTX.ipAddr}) reported error ${pErr.toString()}`);
 
-    if (! adapter.config.optNoCloseOnError) {
+    if (!adapter.config.optNoCloseOnError) {
         adapter.clearInterval(pCTX.pollTimer);
         pCTX.pollTimer = null;
 
@@ -1419,15 +1415,14 @@ async function onReaderSessionError(pCTX, pErr) {
  * createReaderSession - initializes a snmp reader session for one device and starts the reader thread
  *
  * @param   {object}    pCTX    CTX object
- * @return
- *
+ * @returns
  */
 async function createReaderSession(pCTX) {
-    adapter.log.debug('createReaderSession - device ' + pCTX.name + ' (' + pCTX.ipAddr + ')');
+    adapter.log.debug(`createReaderSession - device ${pCTX.name} (${pCTX.ipAddr})`);
 
     // (re)set device online and alarm status
-    await adapter.setStateAsync(pCTX.id + '.info.error', {val: false, ack: true, q:0x00});
-    await adapter.setStateAsync(pCTX.id + '.info.online', {val: false, ack: true, q:0x00});
+    await adapter.setStateAsync(`${pCTX.id}.info.error`, { val: false, ack: true, q: 0x00 });
+    await adapter.setStateAsync(`${pCTX.id}.info.online`, { val: false, ack: true, q: 0x00 });
 
     // stop existing timers and close session if one exists
     if (pCTX.retryTimer) {
@@ -1447,7 +1442,7 @@ async function createReaderSession(pCTX) {
 
     // do NOT create any new session if already shutting down
     if (g_shutdownInProgress) {
-        adapter.log.warn('session for device "' + pCTX.name + '" (' + pCTX.ipAddr + ') NOT created as instance is shutting down');
+        adapter.log.warn(`session for device "${pCTX.name}" (${pCTX.ipAddr}) NOT created as instance is shutting down`);
         return;
     }
 
@@ -1457,8 +1452,12 @@ async function createReaderSession(pCTX) {
     if (pCTX.sessCtx && pCTX.sessCtx.session) {
         // ok: session created
 
-        pCTX.sessCtx.session.on('close', () => { onReaderSessionClose(pCTX); });
-        pCTX.sessCtx.session.on('error', (err) => { onReaderSessionError(pCTX, err); });
+        pCTX.sessCtx.session.on('close', () => {
+            onReaderSessionClose(pCTX);
+        });
+        pCTX.sessCtx.session.on('error', err => {
+            onReaderSessionError(pCTX, err);
+        });
 
         // read one time immediately
         await readOids(pCTX);
@@ -1466,20 +1465,21 @@ async function createReaderSession(pCTX) {
         // start recurrent reading
         pCTX.pollTimer = adapter.setInterval(readOids, pCTX.pollIntvl, pCTX);
 
-        adapter.log.debug('session for device "' + pCTX.name + '" (' + pCTX.ipAddr + ') created');
-
+        adapter.log.debug(`session for device "${pCTX.name}" (${pCTX.ipAddr}) created`);
     } else {
         // error: retry again
 
-        adapter.log.debug('session for device "' + pCTX.name + '" (' + pCTX.ipAddr + ') NOT created, will retry');
+        adapter.log.debug(`session for device "${pCTX.name}" (${pCTX.ipAddr}) NOT created, will retry`);
 
-        pCTX.retryTimer = adapter.setTimeout((pCTX) => {
-            pCTX.retryTimer = null;
-            createReaderSession(pCTX);
-        }, pCTX.retryIntvl, pCTX);
-
+        pCTX.retryTimer = adapter.setTimeout(
+            pCTX => {
+                pCTX.retryTimer = null;
+                createReaderSession(pCTX);
+            },
+            pCTX.retryIntvl,
+            pCTX,
+        );
     }
-
 }
 
 /**
@@ -1488,25 +1488,29 @@ async function createReaderSession(pCTX) {
  * @param   {string}    pStateId    (base) state id
  * @param   {object}    pOptions    options object as definded by adapter.setState
  * @param   {object}    pValues     (optional) values object containing values for base, type and json states
- *
- * @return  nothing
- *
+ * @returns  nothing
  */
-async function setStates (pStateId, pOptions, pValues ) {
-    adapter.log.debug('setStates - ' + pStateId);
+async function setStates(pStateId, pOptions, pValues) {
+    adapter.log.debug(`setStates - ${pStateId}`);
 
     const state = pOptions;
 
-    if (pValues) state.val = pValues.val;
+    if (pValues) {
+        state.val = pValues.val;
+    }
     await adapter.setStateAsync(pStateId, state);
 
-    if (adapter.config.optTypeStates){
-        if (pValues) state.val = pValues.type;
-        await adapter.setStateAsync(pStateId+'-type', state);
+    if (adapter.config.optTypeStates) {
+        if (pValues) {
+            state.val = pValues.type;
+        }
+        await adapter.setStateAsync(`${pStateId}-type`, state);
     }
-    if (adapter.config.optRawStates){
-        if (pValues) state.val = pValues.json;
-        await adapter.setStateAsync(pStateId+'-raw', state);
+    if (adapter.config.optRawStates) {
+        if (pValues) {
+            state.val = pValues.json;
+        }
+        await adapter.setStateAsync(`${pStateId}-raw`, state);
     }
 }
 
@@ -1518,27 +1522,36 @@ async function setStates (pStateId, pOptions, pValues ) {
  * @param {string}      pMsg        (optional) text to add to info message
  * @param {string}      pErr        (optional) text to use for error message
  *                                  error message logged only if pErr != null
- * @return nothiung
+ * @returns nothiung
  */
-async function setOnlineState (pCTX, pOnline, pMsg, pErr){
-
-    await adapter.setStateAsync(pCTX.id + '.info.online', {val: pOnline, ack: true, q:0x00});
+async function setOnlineState(pCTX, pOnline, pMsg, pErr) {
+    await adapter.setStateAsync(`${pCTX.id}.info.online`, { val: pOnline, ack: true, q: 0x00 });
 
     let err = 'RequestTimedOutError: Request timed out';
-    if (pErr) err = pErr;
-    if (pOnline) err = null;
-    await adapter.setStateAsync(pCTX.id + '.info.error_text', {val: err, ack: true, q:0x00});
+    if (pErr) {
+        err = pErr;
+    }
+    if (pOnline) {
+        err = null;
+    }
+    await adapter.setStateAsync(`${pCTX.id}.info.error_text`, { val: err, ack: true, q: 0x00 });
 
-    if (pCTX.initialized && (pCTX.online == pOnline) ) return;
+    if (pCTX.initialized && pCTX.online == pOnline) {
+        return;
+    }
 
     if (pErr) {
         adapter.log.error(`[${pCTX.id}] ${pErr}`);
-        await adapter.setStateAsync(pCTX.id + '.info.error', {val: true, ack: true, q:0x00});
+        await adapter.setStateAsync(`${pCTX.id}.info.error`, { val: true, ack: true, q: 0x00 });
     }
-    if (pOnline) await adapter.setStateAsync(pCTX.id + '.info.error', {val: false, ack: true, q:0x00});
+    if (pOnline) {
+        await adapter.setStateAsync(`${pCTX.id}.info.error`, { val: false, ack: true, q: 0x00 });
+    }
 
     let msg = pOnline ? 'connected' : 'disconnected';
-    if (pMsg) msg = `${msg} - ${pMsg}`;
+    if (pMsg) {
+        msg = `${msg} - ${pMsg}`;
+    }
     adapter.log.info(`[${pCTX.id}] device ${msg}`);
 
     pCTX.initialized = true;
@@ -1549,13 +1562,16 @@ async function setOnlineState (pCTX, pOnline, pMsg, pErr){
 /**
  * processVarbind - process single varbind
  *
+ * @param pCTX
+ * @param pStateId
+ * @param pFormat
+ * @param pWriteable
  * @param {object} pVarbind snmp varbind object
- * @return string
- *
+ * @returns string
  */
 async function processVarbind(pCTX, pStateId, pFormat, pWriteable, pVarbind) {
-//async function processVarbind(pCTX, pChunkIdx, pIdx, pVarbind) {
-    adapter.log.debug('processVarbind - [' + pCTX.id + '] ' + pStateId);
+    //async function processVarbind(pCTX, pChunkIdx, pIdx, pVarbind) {
+    adapter.log.debug(`processVarbind - [${pCTX.id}] ${pStateId}`);
 
     const devId = pCTX.id;
     //const OID = pCTX.chunks[pChunkIdx].OIDs[pIdx];
@@ -1564,7 +1580,7 @@ async function processVarbind(pCTX, pStateId, pFormat, pWriteable, pVarbind) {
 
     const state = varbindDecode(pVarbind, pFormat, devId, pStateId);
 
-    adapter.log.debug(`[${devId}] ${pStateId} (${state.typeStr})` + JSON.stringify(pVarbind));
+    adapter.log.debug(`[${devId}] ${pStateId} (${state.typeStr})${JSON.stringify(pVarbind)}`);
     adapter.log.debug(`[${devId}] update ${pStateId}: ${state.val}`);
 
     // data OK
@@ -1576,14 +1592,16 @@ async function processVarbind(pCTX, pStateId, pFormat, pWriteable, pVarbind) {
             write: !!pWriteable,
             read: true,
             type: oidFormat2StateType(state.format),
-            role: 'value'
+            role: 'value',
         },
-        native: {
-        }
+        native: {},
     });
 
-    await setStates( pStateId,{ ack: true, q:state.qual},
-        { val: state.val, type: pVarbind.type + ': '+state.typeStr, json: JSON.stringify(pVarbind) } );
+    await setStates(
+        pStateId,
+        { ack: true, q: state.qual },
+        { val: state.val, type: `${pVarbind.type}: ${state.typeStr}`, json: JSON.stringify(pVarbind) },
+    );
 
     /*
     await adapter.setStateAsync(pStateId, state.val, true);
@@ -1595,16 +1613,16 @@ async function processVarbind(pCTX, pStateId, pFormat, pWriteable, pVarbind) {
     }
     */
 
-    if ( pWriteable ) {
+    if (pWriteable) {
         STATEs[fullId] = {
             CTX: pCTX,
             stateId: pStateId,
-            format: pFormat
+            format: pFormat,
         };
         STATEs[fullId].varbind = {
             oid: pVarbind.oid,
             type: pVarbind.type,
-            value: null
+            value: null,
         };
     }
     return;
@@ -1615,51 +1633,52 @@ async function processVarbind(pCTX, pStateId, pFormat, pWriteable, pVarbind) {
  *
  * @param {object} pCTX specific context
  * @param {number} pIdx chunk index
- * @return
- *
+ * @returns
  */
 
 async function readChunkOids(pCTX, pIdx) {
-    adapter.log.debug('readChunkOIDs - device "' + pCTX.name + '" (' + pCTX.ipAddr + '), chunk idx ' + pIdx);
+    adapter.log.debug(`readChunkOIDs - device "${pCTX.name}" (${pCTX.ipAddr}), chunk idx ${pIdx}`);
 
     const devId = pCTX.id;
     const oids = pCTX.chunks[pIdx].oids;
 
-    if (! pCTX.sessCtx){
-        adapter.log.debug('[' + devId + '] session.get - session context is null, skip processing');
+    if (!pCTX.sessCtx) {
+        adapter.log.debug(`[${devId}] session.get - session context is null, skip processing`);
         return;
     }
 
-    const result = await snmpSessionGetAsync( pCTX.sessCtx.session, oids);
-    adapter.log.debug('[' + devId + '] session.get completed for chunk index ' + pIdx );
+    const result = await snmpSessionGetAsync(pCTX.sessCtx.session, oids);
+    adapter.log.debug(`[${devId}] session.get completed for chunk index ${pIdx}`);
     if (result.err) {
         // error
-        adapter.log.debug('[' + devId + '] session.get: ' + result.err.toString());
+        adapter.log.debug(`[${devId}] session.get: ${result.err.toString()}`);
         if (result.err.toString() === 'RequestTimedOutError: Request timed out') {
             // timeout error
             for (let ii = 0; ii < pCTX.chunks[pIdx].ids.length; ii++) {
-                await setStates( pCTX.chunks[pIdx].ids[ii], {ack: true, q:0x02} ); // connection problem
+                await setStates(pCTX.chunks[pIdx].ids[ii], { ack: true, q: 0x02 }); // connection problem
             }
-            await setOnlineState( pCTX, false, 'request timeout', null); // log info only
+            await setOnlineState(pCTX, false, 'request timeout', null); // log info only
         } else {
             // other error
             for (let ii = 0; ii < pCTX.chunks[pIdx].ids.length; ii++) {
-                await setStates(pCTX.chunks[pIdx].ids[ii], {val: null, ack: true, q:0x44} ); // device reports error
+                await setStates(pCTX.chunks[pIdx].ids[ii], { val: null, ack: true, q: 0x44 }); // device reports error
             }
-            await setOnlineState( pCTX, false, null, 'session.get: ' + result.err.toString()); // log an error
+            await setOnlineState(pCTX, false, null, `session.get: ${result.err.toString()}`); // log an error
         }
     } else {
         // success
-        await setOnlineState( pCTX, true, null, null);
+        await setOnlineState(pCTX, true, null, null);
 
         // process returned values
         for (let ii = 0; ii < result.varbinds.length; ii++) {
             if (snmp.isVarbindError(result.varbinds[ii])) {
-                if ( ! pCTX.chunks[pIdx].OIDs[ii].oidOptional ||
-                    ! snmp.varbindError(result.varbinds[ii]).startsWith('NoSuchInstance:') ) {
-                    adapter.log.error('[' + devId + '] session.get: ' + snmp.varbindError(result.varbinds[ii]));
+                if (
+                    !pCTX.chunks[pIdx].OIDs[ii].oidOptional ||
+                    !snmp.varbindError(result.varbinds[ii]).startsWith('NoSuchInstance:')
+                ) {
+                    adapter.log.error(`[${devId}] session.get: ${snmp.varbindError(result.varbinds[ii])}`);
                 }
-                await setStates(pCTX.chunks[pIdx].ids[ii], {val: null, ack: true, q:0x84} ); // sensor reports error
+                await setStates(pCTX.chunks[pIdx].ids[ii], { val: null, ack: true, q: 0x84 }); // sensor reports error
             } else {
                 const OID = pCTX.chunks[pIdx].OIDs[ii];
                 const stateId = pCTX.chunks[pIdx].ids[ii];
@@ -1673,22 +1692,20 @@ async function readChunkOids(pCTX, pIdx) {
  * readOids - read all oids from a specific target device
  *
  * @param {object} pCTX CTX object
- * @return
- *
+ * @returns
  */
 async function readOids(pCTX) {
-    adapter.log.debug('readOIDs - device "' + pCTX.name + '" (' + pCTX.ipAddr + ')');
+    adapter.log.debug(`readOIDs - device "${pCTX.name}" (${pCTX.ipAddr})`);
 
     //const session = pCTX.session;
     const devId = pCTX.id;
 
     for (let cc = 0; cc < pCTX.chunks.length; cc++) {
-        adapter.log.debug('[' + devId + '] processing oid chunk index ' + cc );
-        await readChunkOids( pCTX, cc);
-        adapter.log.debug('[' + devId + '] processing oid chunk index ' + cc + ' completed' );
+        adapter.log.debug(`[${devId}] processing oid chunk index ${cc}`);
+        await readChunkOids(pCTX, cc);
+        adapter.log.debug(`[${devId}] processing oid chunk index ${cc} completed`);
     }
 }
-
 
 // #################### general housekeeping functions ####################
 
@@ -1697,7 +1714,9 @@ async function handleConnectionInfo() {
 
     let haveConnection = false;
     for (let ii = 0; ii < CTXs.length; ii++) {
-        if (CTXs[ii].online) haveConnection = true;
+        if (CTXs[ii].online) {
+            haveConnection = true;
+        }
     }
 
     if (g_isConnected !== haveConnection) {
@@ -1708,7 +1727,7 @@ async function handleConnectionInfo() {
         }
         g_isConnected = haveConnection;
 
-        adapter.log.debug('info.connection set to ' + g_isConnected);
+        adapter.log.debug(`info.connection set to ${g_isConnected}`);
     }
 
     await adapter.setStateAsync('info.connection', g_isConnected, true);
@@ -1717,8 +1736,7 @@ async function handleConnectionInfo() {
 /**
  * validateConfig - scan and validate config data
  *
- * @return
- *
+ * @returns
  */
 function validateConfig() {
     let ok = true;
@@ -1745,11 +1763,13 @@ function validateConfig() {
     for (let ii = 0; ii < adapter.config.oids.length; ii++) {
         const oid = adapter.config.oids[ii];
 
-        if (!oid.oidAct) continue;
+        if (!oid.oidAct) {
+            continue;
+        }
 
-        oid.oidGroup = (oid.oidGroup||'').trim();
-        oid.oidName = (oid.oidName||'').trim();
-        oid.oidOid = (oid.oidOid||'').trim().replace(/^\./, '');
+        oid.oidGroup = (oid.oidGroup || '').trim();
+        oid.oidName = (oid.oidName || '').trim();
+        oid.oidOid = (oid.oidOid || '').trim().replace(/^\./, '');
 
         const oidGroup = oid.oidGroup;
 
@@ -1766,19 +1786,27 @@ function validateConfig() {
         // as ids must not end with a dot, the name must not end with a dot too
         // duplicate dots would result in empty folder names
         if (oid.oidName.endsWith('.')) {
-            adapter.log.error('oid "' + oid.oidName + '"is invalid. Name must not end with ".". Please correct configuration.');
+            adapter.log.error(
+                `oid "${oid.oidName}"is invalid. Name must not end with ".". Please correct configuration.`,
+            );
             ok = false;
         }
         if (oid.oidName.includes('..')) {
-            adapter.log.error('oid "' + oid.oidName + '"is invalid. Name must not include consecutive dots. Please correct configuration.');
+            adapter.log.error(
+                `oid "${oid.oidName}"is invalid. Name must not include consecutive dots. Please correct configuration.`,
+            );
             ok = false;
         }
         if (oid.oidName === 'online') {
-            adapter.log.error('oid "' + oid.oidName + '"is invalid. Name "online" is reserved. Please correct configuration.');
+            adapter.log.error(
+                `oid "${oid.oidName}"is invalid. Name "online" is reserved. Please correct configuration.`,
+            );
             ok = false;
         }
         if (oid.oidName.startsWith('info.')) {
-            adapter.log.error('oid "' + oid.oidName + '"is invalid. Folder "info" is reserved. Please correct configuration.');
+            adapter.log.error(
+                `oid "${oid.oidName}"is invalid. Folder "info" is reserved. Please correct configuration.`,
+            );
             ok = false;
         }
 
@@ -1787,8 +1815,8 @@ function validateConfig() {
             ok = false;
         }
 
-        if (! /^\d+(\.\d+)*$/.test(oid.oidOid)) {
-            adapter.log.error('oid "' + oid.oidOid + '" has invalid format, please correct configuration.');
+        if (!/^\d+(\.\d+)*$/.test(oid.oidOid)) {
+            adapter.log.error(`oid "${oid.oidOid}" has invalid format, please correct configuration.`);
             ok = false;
         }
 
@@ -1797,7 +1825,6 @@ function validateConfig() {
         // TODO: oidGroup + oidName + oidOid    must be unique
 
         oidSets[oidGroup] = true;
-
     }
 
     if (!ok) {
@@ -1816,7 +1843,7 @@ function validateConfig() {
             continue;
         }
         if (authSets[authId]) {
-            adapter.log.error('duplicate authorization id ' + authId + ' detected, please correct configuration.');
+            adapter.log.error(`duplicate authorization id ${authId} detected, please correct configuration.`);
             ok = false;
             continue;
         }
@@ -1838,12 +1865,14 @@ function validateConfig() {
     for (let ii = 0; ii < adapter.config.devs.length; ii++) {
         const dev = adapter.config.devs[ii];
 
-        if (!dev.devAct) continue;
+        if (!dev.devAct) {
+            continue;
+        }
 
-        dev.devName = (dev.devName||'').trim();
-        dev.devIpAddr = (dev.devIpAddr||'').trim();
-        dev.devOidGroup = (dev.devOidGroup||'').trim();
-        dev.devAuthId = (dev.devAuthId||'').trim();
+        dev.devName = (dev.devName || '').trim();
+        dev.devIpAddr = (dev.devIpAddr || '').trim();
+        dev.devOidGroup = (dev.devOidGroup || '').trim();
+        dev.devAuthId = (dev.devAuthId || '').trim();
         //dev.devTimeout = dev.devTimeout;
         //dev.devRetryIntvl = dev.devRetryIntvl;
         //dev.devPollIntvl = dev.devPollIntvl;
@@ -1854,11 +1883,15 @@ function validateConfig() {
             ok = false;
         }
         if (dev.devName.endsWith('.')) {
-            adapter.log.error('devicename "' + dev.devName + '"is invalid. Name must not end with ".". Please correct configuration.');
+            adapter.log.error(
+                `devicename "${dev.devName}"is invalid. Name must not end with ".". Please correct configuration.`,
+            );
             ok = false;
         }
         if (dev.devName.includes('..')) {
-            adapter.log.error('devicename "' + dev.devName + '"is invalid. Name must not include consecutive dots. Please correct configuration.');
+            adapter.log.error(
+                `devicename "${dev.devName}"is invalid. Name must not include consecutive dots. Please correct configuration.`,
+            );
             ok = false;
         }
 
@@ -1868,123 +1901,161 @@ function validateConfig() {
         // 1.2.3.4, 1.2.3.4:123 - IPv4 with or without port
         // 8001:1234:ffff::1234 - IPv6 without port
         // [8001:1234:ffff::1234], [8001:1234:ffff::1234]:123 - IPv6 with or without domain name
-        adapter.log.debug('ip address "' + dev.devIpAddr + '" will be checked for ' + (dev.devIp6?'IPv6':'IPv4'));
-        if (dev.devIp6)
-        {
+        adapter.log.debug(`ip address "${dev.devIpAddr}" will be checked for ${dev.devIp6 ? 'IPv6' : 'IPv4'}`);
+        if (dev.devIp6) {
             // IPv6 address or dsn name
             const tmp = dev.devIpAddr.match(/^\[([0-9a-fA-F:.]+)\](:\d+)?$/);
-            if ( tmp ) {
-                adapter.log.debug('ip address "' + dev.devIpAddr + '" bracket notation detected');
-                if (! net.isIPv6( tmp[1] ) ) {
-                    adapter.log.error('ip address "' + tmp[1] + '" is no valid ipv6 address, please correct configuration.');
+            if (tmp) {
+                adapter.log.debug(`ip address "${dev.devIpAddr}" bracket notation detected`);
+                if (!net.isIPv6(tmp[1])) {
+                    adapter.log.error(`ip address "${tmp[1]}" is no valid ipv6 address, please correct configuration.`);
                     ok = false;
                 } else {
-                    adapter.log.debug('ip address "' + dev.devIpAddr + '" address check passed');
+                    adapter.log.debug(`ip address "${dev.devIpAddr}" address check passed`);
                 }
             } else if (/^[0-9a-fA-F:.]+$/.test(dev.devIpAddr)) {
-                adapter.log.debug('ip address "' + dev.devIpAddr + '" plain numeric notation detected');
-                if (! net.isIPv6( dev.devIpAddr ) ) {
-                    adapter.log.error('ip address "' + dev.devIpAddr + '" is no valid ipv6 address, please correct configuration.');
+                adapter.log.debug(`ip address "${dev.devIpAddr}" plain numeric notation detected`);
+                if (!net.isIPv6(dev.devIpAddr)) {
+                    adapter.log.error(
+                        `ip address "${dev.devIpAddr}" is no valid ipv6 address, please correct configuration.`,
+                    );
                     ok = false;
                 } else {
-                    adapter.log.debug('ip address "' + dev.devIpAddr + '" address check passed');
+                    adapter.log.debug(`ip address "${dev.devIpAddr}" address check passed`);
                 }
             } else if (/^[a-zA-Z0-9.-]+(:\d+)?$/.test(dev.devIpAddr)) {
-                adapter.log.debug('ip address "' + dev.devIpAddr + '" domain name detected');
+                adapter.log.debug(`ip address "${dev.devIpAddr}" domain name detected`);
             } else {
-                adapter.log.error('ip address "' + dev.devIpAddr + '" has invalid format for ipv6, please correct configuration.');
+                adapter.log.error(
+                    `ip address "${dev.devIpAddr}" has invalid format for ipv6, please correct configuration.`,
+                );
                 ok = false;
             }
         } else {
             // IPv4 address or dsn name
             if (/^\d+\.\d+\.\d+\.\d+(:\d+)?$/.test(dev.devIpAddr)) {
-                adapter.log.debug('ip address "' + dev.devIpAddr + '" numeric notation detected');
+                adapter.log.debug(`ip address "${dev.devIpAddr}" numeric notation detected`);
                 const tmp = dev.devIpAddr.split(':');
-                if (! net.isIPv4( tmp[0] ) ) {
-                    adapter.log.error('ip address "' + dev.devIpAddr + '" is no valid ipv4 address, please correct configuration.');
+                if (!net.isIPv4(tmp[0])) {
+                    adapter.log.error(
+                        `ip address "${dev.devIpAddr}" is no valid ipv4 address, please correct configuration.`,
+                    );
                     ok = false;
                 } else {
-                    adapter.log.debug('ip address "' + dev.devIpAddr + '" address check passed');
+                    adapter.log.debug(`ip address "${dev.devIpAddr}" address check passed`);
                 }
             } else if (/^[a-zA-Z0-9.-]+(:\d+)?$/.test(dev.devIpAddr)) {
-                adapter.log.debug('ip address "' + dev.devIpAddr + '" domain name detected');
+                adapter.log.debug(`ip address "${dev.devIpAddr}" domain name detected`);
             } else {
-                adapter.log.error('ip address "' + dev.devIpAddr + '" has invalid format for ipv4, please correct configuration.');
+                adapter.log.error(
+                    `ip address "${dev.devIpAddr}" has invalid format for ipv4, please correct configuration.`,
+                );
                 ok = false;
             }
         }
 
         if (!dev.devOidGroup || dev.devOidGroup == '') {
-            adapter.log.error('device "' + dev.devName + '" (' + dev.devIpAddr + ') does not specify a oid group. Please correct configuration.');
+            adapter.log.error(
+                `device "${dev.devName}" (${dev.devIpAddr}) does not specify a oid group. Please correct configuration.`,
+            );
             ok = false;
         }
 
         if (dev.devOidGroup && dev.devOidGroup != '' && !oidSets[dev.devOidGroup]) {
-            adapter.log.warn('device "' + dev.devName + '" (' + dev.devIpAddr + ') references unknown or completly inactive oid group ' + dev.devOidGroup + '. Please correct configuration.');
+            adapter.log.warn(
+                `device "${dev.devName}" (${dev.devIpAddr}) references unknown or completly inactive oid group ${dev.devOidGroup}. Please correct configuration.`,
+            );
             //ok = false;
         }
 
         if (dev.devSnmpVers == SNMP_V3 && dev.authId == '') {
-            adapter.log.error('device "' + dev.devName + '" (' + dev.devIpAddr + ') requires valid authorization id. Please correct configuration.');
+            adapter.log.error(
+                `device "${dev.devName}" (${dev.devIpAddr}) requires valid authorization id. Please correct configuration.`,
+            );
             ok = false;
         }
 
         if (dev.devSnmpVers == SNMP_V3 && dev.devAuthId != '' && !authSets[dev.devAuthId]) {
-            adapter.log.error('device "' + dev.devName + '" (' + dev.devIpAddr + ') references unknown authorization group ' + dev.devAuthId + '. Please correct configuration.');
+            adapter.log.error(
+                `device "${dev.devName}" (${dev.devIpAddr}) references unknown authorization group ${dev.devAuthId}. Please correct configuration.`,
+            );
             ok = false;
         }
 
         if (!/^\d+$/.test(dev.devTimeout)) {
-            adapter.log.error('device "' + dev.devName + '" - timeout (' + dev.devTimeout + ') must be numeric, please correct configuration.');
+            adapter.log.error(
+                `device "${dev.devName}" - timeout (${dev.devTimeout}) must be numeric, please correct configuration.`,
+            );
             ok = false;
         }
         dev.devTimeout = parseInt(dev.devTimeout, 10) || 5;
-        if (dev.devTimeout > 600) { // must be less than 0x7fffffff / 1000
-            adapter.log.warn('device "' + dev.devName + '" - device timeout (' + dev.devTimeout + ') must be less than 600 seconds, please correct configuration.');
+        if (dev.devTimeout > 600) {
+            // must be less than 0x7fffffff / 1000
+            adapter.log.warn(
+                `device "${dev.devName}" - device timeout (${dev.devTimeout}) must be less than 600 seconds, please correct configuration.`,
+            );
             dev.devTimeout = 600;
-            adapter.log.warn('device "' + dev.devName + '" - device timeout set to 600 seconds.');
+            adapter.log.warn(`device "${dev.devName}" - device timeout set to 600 seconds.`);
         }
         if (dev.devTimeout < 1) {
-            adapter.log.warn('device "' + dev.devName + '" - device timeout (' + dev.devTimeout + ') must be at least 1 second, please correct configuration.');
+            adapter.log.warn(
+                `device "${dev.devName}" - device timeout (${dev.devTimeout}) must be at least 1 second, please correct configuration.`,
+            );
             dev.devTimeout = 1;
-            adapter.log.warn('device "' + dev.devName + '" - device timeout set to 1 second.');
+            adapter.log.warn(`device "${dev.devName}" - device timeout set to 1 second.`);
         }
 
         if (!/^\d+$/.test(dev.devRetryIntvl)) {
-            adapter.log.error('device "' + dev.devName + '" - retry intervall (' + dev.devRetryIntvl + ') must be numeric, please correct configuration.');
+            adapter.log.error(
+                `device "${dev.devName}" - retry intervall (${dev.devRetryIntvl}) must be numeric, please correct configuration.`,
+            );
             ok = false;
         }
         dev.devRetryIntvl = parseInt(dev.devRetryIntvl, 10) || 5;
-        if (dev.devRetryIntvl > 3600) { // must be less than 0x7fffffff / 1000
-            adapter.log.warn('device "' + dev.devName + '" - retry intervall (' + dev.devRetryIntvl + ') must be less than 3600 seconds, please correct configuration.');
+        if (dev.devRetryIntvl > 3600) {
+            // must be less than 0x7fffffff / 1000
+            adapter.log.warn(
+                `device "${dev.devName}" - retry intervall (${dev.devRetryIntvl}) must be less than 3600 seconds, please correct configuration.`,
+            );
             dev.devRetryIntvl = 3600;
-            adapter.log.warn('device "' + dev.devName + '" - retry intervall set to 3600 seconds.');
+            adapter.log.warn(`device "${dev.devName}" - retry intervall set to 3600 seconds.`);
         }
         if (dev.devRetryIntvl < 1) {
-            adapter.log.warn('device "' + dev.devName + '" - retry intervall (' + dev.devRetryIntvl + ') must be at least 1 second, please correct configuration.');
+            adapter.log.warn(
+                `device "${dev.devName}" - retry intervall (${dev.devRetryIntvl}) must be at least 1 second, please correct configuration.`,
+            );
             dev.devRetryIntvl = 1;
-            adapter.log.warn('device "' + dev.devName + '" - retry intervall set to 1 second.');
+            adapter.log.warn(`device "${dev.devName}" - retry intervall set to 1 second.`);
         }
 
         if (!/^\d+$/.test(dev.devPollIntvl)) {
-            adapter.log.error('device "' + dev.devName + '" - poll intervall (' + dev.devPollIntvl + ') must be numeric, please correct configuration.');
+            adapter.log.error(
+                `device "${dev.devName}" - poll intervall (${dev.devPollIntvl}) must be numeric, please correct configuration.`,
+            );
             ok = false;
         }
         dev.devPollIntvl = parseInt(dev.devPollIntvl, 10) || 30;
-        if (dev.devPollIntvl > 3600) { // must be less than 0x7fffffff / 1000
-            adapter.log.warn('device "' + dev.devName + '" - poll intervall (' + dev.devPollIntvl + ') must be less than 3600 seconds, please correct configuration.');
+        if (dev.devPollIntvl > 3600) {
+            // must be less than 0x7fffffff / 1000
+            adapter.log.warn(
+                `device "${dev.devName}" - poll intervall (${dev.devPollIntvl}) must be less than 3600 seconds, please correct configuration.`,
+            );
             dev.devPollIntvl = 3600;
-            adapter.log.warn('device "' + dev.devName + '" - poll intervall set to 3600 seconds.');
+            adapter.log.warn(`device "${dev.devName}" - poll intervall set to 3600 seconds.`);
         }
         if (dev.devPollIntvl < 5) {
-            adapter.log.warn('device "' + dev.devName + '" - poll intervall (' + dev.devPollIntvl + ') must be at least 5 seconds, please correct configuration.');
+            adapter.log.warn(
+                `device "${dev.devName}" - poll intervall (${dev.devPollIntvl}) must be at least 5 seconds, please correct configuration.`,
+            );
             dev.devPollIntvl = 5;
-            adapter.log.warn('device "' + dev.devName + '" - poll intervall set to 5 seconds.');
+            adapter.log.warn(`device "${dev.devName}" - poll intervall set to 5 seconds.`);
         }
         if (dev.devPollIntvl <= dev.devTimeout) {
-            adapter.log.warn('device "' + dev.devName + '" - poll intervall (' + dev.devPollIntvl + ') must be larger than device timeout (' + dev.devTimeout + '), please correct configuration.');
+            adapter.log.warn(
+                `device "${dev.devName}" - poll intervall (${dev.devPollIntvl}) must be larger than device timeout (${dev.devTimeout}), please correct configuration.`,
+            );
             dev.devPollIntvl = dev.devTimeout + 1;
-            adapter.log.warn('device "' + dev.devName + '" - poll intervall set to ' + dev.devPollIntvl + ' seconds.');
+            adapter.log.warn(`device "${dev.devName}" - poll intervall set to ${dev.devPollIntvl} seconds.`);
         }
     }
 
@@ -2000,7 +2071,7 @@ function validateConfig() {
 /**
  * setupContices - setup contices for worker threads
  *
- * @return
+ * @returns
  *
  *	CTX		object containing data for one device
  *			it has the following attributes
@@ -2023,18 +2094,20 @@ function setupContices() {
             continue;
         }
 
-        adapter.log.debug('adding device "' + dev.devIpAddr + '" (' + dev.devName + ') , snmp id: ' + dev.devSnmpVers);
-        adapter.log.debug('timing parameter: timeout ' + dev.devTimeout + 's , retry ' + dev.devRetryIntvl + 's, polling ' + dev.devPollIntvl + 's');
+        adapter.log.debug(`adding device "${dev.devIpAddr}" (${dev.devName}) , snmp id: ${dev.devSnmpVers}`);
+        adapter.log.debug(
+            `timing parameter: timeout ${dev.devTimeout}s , retry ${dev.devRetryIntvl}s, polling ${dev.devPollIntvl}s`,
+        );
 
         let ipAddr = '';
         let ipPort = 161;
-        if (dev.devIp6 ) {
+        if (dev.devIp6) {
             // IPv6
             // ffff:0:1234::8abc
             // [ffff:0:1234::8abc] or [ffff:0:1234::8abc]:123
             // mynode.test.com or mynode.test.com:123
             const tmp = dev.devIpAddr.match(/^\[([0-9a-fA-F:.]+)\](:(\d+))?$/);
-            if ( tmp ) {
+            if (tmp) {
                 // brackated ipv6 with optional port attached
                 ipAddr = tmp[1];
                 ipPort = tmp[3] || 161;
@@ -2049,7 +2122,9 @@ function setupContices() {
                 ipPort = tmp[1] || 161;
             } else {
                 // NOTE: should never occure here
-                adapter.log.error('ip address "' + dev.devIpAddr + '" has invalid format for ipv6, please correct configuration.');
+                adapter.log.error(
+                    `ip address "${dev.devIpAddr}" has invalid format for ipv6, please correct configuration.`,
+                );
             }
         } else {
             // IPv4
@@ -2065,24 +2140,26 @@ function setupContices() {
         CTXs[jj].ipAddr = ipAddr;
         CTXs[jj].ipPort = ipPort;
         CTXs[jj].id = dev.devName;
-        if ( adapter.config.optUseName ) {
-            if ( dev.devIp6 ) {
-                adapter.log.warn('device "' + dev.devIpAddr + '" (' + dev.devName + ') requests ipv6. Option compatibility mode ignored.');
+        if (adapter.config.optUseName) {
+            if (dev.devIp6) {
+                adapter.log.warn(
+                    `device "${dev.devIpAddr}" (${dev.devName}) requests ipv6. Option compatibility mode ignored.`,
+                );
             } else {
                 CTXs[jj].id = ip2ipStr(CTXs[jj].ipAddr);
             }
         }
         CTXs[jj].isIPv6 = dev.devIp6;
-        CTXs[jj].timeout = dev.devTimeout * 1000;       //s -> ms must be less than 0x7fffffff
+        CTXs[jj].timeout = dev.devTimeout * 1000; //s -> ms must be less than 0x7fffffff
         CTXs[jj].retryIntvl = dev.devRetryIntvl * 1000; //s -> ms must be less than 0x7fffffff
-        CTXs[jj].pollIntvl = dev.devPollIntvl * 1000;   //s -> ms must be less than 0x7fffffff
+        CTXs[jj].pollIntvl = dev.devPollIntvl * 1000; //s -> ms must be less than 0x7fffffff
         CTXs[jj].snmpVers = dev.devSnmpVers;
         CTXs[jj].authId = dev.devAuthId;
 
-        if (dev.devSnmpVers == SNMP_V3 ) {
+        if (dev.devSnmpVers == SNMP_V3) {
             let authSet = [];
             for (let ii = 0; ii < adapter.config.authSets.length; ii++) {
-                if ( adapter.config.authSets[ii].authId == dev.devAuthId ){
+                if (adapter.config.authSets[ii].authId == dev.devAuthId) {
                     authSet = adapter.config.authSets[ii];
                 }
             }
@@ -2091,7 +2168,7 @@ function setupContices() {
             CTXs[jj].authAuthProto = authSet.authAuthProto || 0;
             CTXs[jj].authAuthKey = (authSet.authAuthKey || '').trim();
             CTXs[jj].authEncProto = authSet.authEncProto || 0;
-            CTXs[jj].authEncKey = (authSet.authEncKey || '' ).trim();
+            CTXs[jj].authEncKey = (authSet.authEncKey || '').trim();
         }
 
         //        CTXs[jj].OIDs = [];
@@ -2099,31 +2176,34 @@ function setupContices() {
         //        CTXs[jj].ids = [];
         CTXs[jj].chunks = [];
 
-        CTXs[jj].pollTimer = null;  // poll intervall timer
-        CTXs[jj].session = null;    // snmp session
-        CTXs[jj].initialized = false;   // connection initialization status of device
-        CTXs[jj].online = false;   // connection status of device
+        CTXs[jj].pollTimer = null; // poll intervall timer
+        CTXs[jj].session = null; // snmp session
+        CTXs[jj].initialized = false; // connection initialization status of device
+        CTXs[jj].online = false; // connection status of device
 
-        let cIdx = -1;    // chunk index
-        let cCnt = 0;     // chunk element count
+        let cIdx = -1; // chunk index
+        let cCnt = 0; // chunk element count
 
         for (let oo = 0; oo < adapter.config.oids.length; oo++) {
             const oid = adapter.config.oids[oo];
 
             // skip inactive oids and oids belonging to other oid groups
-            if (!oid.oidAct) continue;
-            if (dev.devOidGroup != oid.oidGroup) continue;
+            if (!oid.oidAct) {
+                continue;
+            }
+            if (dev.devOidGroup != oid.oidGroup) {
+                continue;
+            }
 
-            const id = CTXs[jj].id + '.' + name2id(oid.oidName);
-            if (cCnt <= 0 )
-            {
+            const id = `${CTXs[jj].id}.${name2id(oid.oidName)}`;
+            if (cCnt <= 0) {
                 cIdx++;
                 CTXs[jj].chunks.push([]);
                 CTXs[jj].chunks[cIdx].OIDs = [];
                 CTXs[jj].chunks[cIdx].oids = [];
                 CTXs[jj].chunks[cIdx].ids = [];
                 cCnt = g_chunkSize;
-                adapter.log.debug('       oid chunk index ' + cIdx + ' created');
+                adapter.log.debug(`       oid chunk index ${cIdx} created`);
             }
             //            CTXs[jj].oids.push(oid.oidOid);
             //            CTXs[jj].ids.push(id);
@@ -2133,7 +2213,7 @@ function setupContices() {
             CTXs[jj].chunks[cIdx].OIDs.push(oid);
             cCnt--;
 
-            adapter.log.debug('       oid "' + oid.oidOid + '" (' + id + ')');
+            adapter.log.debug(`       oid "${oid.oidOid}" (${id})`);
         }
 
         jj++;
@@ -2145,11 +2225,9 @@ function setupContices() {
 /**
  * onReady - will be called as soon as adapter is ready
  *
- * @return
- *
+ * @returns
  */
 async function onReady() {
-
     adapter.log.debug('onReady triggered');
 
     if (doInstall) {
@@ -2192,7 +2270,6 @@ async function onReady() {
             adapter.terminate('restart after update of config', EXIT_CODES.NO_ERROR);
             return; // shut down as soon as possible
         }
-
     }
     // mark adapter as non active
     await adapter.setStateAsync('info.connection', false, true);
@@ -2209,7 +2286,7 @@ async function onReady() {
 
     // read global config
     g_chunkSize = adapter.config.optChunkSize || 20;
-    adapter.log.info('adapter initializing, chunk size set to ' + g_chunkSize);
+    adapter.log.info(`adapter initializing, chunk size set to ${g_chunkSize}`);
 
     // setup worker thread contices
     setupContices();
@@ -2234,7 +2311,6 @@ async function onReady() {
     g_connUpdateTimer = adapter.setInterval(handleConnectionInfo, 15000);
 
     adapter.log.debug('startup completed');
-
 }
 
 /**
@@ -2242,17 +2318,18 @@ async function onReady() {
  *
  * @param   {string}    pFullId     id of device
  * @param   {object}    pState      state object of device
- * @return
- *
+ * @returns
  */
-async function onStateChange (pFullId, pState) {
+async function onStateChange(pFullId, pState) {
     adapter.log.debug(`onStateChange triggered - id ${pFullId}`);
 
-    if ( ! pState || pState.ack ) return;
+    if (!pState || pState.ack) {
+        return;
+    }
 
     adapter.log.debug(`onStateChange - state id ${pFullId} set to ${pState.val}`);
 
-    if ( (typeof(STATEs[pFullId]) === 'undefined') || (typeof(STATEs[pFullId].varbind) === 'undefined') ) {
+    if (typeof STATEs[pFullId] === 'undefined' || typeof STATEs[pFullId].varbind === 'undefined') {
         adapter.log.warn(`cannot write to uninitialized state ${pFullId}`);
         return;
     }
@@ -2267,28 +2344,29 @@ async function onStateChange (pFullId, pState) {
     //       Set state only if something hanges (incl. quality) ???
 
     // prepare varbind to be written
-    const varbind = varbindEncode( STATEs[pFullId], pState.val, devId, stateId );
+    const varbind = varbindEncode(STATEs[pFullId], pState.val, devId, stateId);
 
     let sessCtx = await snmpCreateSession(CTX);
 
     if (varbind.value !== null) {
         const resultSet = await snmpSessionSetAsync(sessCtx.session, [varbind]);
         if (resultSet.err) {
-            adapter.log.error('[' + devId + '] session.set: ' + resultSet.err.toString());
+            adapter.log.error(`[${devId}] session.set: ${resultSet.err.toString()}`);
         } else {
-            adapter.log.debug('[' + devId + '] session.set: success');
+            adapter.log.debug(`[${devId}] session.set: success`);
         }
     } else {
-        adapter.log.warn('[' + devId + '] data could not be converted - no data sent');
+        adapter.log.warn(`[${devId}] data could not be converted - no data sent`);
     }
 
     // reread data of device
     const resultGet = await snmpSessionGetAsync(sessCtx.session, [varbind.oid]);
-    if ( resultGet.varbinds.length === 1) { /* should be always one */
+    if (resultGet.varbinds.length === 1) {
+        /* should be always one */
         if (snmp.isVarbindError(resultGet.varbinds[0])) {
-            adapter.log.error('[' + devId + '] session.get: ' + snmp.varbindError(resultGet.varbinds[0]));
+            adapter.log.error(`[${devId}] session.get: ${snmp.varbindError(resultGet.varbinds[0])}`);
 
-            await setStates(stateId, {val: null, ack: true, q:0x84} ); // sensor reports error
+            await setStates(stateId, { val: null, ack: true, q: 0x84 }); // sensor reports error
             /*
             await adapter.setStateAsync(stateId, { val: null, ack: true, q: 0x84}); // sensor reports error
             if (adapter.config.optTypeStates){
@@ -2306,18 +2384,15 @@ async function onStateChange (pFullId, pState) {
     }
 
     if (sessCtx) {
-        await snmpCloseSession (sessCtx);
-        sessCtx=null;
+        await snmpCloseSession(sessCtx);
+        sessCtx = null;
     }
 }
-
 
 /**
  * onUnload - called when adapter shuts down
  *
  * @param {callback} callback 	callback function
- * @return
- *
  */
 function onUnload(callback) {
     adapter.log.debug('onUnload triggered');
@@ -2329,15 +2404,19 @@ function onUnload(callback) {
 
         // (re)set device online status
         try {
-            adapter.setState(CTX.id + '.info.error', {val: false, ack: true, q:0x00});
-            adapter.setState(CTX.id + '.info.online', {val: false, ack: true, q:0x00});
-        } catch (e) { /* */ }
+            adapter.setState(`${CTX.id}.info.error`, { val: false, ack: true, q: 0x00 });
+            adapter.setState(`${CTX.id}.info.online`, { val: false, ack: true, q: 0x00 });
+        } catch {
+            /* */
+        }
 
         // close session if one exists
         if (CTX.pollTimer) {
             try {
                 adapter.clearInterval(CTX.pollTimer);
-            } catch (e) { /* */ }
+            } catch {
+                /* */
+            }
             CTX.pollTimer = null;
         }
 
@@ -2350,13 +2429,17 @@ function onUnload(callback) {
     if (g_connUpdateTimer) {
         try {
             adapter.clearInterval(g_connUpdateTimer);
-        } catch (e) { /* */ }
+        } catch {
+            /* */
+        }
         g_connUpdateTimer = null;
     }
 
     try {
         adapter.setState('info.connection', false, true);
-    } catch (e) { /* */ }
+    } catch {
+        /* */
+    }
 
     // callback must be called under all circumstances
     callback && callback();
@@ -2365,7 +2448,7 @@ function onUnload(callback) {
 /**
  * here we start
  */
-console.log('DEBUG  : snmp adapter initializing (' + process.argv + ') ...'); //logger not yet initialized
+console.log(`DEBUG  : snmp adapter initializing (${process.argv}) ...`); //logger not yet initialized
 
 if (process.argv) {
     for (let a = 1; a < process.argv.length; a++) {
