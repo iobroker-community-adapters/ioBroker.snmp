@@ -445,18 +445,16 @@
 				"optChunkSize": 	{
                     "type": "number",
                     "label": "lblOptChunkSize",
-                    "filter": false,
-                    "sort": false,
                     "min": 1,
                     "max": 50,
                     "default": "20",
                     "tooltip": "ttOptChunkSize",
                     "help": "hlpOptChunkSize",
-                    "xs": 12,
-                    "sm": 8,
-                    "md": 6,
-                    "lg": 4,
-                    "xl": 2
+                    "xs": 8,
+                    "sm": 4,
+                    "md": 3,
+                    "lg": 2,
+                    "xl": 1
                 },
 				"optUseName": 	{
                     "type": "checkbox",
@@ -467,8 +465,8 @@
                     "help": "hlpOptUseIp",
                     "xs": 12,
                     "sm": 8,
-                    "md": 4,
-                    "lg": 6,
+                    "md": 6,
+                    "lg": 4,
                     "xl": 2
                 },
 				"optNoCloseOnError": 	{
@@ -480,8 +478,8 @@
                     "help": "hlpOptNoCloseOnError",
                     "xs": 12,
                     "sm": 8,
-                    "md": 4,
-                    "lg": 6,
+                    "md": 6,
+                    "lg": 4,
                     "xl": 2
                 },
 				"optRawStates": 	{
@@ -493,8 +491,8 @@
                     "help": "hlpOptRawStates",
                     "xs": 12,
                     "sm": 8,
-                    "md": 4,
-                    "lg": 6,
+                    "md": 6,
+                    "lg": 4,
                     "xl": 2
                 },
 				"optTypeStates": 	{
@@ -506,8 +504,8 @@
                     "help": "hlpOptTypeStates",
                     "xs": 12,
                     "sm": 8,
-                    "md": 4,
-                    "lg": 6,
+                    "md": 6,
+                    "lg": 4,
                     "xl": 2
                 }
             }
