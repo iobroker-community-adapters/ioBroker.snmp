@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "snmp",
-    "version": "3.3.0-alpha.0",
+    "version": "3.3.0-alpha.1",
     "news": {
+      "3.3.0-alpha.1": {
+        "en": "Adapter requires node.js 20, js-controller >= 6.011 and admin >= 7.6.17 now.\nDependencies have been updated",
+        "de": "Adapter erfordert jetzt node.js 20, js-controller >= 6.011 und admin >= 7.6.17.\nAbhängigkeiten wurden aktualisiert",
+        "ru": "Адаптер требует node.js 20, js-контроллер >= 6.011 и админ >= 7.6.17 сейчас.\nЗависимости были обновлены",
+        "pt": "O adaptador requer nod.js 20, js-controller >= 6,011 e admin >= 7,617 agora.\nAs dependências foram atualizadas",
+        "nl": "Voor de adapter zijn node.js 20, js-controller < 6,011 en admin > 7.6.17 nodig.\nAfhankelijkheden zijn bijgewerkt",
+        "fr": "Adapter nécessite node.js 20, js-controller >= 6.011 et admin >= 7.6.17.\nLes dépendances ont été actualisées",
+        "it": "Adattatore richiede node.js 20, js-controller >= 6.011 e admin >= 7.6.17 ora.\nLe dipendenze sono state aggiornate",
+        "es": "Adaptador requiere node.js 20, js-controller н= 6.011 y admin= 7.6.17 ahora.\nSe han actualizado las dependencias",
+        "pl": "Adapter wymaga node.js 20, js- controller > = 6.011 i admin > = 7.6.17 teraz.\nZaktualizowano zależności",
+        "uk": "Адаптер вимагає node.js 20, js-controller >=6.011 і admin >=7.6.17 тепер.\nЗалежність було оновлено",
+        "zh-cn": "适配器需要节点.js 20,js控制器 >= 6.011和管理员 >= 7.6.17 现在.\n依赖关系已更新"
+      },
       "3.3.0-alpha.0": {
         "en": "Adapter requires node.js 20, js-controller >= 6.011 and admin >= 7.6.17 now.\nDependencies have been updated",
         "de": "Adapter erfordert jetzt node.js 20, js-controller >= 6.011 und admin >= 7.6.17.\nAbhängigkeiten wurden aktualisiert",
@@ -80,19 +93,6 @@
         "pl": "Inna typacja na wyjściu błędów została naprawiona",
         "uk": "Ще один тип на виході помилки було виправлено",
         "zh-cn": "另一个错误产出的类型是固定的。"
-      },
-      "2.4.9": {
-        "en": "An option to disable closing of reader session in case of an error has been added.\nLogging in case of errors hase been enhanced when debug log enabled.",
-        "de": "Es wurde eine Möglichkeit hinzugefügt, das Schließen der Lesesitzung bei einem Fehler zu deaktivieren.\nDas Logging bei Fehlern wurde verbessert, wenn das Debug-Log aktiviert ist.",
-        "ru": "Добавлена возможность отключить закрытие читателя в случае ошибки.\nЗапись в случае ошибок была улучшена при разрешении отладки.",
-        "pt": "Uma opção para desativar o fechamento da sessão do leitor no caso de um erro foi adicionado.\nLogging em caso de erros foi aprimorado quando o log de depuração ativado.",
-        "nl": "Een optie om het sluiten van de lezersessie uit te schakelen in geval van een fout is toegevoegd.\nIn het geval van fouten is verbeterd als debug log in staat was.",
-        "fr": "Une option pour désactiver la fermeture de la session de lecteur en cas d'erreur a été ajoutée.\nL'enregistrement en cas d'erreur a été amélioré lorsque le journal de débogage a été activé.",
-        "it": "È stata aggiunta un'opzione per disabilitare la chiusura della sessione del lettore in caso di errore.\nLa registrazione in caso di errori è stata migliorata quando il registro di debug è abilitato.",
-        "es": "Se ha añadido una opción para desactivar el cierre de la sesión de lectores en caso de error.\nLogging in case of errors hase been enhanced when debug log enabled.",
-        "pl": "Dodano możliwość zamknięcia sesji czytelnika w przypadku błędu.\nUmożliwia to, że błędy zostały poprawione, gdy logowanie debugowe umożliwiało.",
-        "uk": "Додана можливість відключити закриття сеансу зчитувача при похибці помилки.\nУ разі виникнення помилок було розширено при ввімкненні з'єднання.",
-        "zh-cn": "在出现错误的情况下,添加了一种可更改读者届会的备选办法。.\n出现错误时,由于黑暗的缘故,加重了损失。."
       }
     },
     "titleLang": {
