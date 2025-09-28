@@ -1,0 +1,87 @@
+# Template Version: 0.4.0
+# Source: https://raw.githubusercontent.com/DrozmotiX/ioBroker-Copilot-Instructions/main/templates/ghAction-InitialSetup.yml
+
+name: "🤖 Initial Copilot Setup"
+
+on:
+  workflow_dispatch:
+    inputs:
+      force_setup:
+        description: 'Force setup even if copilot-instructions.md exists'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  copilot-setup:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      issues: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Check copilot instructions existence
+        id: check-copilot
+        run: |
+          if [ -f ".github/copilot-instructions.md" ] && [ "${{ github.event.inputs.force_setup }}" != "true" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Copilot instructions already exist and force_setup is not enabled"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Setup is needed"
+          fi
+      
+      - name: Fetch template version
+        id: fetch-version
+        run: |
+          METADATA_URL="https://raw.githubusercontent.com/DrozmotiX/ioBroker-Copilot-Instructions/main/config/metadata.json"
+          LATEST_VERSION=$(curl -s "$METADATA_URL" | jq -r '.version')
+          echo "latest_version=$LATEST_VERSION" >> $GITHUB_OUTPUT
+          echo "Latest template version: $LATEST_VERSION"
+      
+      - name: Create setup issue
+        if: steps.check-copilot.outputs.exists == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const templateUrl = 'https://raw.githubusercontent.com/DrozmotiX/ioBroker-Copilot-Instructions/main/templates/initial-setup-automation.md';
+            const response = await fetch(templateUrl);
+            const template = await response.text();
+            
+            // Get repository info
+            const { data: repo } = await github.rest.repos.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            
+            const issueTitle = `🤖 Setup ioBroker GitHub Copilot Instructions`;
+            const latestVersion = '${{ steps.fetch-version.outputs.latest_version }}';
+            
+            // Replace placeholders in template
+            const customizedBody = template
+              .replace(/\[LATEST_VERSION_FROM_METADATA\]/g, latestVersion)
+              .replace(/\[DETECTED_ADAPTER_NAME\]/g, repo.name.replace('ioBroker.', ''))
+              .replace(/\[BASED_ON_PACKAGE_JSON_AND_README\]/g, repo.description || 'ioBroker adapter')
+              .replace(/\[IDENTIFIED_EXTERNAL_APIS_OR_SERVICES\]/g, 'To be analyzed from dependencies')
+              .replace(/\[BASED_ON_IO_PACKAGE_JSON\]/g, 'To be analyzed from io-package.json');
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: issueTitle,
+              body: customizedBody,
+              labels: ['copilot-setup', 'automation'],
+              assignees: ['copilot']
+            });
+            
+            console.log('Setup issue created successfully');
+      
+      - name: Log completion
+        if: steps.check-copilot.outputs.exists == 'true'
+        run: |
+          echo "Copilot instructions already exist. Setup is complete."
+          echo "To force a new setup, run this workflow with force_setup = true"
