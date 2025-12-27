@@ -114,14 +114,9 @@
     "dataSource": "poll",
     "compact": true,
     "authors": [
-      {
-        "name": "Marcolotti",
-        "email": "info@ct-j.de"
-      },
-      {
-        "name": "mcm1957",
-        "email": "mcm57@gmx.at"
-      }
+      "Marcolotti <info@ct-j.de>",
+      "mcm1957 <mcm57@gmx.at>",
+      "iobroker-community-adapters <iobroker-community-adapters@gmx.de>"
     ],
     "adminUI": {
       "config": "json"
