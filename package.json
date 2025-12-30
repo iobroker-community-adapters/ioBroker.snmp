@@ -2,19 +2,11 @@
   "name": "iobroker.snmp",
   "version": "3.3.0",
   "description": "ioBroker SNMP Adapter",
-  "author": {
-    "name": "Marcolotti",
-    "email": "info@ct-j.de"
-  },
+  "author": "Marcolotti <info@ct-j.de>",
   "contributors": [
-    {
-      "name": "Marcolotti",
-      "email": "info@ct-j.de"
-    },
-    {
-      "name": "McM1957",
-      "email": "mcm57@gmx.at"
-    }
+    "Marcolotti <info@ct-j.de>",
+    "McM1957 <mcm57@gmx.at>",
+    "iobroker-community-adapters <iobroker-community-adapters@gmx.de>"
   ],
   "homepage": "https://github.com/iobroker-community-adapters/ioBroker.snmp",
   "license": "MIT",
