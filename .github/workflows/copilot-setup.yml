@@ -45,7 +45,7 @@ jobs:
       
       - name: Create setup issue
         if: steps.check-copilot.outputs.exists == 'false'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const templateUrl = 'https://raw.githubusercontent.com/DrozmotiX/ioBroker-Copilot-Instructions/main/templates/initial-setup-automation.md';
