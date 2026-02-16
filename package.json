@@ -1,6 +1,6 @@
 {
   "name": "iobroker.snmp",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "description": "ioBroker SNMP Adapter",
   "author": "Marcolotti <info@ct-j.de>",
   "contributors": [
