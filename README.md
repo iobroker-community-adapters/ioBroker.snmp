@@ -43,6 +43,10 @@ For details see documentation referenced below.
 <!--
    ### **WORK IN PROGRESS**
 -->
+
+### **WORK IN PROGRESS**
+- (copilot) Adapter requires admin >= 7.7.22 now
+
 ### 3.4.0 (2026-02-16)
 - (mcm1957) Dependencies have been updated
 
