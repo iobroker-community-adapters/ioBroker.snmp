@@ -123,7 +123,7 @@ const InstallUtils = require('./lib/installUtils');
 
 // Load modules required by adapter
 const snmp = require('net-snmp');
-const net = require('net');
+const net = require('node:net');
 
 // init installation marker
 let doInstall = false;
