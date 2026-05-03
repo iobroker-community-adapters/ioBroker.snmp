@@ -65,6 +65,8 @@ For details see documentation referenced below.
 ### 3.0.0 (2023-10-12)
 * (bluefox) updated packages. Minimal node.js version is 16
 
+[Older changelogs can be found there](CHANGELOG_OLD.md)
+
 ## License
 The MIT License (MIT)
 
