@@ -39,8 +39,8 @@
 					"type": "staticText",
 					"text": "errOidGrpEmpty",
 					"newLine": true,
-					"hidden": "for(let ii=0; ii<data.oids.length; ii++) {if (data.oids[ii].oidGroup != ''){return 1;}}; return 0;",
-					"validator": "for(let ii=0; ii<data.oids.length; ii++) {if (data.oids[ii].oidGroup != ''){return 1;}}; return 0;",
+					"hidden": "for(let ii=0; ii<(data.oids.length||0); ii++) {if (data.oids[ii].oidGroup != ''){return 1;}}; return 0;",
+					"validator": "for(let ii=0; ii<(data.oids.length||0); ii++) {if (data.oids[ii].oidGroup != ''){return 1;}}; return 0;",
 					"validatorNoSaveOnError": true,
 					"style": {
 						"fontSize": 16,
@@ -56,8 +56,8 @@
 					"type": "staticText",
 					"text": "errOidEmpty",
 					"newLine": true,
-					"hidden": "for(let ii=0; ii<data.oids.length; ii++) {if (data.oids[ii].oid != ''){return 1;}}; return 0;",
-					"validator": "for(let ii=0; ii<data.oids.length; ii++) {if (data.oids[ii].oid != ''){return 1;}}; return 0;",
+					"hidden": "for(let ii=0; ii<(data.oids.length||0); ii++) {if (data.oids[ii].oid != ''){return 1;}}; return 0;",
+					"validator": "for(let ii=0; ii<(data.oids.length||0); ii++) {if (data.oids[ii].oid != ''){return 1;}}; return 0;",
 					"validatorNoSaveOnError": true,
 					"style": {
 						"fontSize": 16,
