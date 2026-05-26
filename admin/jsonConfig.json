@@ -277,7 +277,7 @@
                             "filter": false,
                             "sort": false,
                             "min": 1,
-                            "default": "5"
+                            "default": 5
                         },
                         {
                             "type": "number",
@@ -287,7 +287,7 @@
                             "filter": false,
                             "sort": false,
                             "min": 1,
-                            "default": "5"
+                            "default": 5
                         },
                         {
                             "type": "number",
@@ -297,7 +297,7 @@
                             "filter": false,
                             "sort": false,
                             "min": 1,
-                            "default": "30"
+                            "default": 30
                         }
                     ]
                 }
@@ -446,7 +446,7 @@
                     "label": "lblOptChunkSize",
                     "min": 1,
                     "max": 50,
-                    "default": "20",
+                    "default": 20,
                     "tooltip": "ttOptChunkSize",
                     "help": "hlpOptChunkSize",
                     "xs": 8,
