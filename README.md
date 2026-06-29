@@ -45,6 +45,7 @@ For details see documentation referenced below.
 -->
 
 ### **WORK IN PROGRESS**
+- (copilot) Adapter requires node.js >= 22 now
 - (copilot) Adapter requires admin >= 7.7.22 now
 
 ### 3.4.0 (2026-02-16)
