@@ -2,6 +2,7 @@
     "errOidEmpty": "Il campo OID non deve essere vuoto",
     "errOidGrpEmpty": "I campi del gruppo OID non devono essere vuoti",
     "errOidGrpMissing": "È richiesto almeno un gruppo OID",
+    "errOidNameEmpty": "I campi del nome OID non devono essere vuoti",
     "hlpOptChunkSize": "Questo parametro specifica il numero massimo di oid all'interno di una richiesta.",
     "hlpOptNoCloseOnError": "La selezione di questa opzione non chiuderà e riaprirà la sessione del lettore in caso di errore.",
     "hlpOptRawStates": "La selezione di questa opzione consente la creazione di stati contenenti dati non elaborati.",

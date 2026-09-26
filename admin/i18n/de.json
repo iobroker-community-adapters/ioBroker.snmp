@@ -2,6 +2,7 @@
     "errOidEmpty": "OID-Feld darf nicht leer sein",
     "errOidGrpEmpty": "OID-Gruppenfelder dürfen nicht leer sein",
     "errOidGrpMissing": "Mindestens eine OID-Gruppe ist erforderlich",
+    "errOidNameEmpty": "OID-Namensfelder dürfen nicht leer sein",
     "hlpOptChunkSize": "Dieser Parameter gibt die maximale OID-Anzahl innerhalb einer Abfrage an.",
     "hlpOptNoCloseOnError": "Wenn Sie diese Option auswählen, wird die Lesesitzung im Fehlerfall nicht geschlossen und erneut geöffnet.",
     "hlpOptRawStates": "Die Auswahl dieser Option aktiviert die Erstellung von Zuständen, die Rohdaten enthalten.",

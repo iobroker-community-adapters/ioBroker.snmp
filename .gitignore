@@ -7,5 +7,9 @@ ToDo.txt
 # ioBroker dev-server
 .dev-server/
 
+# compiler output - see common.nogit in io-package.json
+build
+*.tsbuildinfo
+
 #ignore .commitinfo created by ioBroker release script
 .commitinfo

@@ -2,6 +2,7 @@
     "errOidEmpty": "OID 字段不能为空",
     "errOidGrpEmpty": "OID 组字段不能为空",
     "errOidGrpMissing": "至少需要一个 OID 组",
+    "errOidNameEmpty": "OID 名称字段不能为空",
     "hlpOptChunkSize": "此参数指定一个请求中的最大 oid 计数。",
     "hlpOptNoCloseOnError": "选择此选项不会在出错时关闭并重新打开读取器会话。",
     "hlpOptRawStates": "选择此选项可以创建包含原始数据的状态。",

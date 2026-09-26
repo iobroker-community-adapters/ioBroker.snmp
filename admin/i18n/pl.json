@@ -2,6 +2,7 @@
     "errOidEmpty": "Pole OID nie może być puste",
     "errOidGrpEmpty": "Pola grupy OID nie mogą być puste",
     "errOidGrpMissing": "Wymagana jest co najmniej jedna grupa OID",
+    "errOidNameEmpty": "Pola nazwy OID nie mogą być puste",
     "hlpOptChunkSize": "Ten parametr określa maksymalną liczbę oidów w ramach jednego żądania.",
     "hlpOptNoCloseOnError": "Wybranie tej opcji nie spowoduje zamknięcia i ponownego otwarcia sesji czytnika w przypadku błędu.",
     "hlpOptRawStates": "Zaznaczenie tej opcji umożliwia tworzenie stanów zawierających surowe dane.",

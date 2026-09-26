@@ -126,6 +126,7 @@
     "connectionType": "local",
     "dataSource": "poll",
     "compact": true,
+    "nogit": true,
     "authors": [
       "Marcolotti <info@ct-j.de>",
       "mcm1957 <mcm57@gmx.at>",
@@ -261,7 +262,16 @@
       }
     ]
   },
-  "native": {},
+  "native": {
+    "oids": [],
+    "devs": [],
+    "authSets": [],
+    "optChunkSize": 20,
+    "optUseName": false,
+    "optNoCloseOnError": false,
+    "optRawStates": false,
+    "optTypeStates": false
+  },
   "objects": [],
   "instanceObjects": [
     {

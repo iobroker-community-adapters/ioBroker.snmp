@@ -45,6 +45,10 @@ For details see documentation referenced below.
 -->
 
 ### **WORK IN PROGRESS**
+- (bluefox) The adapter has been refactored to TypeScript, the sources now live in `src/` and are compiled to `build/`
+- (bluefox) The admin translations have been moved from `admin/i18n/<lang>/translations.json` to `admin/i18n/<lang>.json`, `admin/words.js` has been removed
+- (bluefox) The npm `install` script has been removed - the configuration migration runs at adapter startup as before
+- (bluefox) The adapter can no longer be installed directly from GitHub (`common.nogit`), please install it from npm
 - (copilot) Adapter requires node.js >= 22 now
 - (copilot) Adapter requires admin >= 7.7.22 now
 

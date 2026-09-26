@@ -2,6 +2,7 @@
     "errOidEmpty": "OID-veld mag niet leeg zijn",
     "errOidGrpEmpty": "OID-groepsvelden mogen niet leeg zijn",
     "errOidGrpMissing": "Er is ten minste één OID-groep vereist",
+    "errOidNameEmpty": "OID-naamvelden mogen niet leeg zijn",
     "hlpOptChunkSize": "Deze parameter specificeert het maximale aantal oids binnen één verzoek.",
     "hlpOptNoCloseOnError": "Als u deze optie selecteert, wordt de lezersessie bij een fout niet gesloten en opnieuw geopend.",
     "hlpOptRawStates": "Als u deze optie selecteert, kunnen toestanden met onbewerkte gegevens worden gemaakt.",
