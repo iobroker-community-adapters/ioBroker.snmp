@@ -24,6 +24,11 @@ declare global {
             optRawStates: boolean;
             /** additionally create "<oid>-type" states containing the snmp object type */
             optTypeStates: boolean;
+            /**
+             * interpret the OID column as a symbolic MIB name (`IF-MIB::ifDescr.1`) and derive the
+             * state ids from the MIB symbol instead of from `oidName`
+             */
+            optUseMibNames: boolean;
 
             /**
              * Version of the stored configuration - written by `InstallUtils`, not part of the

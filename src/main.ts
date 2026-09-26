@@ -24,11 +24,19 @@ import * as utils from '@iobroker/adapter-core';
 import { isVarbindError, varbindError, type Varbind } from 'net-snmp';
 import { isIPv4, isIPv6 } from 'node:net';
 
-import { DEFAULT_SNMP_PORT, SNMP_V3 } from './lib/constants';
+import { DEFAULT_SNMP_PORT, F_TEXT, SNMP_V3 } from './lib/constants';
 import { InstallUtils } from './lib/installUtils';
-import { snmpCloseSession, snmpCreateSession, snmpSessionGetAsync, snmpSessionSetAsync } from './lib/snmpSession';
-import type { AuthConfig, DeviceContext, OidConfig, SessionContext, StateCacheEntry } from './lib/types';
-import { ip2ipStr, name2id, oidFormat2StateType } from './lib/utils';
+import { isNumericOid, MibStore } from './lib/mib';
+import type { MibDevicesResponse, MibModulesResponse, MibNodesResponse } from './lib/mibTypes';
+import {
+    snmpCloseSession,
+    snmpCreateSession,
+    snmpSessionGetAsync,
+    snmpSessionSetAsync,
+    snmpSessionSubtreeAsync,
+} from './lib/snmpSession';
+import type { AuthConfig, DeviceConfig, DeviceContext, OidConfig, SessionContext, StateCacheEntry } from './lib/types';
+import { ip2ipStr, name2id, oidFormat2StateType, oidObjType2Text } from './lib/utils';
 import { varbindDecode, varbindEncode } from './lib/varbind';
 
 /** Object definition as passed to `initObject` */
@@ -42,6 +50,11 @@ interface StateValues {
     type: string;
     json: string;
 }
+
+/** maximum number of varbinds a single MIB browser walk returns */
+const MIB_WALK_LIMIT = 500;
+/** name of the meta object which holds the uploaded MIB files */
+const MIB_META_SUFFIX = 'mibs';
 
 /**
  * true if the adapter has been started with '--install' - the process then only migrates the
@@ -62,12 +75,17 @@ class Snmp extends utils.Adapter {
     private chunkSize = 3;
     /** true as soon as the configuration migration has been executed */
     private didInstall = false;
+    /** the parsed MIB modules, used to resolve symbolic oids and to feed the admin MIB browser */
+    private readonly mibStore: MibStore;
 
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({ ...options, name: 'snmp' });
 
+        this.mibStore = new MibStore(this.log, utils.getAbsoluteInstanceDataDir(this));
+
         this.on('ready', () => void this.onReady());
         this.on('stateChange', (id, state) => void this.onStateChange(id, state));
+        this.on('message', obj => void this.onMessage(obj));
         this.on('unload', callback => this.onUnload(callback));
 
         if (DO_INSTALL) {
@@ -824,7 +842,15 @@ class Snmp extends utils.Adapter {
                 ok = false;
             }
 
-            if (!/^\d+(\.\d+)*$/.test(oid.oidOid)) {
+            if (this.config.optUseMibNames && !isNumericOid(oid.oidOid)) {
+                // with optUseMibNames a symbolic name is allowed - it just has to resolve
+                if (!this.mibStore.resolve(oid.oidOid)) {
+                    this.log.error(
+                        `oid "${oid.oidOid}" is not known by any loaded mib module, please correct configuration or upload the mib.`,
+                    );
+                    ok = false;
+                }
+            } else if (!/^\d+(\.\d+)*$/.test(oid.oidOid)) {
                 this.log.error(`oid "${oid.oidOid}" has invalid format, please correct configuration.`);
                 ok = false;
             }
@@ -1097,86 +1123,8 @@ class Snmp extends utils.Adapter {
                 `timing parameter: timeout ${dev.devTimeout}s , retry ${dev.devRetryIntvl}s, polling ${dev.devPollIntvl}s`,
             );
 
-            let ipAddr = '';
-            let ipPort = DEFAULT_SNMP_PORT;
-            if (dev.devIp6) {
-                // IPv6
-                // ffff:0:1234::8abc
-                // [ffff:0:1234::8abc] or [ffff:0:1234::8abc]:123
-                // mynode.test.com or mynode.test.com:123
-                const tmp = dev.devIpAddr.match(/^\[([0-9a-fA-F:.]+)\](:(\d+))?$/);
-                if (tmp) {
-                    // brackated ipv6 with optional port attached
-                    ipAddr = tmp[1];
-                    ipPort = tmp[3] ? Number(tmp[3]) : DEFAULT_SNMP_PORT;
-                } else if (/^[0-9a-fA-F:.]+$/.test(dev.devIpAddr)) {
-                    // numeric ipv6 without port attached
-                    ipAddr = dev.devIpAddr;
-                    ipPort = DEFAULT_SNMP_PORT;
-                } else if (/^[a-zA-Z0-9.-]+(:\d+)?$/.test(dev.devIpAddr)) {
-                    // domain name with optional port attached
-                    const parts = dev.devIpAddr.split(':');
-                    ipAddr = parts[0];
-                    ipPort = parts[1] ? Number(parts[1]) : DEFAULT_SNMP_PORT;
-                } else {
-                    // NOTE: should never occure here
-                    this.log.error(
-                        `ip address "${dev.devIpAddr}" has invalid format for ipv6, please correct configuration.`,
-                    );
-                }
-            } else {
-                // IPv4
-                // 1.2.3.4 or 1.2.3.4:123
-                // mynode.test.com or mynode.test.com:123
-                const parts = dev.devIpAddr.split(':');
-                ipAddr = parts[0];
-                ipPort = parts[1] ? Number(parts[1]) : DEFAULT_SNMP_PORT;
-            }
-
-            const CTX: DeviceContext = {
-                name: dev.devName,
-                ipAddr: ipAddr,
-                ipPort: ipPort,
-                id: dev.devName,
-                isIPv6: dev.devIp6,
-                timeout: dev.devTimeout * 1000, //s -> ms must be less than 0x7fffffff
-                retryIntvl: dev.devRetryIntvl * 1000, //s -> ms must be less than 0x7fffffff
-                pollIntvl: dev.devPollIntvl * 1000, //s -> ms must be less than 0x7fffffff
-                snmpVers: dev.devSnmpVers,
-                authId: dev.devAuthId,
-                chunks: [],
-                pollTimer: null, // poll intervall timer
-                retryTimer: null, // retry timer
-                sessCtx: null, // snmp session
-                initialized: false, // connection initialization status of device
-                online: false, // connection status of device
-            };
+            const CTX = this.buildDeviceContext(dev);
             this.CTXs[jj] = CTX;
-
-            if (this.config.optUseName) {
-                if (dev.devIp6) {
-                    this.log.warn(
-                        `device "${dev.devIpAddr}" (${dev.devName}) requests ipv6. Option compatibility mode ignored.`,
-                    );
-                } else {
-                    CTX.id = ip2ipStr(CTX.ipAddr);
-                }
-            }
-
-            if (Number(dev.devSnmpVers) === SNMP_V3) {
-                let authSet: Partial<AuthConfig> = {};
-                for (let kk = 0; kk < this.config.authSets.length; kk++) {
-                    if (this.config.authSets[kk].authId === dev.devAuthId) {
-                        authSet = this.config.authSets[kk];
-                    }
-                }
-                CTX.authSecLvl = authSet.authSecLvl || 0;
-                CTX.authUser = (authSet.authUser || '').trim();
-                CTX.authAuthProto = authSet.authAuthProto || 0;
-                CTX.authAuthKey = (authSet.authAuthKey || '').trim();
-                CTX.authEncProto = authSet.authEncProto || 0;
-                CTX.authEncKey = (authSet.authEncKey || '').trim();
-            }
 
             let cIdx = -1; // chunk index
             let cCnt = 0; // chunk element count
@@ -1192,14 +1140,14 @@ class Snmp extends utils.Adapter {
                     continue;
                 }
 
-                const id = `${CTX.id}.${name2id(oid.oidName, this.FORBIDDEN_CHARS)}`;
+                const { oid: numericOid, id } = this.resolveConfiguredOid(oid, CTX.id);
                 if (cCnt <= 0) {
                     cIdx++;
                     CTX.chunks.push({ OIDs: [], oids: [], ids: [] });
                     cCnt = this.chunkSize;
                     this.log.debug(`       oid chunk index ${cIdx} created`);
                 }
-                CTX.chunks[cIdx].oids.push(oid.oidOid);
+                CTX.chunks[cIdx].oids.push(numericOid);
                 CTX.chunks[cIdx].ids.push(id);
                 CTX.chunks[cIdx].OIDs.push(oid);
                 cCnt--;
@@ -1211,8 +1159,317 @@ class Snmp extends utils.Adapter {
         }
     }
 
-    // #################### adapter main functions ####################
+    /**
+     * buildDeviceContext - create the runtime context of one configured device
+     *
+     *		Used by setupContices for the reader threads and by the MIB browser, which needs a
+     *		context for a one shot walk of a device.
+     *
+     * @param dev one row of `native.devs`
+     * @returns the device context, without any oids
+     */
+    private buildDeviceContext(dev: DeviceConfig): DeviceContext {
+        let ipAddr = '';
+        let ipPort = DEFAULT_SNMP_PORT;
+        if (dev.devIp6) {
+            // IPv6
+            // ffff:0:1234::8abc
+            // [ffff:0:1234::8abc] or [ffff:0:1234::8abc]:123
+            // mynode.test.com or mynode.test.com:123
+            const tmp = dev.devIpAddr.match(/^\[([0-9a-fA-F:.]+)\](:(\d+))?$/);
+            if (tmp) {
+                // brackated ipv6 with optional port attached
+                ipAddr = tmp[1];
+                ipPort = tmp[3] ? Number(tmp[3]) : DEFAULT_SNMP_PORT;
+            } else if (/^[0-9a-fA-F:.]+$/.test(dev.devIpAddr)) {
+                // numeric ipv6 without port attached
+                ipAddr = dev.devIpAddr;
+                ipPort = DEFAULT_SNMP_PORT;
+            } else if (/^[a-zA-Z0-9.-]+(:\d+)?$/.test(dev.devIpAddr)) {
+                // domain name with optional port attached
+                const parts = dev.devIpAddr.split(':');
+                ipAddr = parts[0];
+                ipPort = parts[1] ? Number(parts[1]) : DEFAULT_SNMP_PORT;
+            } else {
+                // NOTE: should never occure here
+                this.log.error(
+                    `ip address "${dev.devIpAddr}" has invalid format for ipv6, please correct configuration.`,
+                );
+            }
+        } else {
+            // IPv4
+            // 1.2.3.4 or 1.2.3.4:123
+            // mynode.test.com or mynode.test.com:123
+            const parts = dev.devIpAddr.split(':');
+            ipAddr = parts[0];
+            ipPort = parts[1] ? Number(parts[1]) : DEFAULT_SNMP_PORT;
+        }
 
+        const CTX: DeviceContext = {
+            name: dev.devName,
+            ipAddr: ipAddr,
+            ipPort: ipPort,
+            id: dev.devName,
+            isIPv6: dev.devIp6,
+            timeout: dev.devTimeout * 1000, //s -> ms must be less than 0x7fffffff
+            retryIntvl: dev.devRetryIntvl * 1000, //s -> ms must be less than 0x7fffffff
+            pollIntvl: dev.devPollIntvl * 1000, //s -> ms must be less than 0x7fffffff
+            snmpVers: dev.devSnmpVers,
+            authId: dev.devAuthId,
+            chunks: [],
+            pollTimer: null, // poll intervall timer
+            retryTimer: null, // retry timer
+            sessCtx: null, // snmp session
+            initialized: false, // connection initialization status of device
+            online: false, // connection status of device
+        };
+
+        if (this.config.optUseName) {
+            if (dev.devIp6) {
+                this.log.warn(
+                    `device "${dev.devIpAddr}" (${dev.devName}) requests ipv6. Option compatibility mode ignored.`,
+                );
+            } else {
+                CTX.id = ip2ipStr(CTX.ipAddr);
+            }
+        }
+
+        if (Number(dev.devSnmpVers) === SNMP_V3) {
+            let authSet: Partial<AuthConfig> = {};
+            for (let kk = 0; kk < this.config.authSets.length; kk++) {
+                if (this.config.authSets[kk].authId === dev.devAuthId) {
+                    authSet = this.config.authSets[kk];
+                }
+            }
+            CTX.authSecLvl = authSet.authSecLvl || 0;
+            CTX.authUser = (authSet.authUser || '').trim();
+            CTX.authAuthProto = authSet.authAuthProto || 0;
+            CTX.authAuthKey = (authSet.authAuthKey || '').trim();
+            CTX.authEncProto = authSet.authEncProto || 0;
+            CTX.authEncKey = (authSet.authEncKey || '').trim();
+        }
+
+        return CTX;
+    }
+
+    /**
+     * resolveConfiguredOid - numeric oid and state id of one configured oid
+     *
+     *		Without `optUseMibNames` this is exactly what the adapter has always done: the oid is
+     *		used as configured and the state id is derived from `oidName`.
+     *
+     *		With `optUseMibNames` the oid may be given as a symbolic name (`IF-MIB::ifDescr.1`) and
+     *		the state id is derived from the MIB symbol instead of from `oidName`. If no loaded MIB
+     *		covers the oid, the configured name is used, so that a single unknown oid does not stop
+     *		the whole device.
+     *
+     * @param pOID one row of `native.oids`
+     * @param pDevId id of the device the oid belongs to
+     * @returns the numeric oid to request and the full state id to write
+     */
+    private resolveConfiguredOid(pOID: OidConfig, pDevId: string): { oid: string; id: string } {
+        const fallback = {
+            oid: pOID.oidOid,
+            id: `${pDevId}.${name2id(pOID.oidName, this.FORBIDDEN_CHARS)}`,
+        };
+
+        if (!this.config.optUseMibNames) {
+            return fallback;
+        }
+
+        const resolved = this.mibStore.resolve(pOID.oidOid);
+        if (!resolved) {
+            // validateConfig already reported this - keep the device running with the raw value
+            this.log.warn(`oid "${pOID.oidOid}" cannot be resolved, using it as configured`);
+            return fallback;
+        }
+
+        if (!resolved.name) {
+            this.log.debug(`oid "${pOID.oidOid}" is not covered by a mib, using name "${pOID.oidName}" for the state`);
+            return { oid: resolved.oid, id: fallback.id };
+        }
+
+        const mibName = resolved.instance ? `${resolved.name}.${resolved.instance}` : resolved.name;
+        return { oid: resolved.oid, id: `${pDevId}.${name2id(mibName, this.FORBIDDEN_CHARS)}` };
+    }
+
+    // #################### mib handling ####################
+
+    /**
+     * syncMibs - materialize the uploaded MIB files on disk and parse them
+     *
+     *		The files live in the file storage of the `<namespace>.mibs` meta object, because that is
+     *		what the file selector of the config dialog writes to. net-snmp's parser can only read
+     *		files, and it resolves the IMPORTS of a module relative to the file it is reading, so all
+     *		of them are written into one directory below the instance data directory first.
+     */
+    private async syncMibs(): Promise<void> {
+        const metaId = `${this.namespace}.${MIB_META_SUFFIX}`;
+        const files: { name: string; data: Buffer | string }[] = [];
+
+        try {
+            for (const entry of await this.readDirAsync(metaId, '/')) {
+                if (entry.isDir) {
+                    continue;
+                }
+                const file = await this.readFileAsync(metaId, entry.file);
+                files.push({ name: entry.file, data: file.file });
+            }
+        } catch (e) {
+            this.log.debug(`no mib files uploaded yet (${(e as Error).message})`);
+        }
+
+        this.log.debug(`syncMibs - ${files.length} uploaded mib file(s)`);
+        this.mibStore.writeFiles(files);
+        this.mibStore.load();
+    }
+
+    /** mibModulesResponse - the answer of the mibModules and mibReload commands */
+    private mibModulesResponse(): MibModulesResponse {
+        return {
+            modules: this.mibStore.getModules(),
+            errors: this.mibStore.getLoadErrors(),
+        };
+    }
+
+    /**
+     * walkDevice - walk one device and annotate the result with the MIB names
+     *
+     * @param pDeviceName name of the device as configured at tab "Devices"
+     * @param pOid oid to walk, numeric or symbolic
+     * @returns the tree of everything the device reported below that oid
+     */
+    private async walkDevice(pDeviceName: string, pOid: string): Promise<MibNodesResponse> {
+        const dev = (this.config.devs || []).find(entry => entry.devName === pDeviceName);
+        if (!dev) {
+            return { nodes: [], error: `device "${pDeviceName}" is not configured` };
+        }
+
+        if (!this.mibStore.loaded) {
+            await this.syncMibs();
+        }
+
+        const resolved = this.mibStore.resolve(pOid);
+        if (!resolved) {
+            return { nodes: [], error: `oid "${pOid}" cannot be resolved` };
+        }
+
+        this.log.debug(`walkDevice - device "${pDeviceName}", oid ${resolved.oid}`);
+
+        const CTX = this.buildDeviceContext(dev);
+        const sessCtx = snmpCreateSession(CTX, this.log);
+        if (!sessCtx.session) {
+            return { nodes: [], error: `cannot open a snmp session for device "${pDeviceName}"` };
+        }
+
+        try {
+            const result = await snmpSessionSubtreeAsync(sessCtx.session, resolved.oid, MIB_WALK_LIMIT, this.log);
+            if (result.err) {
+                return { nodes: [], error: result.err.toString() };
+            }
+
+            const varbinds = result.varbinds
+                .filter(varbind => !isVarbindError(varbind))
+                .map(varbind => {
+                    // the browser only displays the values, so the textual format is good enough
+                    const decoded = varbindDecode(varbind, F_TEXT, CTX.id, varbind.oid, this.log);
+                    return {
+                        oid: varbind.oid,
+                        value: decoded.val === null ? '' : String(decoded.val),
+                        type: oidObjType2Text(varbind.type),
+                    };
+                });
+
+            this.log.debug(`walkDevice - ${varbinds.length} varbind(s) read from "${pDeviceName}"`);
+
+            return {
+                nodes: this.mibStore.describeWalkResult(varbinds),
+                truncated: result.truncated || undefined,
+            };
+        } finally {
+            snmpCloseSession(sessCtx, this.log);
+        }
+    }
+
+    /**
+     * onMessage - answer the sendTo commands of the admin MIB browser
+     *
+     *		NOTE: these commands are the interface of the MIB browser component. Do not rename them,
+     *		the component under src-admin/ calls them by name.
+     *
+     * @param obj message object
+     */
+    private async onMessage(obj: ioBroker.Message): Promise<void> {
+        if (!obj?.command) {
+            return;
+        }
+
+        this.log.debug(`onMessage - command "${obj.command}"`);
+
+        const reply = (response: unknown): void => {
+            if (obj.callback) {
+                this.sendTo(obj.from, obj.command, response, obj.callback);
+            }
+        };
+
+        try {
+            switch (obj.command) {
+                case 'mibReload': {
+                    await this.syncMibs();
+                    reply(this.mibModulesResponse());
+                    return;
+                }
+
+                case 'mibModules': {
+                    if (!this.mibStore.loaded) {
+                        await this.syncMibs();
+                    }
+                    reply(this.mibModulesResponse());
+                    return;
+                }
+
+                case 'mibNodes': {
+                    const moduleName = (obj.message as { module?: string })?.module || '';
+                    if (!this.mibStore.loaded) {
+                        await this.syncMibs();
+                    }
+                    const nodes = this.mibStore.getTree(moduleName);
+                    const response: MibNodesResponse = { nodes };
+                    if (!nodes.length) {
+                        response.error = `mib module "${moduleName}" is not loaded`;
+                    }
+                    reply(response);
+                    return;
+                }
+
+                case 'mibDevices': {
+                    const response: MibDevicesResponse = {
+                        devices: (this.config.devs || [])
+                            .filter(dev => !!dev.devName)
+                            .map(dev => ({ value: dev.devName, label: `${dev.devName} (${dev.devIpAddr})` })),
+                    };
+                    reply(response);
+                    return;
+                }
+
+                case 'mibWalk': {
+                    const request = obj.message as { device?: string; oid?: string };
+                    reply(await this.walkDevice(request?.device || '', request?.oid || ''));
+                    return;
+                }
+
+                default: {
+                    this.log.debug(`onMessage - unknown command "${obj.command}"`);
+                    reply({ error: `unknown command "${obj.command}"` });
+                }
+            }
+        } catch (e) {
+            this.log.error(`onMessage - command "${obj.command}" failed: ${(e as Error).message}`);
+            reply({ error: (e as Error).message });
+        }
+    }
+
+    // #################### adapter main functions ####################
     /**
      * onReady - will be called as soon as adapter is ready
      */
@@ -1263,6 +1520,9 @@ class Snmp extends utils.Adapter {
 
         // mark adapter as non active
         await this.setStateAsync('info.connection', false, true);
+
+        // read and parse the uploaded mib files - validateConfig needs them to resolve symbolic oids
+        await this.syncMibs();
 
         // validate config
         if (!this.validateConfig()) {

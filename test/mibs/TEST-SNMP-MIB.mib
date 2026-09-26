@@ -1,0 +1,70 @@
+--
+-- Small MIB used by the unit tests of ioBroker.snmp.
+-- It deliberately contains a scalar, a writeable scalar and a table with two columns.
+--
+TEST-SNMP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, enterprises
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC;
+
+testSnmpMib MODULE-IDENTITY
+    LAST-UPDATED "202601010000Z"
+    ORGANIZATION "ioBroker"
+    CONTACT-INFO "https://github.com/iobroker-community-adapters/ioBroker.snmp"
+    DESCRIPTION  "Test MIB for the ioBroker.snmp unit tests."
+    ::= { enterprises 99999 }
+
+testScalars OBJECT IDENTIFIER ::= { testSnmpMib 1 }
+
+testCounter OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "A read only counter."
+    ::= { testScalars 1 }
+
+testSwitch OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "A writeable value."
+    ::= { testScalars 2 }
+
+testTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A table with two columns."
+    ::= { testSnmpMib 2 }
+
+testEntry OBJECT-TYPE
+    SYNTAX      TestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "One row of testTable."
+    INDEX       { testIndex }
+    ::= { testTable 1 }
+
+TestEntry ::= SEQUENCE {
+    testIndex Integer32,
+    testName  DisplayString
+}
+
+testIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Index of the row."
+    ::= { testEntry 1 }
+
+testName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Name of the row."
+    ::= { testEntry 2 }
+
+END

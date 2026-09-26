@@ -18,6 +18,20 @@
                     "lg": 12,
                     "xl": 12
 				},
+				"_oidsMibInfo":{
+					"type": "staticText",
+					"text": "infoOidMibNames",
+					"newLine": true,
+					"hidden": "!data.optUseMibNames",
+					"style": {
+						"fontSize": 16
+					},
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+				},
 				"_oidsErr_1":{
 					"type": "staticText",
 					"text": "errOidGrpMissing",
@@ -437,6 +451,60 @@
 			}
 		},
         
+        "mibs": {
+            "type": "panel",
+            "label": "lblMib",
+            "items": {
+				"_mibInfo":{
+					"type": "staticText",
+					"text": "infoMib",
+					"style": {
+						"fontSize": 16
+					},
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+				},
+                "_mibUpload": {
+                    "type": "fileSelector",
+                    "label": "lblMibUpload",
+                    "objectID": "snmp.%INSTANCE%.mibs",
+                    "upload": "/",
+                    "pattern": "*.*",
+                    "delete": true,
+                    "refresh": true,
+                    "noNone": true,
+                    "doNotSave": true,
+                    "help": "hlpMibUpload",
+					"newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 6,
+                    "xl": 4
+                },
+				"divider":{
+					"type": "divider"
+				},
+                "_mibBrowser": {
+                    "type": "custom",
+                    "i18n": true,
+                    "url": "custom/customComponents.js",
+                    "name": "SnmpComponentSet/Components/MibBrowser",
+                    "guiApi": 2,
+                    "doNotSave": true,
+					"newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                }
+            }
+		},
+
         "options": {
             "type": "panel",
             "label": "lblOptions",
@@ -475,6 +543,19 @@
                     "default": false,
                     "tooltip": "ttOptNoCloseOnError",
                     "help": "hlpOptNoCloseOnError",
+                    "xs": 12,
+                    "sm": 8,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 2
+                },
+				"optUseMibNames": 	{
+                    "type": "checkbox",
+                    "label": "lblOptUseMibNames",
+					"newLine": true,
+                    "default": false,
+                    "tooltip": "ttOptUseMibNames",
+                    "help": "hlpOptUseMibNames",
                     "xs": 12,
                     "sm": 8,
                     "md": 6,

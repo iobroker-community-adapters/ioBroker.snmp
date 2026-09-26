@@ -21,6 +21,8 @@ export default [
             '.vscode/',
             'admin/**/*',
             'build/**/*',
+            'src-admin/**/*',
+            'tasks.ts',
             'docs/**/*',
             'node_modules/**/*',
             'test/**/*',

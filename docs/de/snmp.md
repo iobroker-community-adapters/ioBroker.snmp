@@ -87,6 +87,28 @@ Auf dieser Registerkarte müssen Sie die gewünschte Sicherheitsstufe wie folgt 
 Bitte beachten Sie, dass die angegebene Sicherheitsstufe vom Zielgerät unterstützt werden muss und Benutzername, Passwort und Verschlüsselungsschlüssel übereinstimmen müssen
 die am Zielgerät eingegebenen Daten. Sie können denselben Autorisierungsblock für mehrere Geräte verwenden, solange sie dieselben Daten verwenden.
 
+### TAB MIB
+Hier laden Sie die MIB-Dateien Ihrer Geräte hoch und sehen sich deren Inhalt an.
+
+| Parameter    | Typ   | Beschreibung                | Kommentar                                                                                    |
+|--------------|-------|-----------------------------|----------------------------------------------------------------------------------------------|
+| MIB-Dateien  | Datei | MIB-Dateien Ihrer Geräte    | alle hochgeladenen Dateien liegen in einem Ordner, eine MIB kann also eine andere importieren |
+
+Die mit dem Adapter ausgelieferten MIBs (SNMPv2-MIB, RFC1213-MIB, IF-MIB und die weiteren
+SMI-Basismodule) sind immer verfügbar und müssen nicht hochgeladen werden.
+
+Unter dem Upload zeigt der **MIB-Browser** den Inhalt der MIB-Dateien. Er hat zwei Quellen:
+
+* **MIB-Datei** - die in der MIB definierte Struktur: Name, OID, Syntax, Zugriffsrechte und der
+  DESCRIPTION-Text als Tooltip.
+* **Gerät (live)** - der Adapter liest das ausgewählte Gerät ab der angegebenen OID aus und zeigt
+  die tatsächlich vorhandenen Instanzen mit ihren aktuellen Werten. Das Ergebnis ist auf 500 Werte
+  begrenzt, geben Sie also eine ausreichend genaue Start-OID an. Dafür muss die Instanz laufen.
+
+Mit dem Plus-Symbol einer Zeile wird diese OID in die OID-Sets übernommen, und zwar in die Gruppe,
+die neben dem Filter eingetragen ist. Der OID-Name kommt aus der MIB, das Format wird auf
+*Automatisch* gesetzt und *schreibbar* wird aus der MAX-ACCESS-Klausel der MIB übernommen.
+
 ### TAB-Optionen
 Hier legen Sie einige allgemeine Optionen fest
 
@@ -96,11 +118,23 @@ Hier legen Sie einige allgemeine Optionen fest
 |----------------------|----------|----------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
 | Paketgröße           | Ganzzahl | maximale Anzahl von OIDs, die innerhalb einer einzigen Anfrage gesendet werden   | reduzieren Sie diesen Wert bei TOOBIG-Fehlern                                                                                              |
 | Kompatibilitätsmodus | boolesch | wenn diese Option aktiviert ist, basieren die Datenpunktnamen auf der IP-Adresse | HINWEIS: veraltet - nicht mehr verwenden. Dieses Flag funktioniert nicht mit IPv6-Adressen. Kann in zukünftigen Versionen entfernt werden. |
+| MIB-Namen verwenden | boolean  | OID-Feld akzeptiert symbolische MIB-Namen, Objekt-IDs folgen der MIB | siehe unten. ACHTUNG: Das Umschalten ändert die Objekt-IDs bestehender OIDs |
 
 
 Die Option packetsize kann verwendet werden, um die Anzahl der abgefragten OIDs innerhalb einer Anfrage zu reduzieren. Je nach Zielgerät ist die Anzahl der
 IODs, die mit einer Anfrage abgefragt werden kann möglicherweise begrenzt. In einem solchen Fall antwortet das Gerät möglicherweise mit Fehler TOOBIG. Versuchen Sie es in einem solchen Fall
 den Wert für Option packetsize zu reduzieren.
+
+Die Option **MIB-Namen verwenden** ändert zwei Dinge gleichzeitig. Die OID-Spalte der OID-Sets
+akzeptiert dann auch einen symbolischen Namen wie `IF-MIB::ifDescr.1` (oder `ifDescr.1` ohne Modul),
+den der Adapter beim Start über die hochgeladenen MIB-Dateien in die numerische OID auflöst. Und die
+ID des ioBroker-States wird nicht mehr aus dem OID-Namen gebildet, sondern aus dem MIB-Symbol - das
+Beispiel landet also in `snmp.0.<Gerät>.ifDescr.1` statt in `snmp.0.<Gerät>.<OID-Name>`.
+
+Achtung: Das Umschalten dieser Option ändert die IDs der States aller OIDs, die von einer MIB
+abgedeckt sind. Die vorher geschriebenen Objekte behalten ihre alten IDs und bleiben als Waisen
+zurück - löschen Sie sie bei Bedarf von Hand. OIDs, die von keiner geladenen MIB abgedeckt sind,
+verwenden weiterhin ihren OID-Namen.
 
 ## OID-Beispiele
 Die Suche nach Hersteller und MIB ist in den meisten Fällen erfolgreich. Zusätzlich können Sie eine mib-Browser-Software verwenden

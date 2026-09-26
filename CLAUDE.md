@@ -13,15 +13,24 @@ on the address (`1.2.3.4:1161`, `[fe80::1]:1161`).
 ## Commands
 
 ```bash
-npm run build            # tsc -p tsconfig.build.json  -> build/
-npm run watch            # same, incremental
-npm run check            # type check only (tsc -p tsconfig.json --noEmit)
+npm run build-backend    # tsc -p tsconfig.build.json  -> build/
+npm run build            # build-backend + tasks.ts (vite build of src-admin -> admin/custom/)
+npm run watch            # backend only, incremental
+npm run check            # type check the backend (tsc -p tsconfig.json --noEmit)
+npm run check-tasks      # type check tasks.ts
 npm run lint             # eslint -c eslint.config.mjs
 npx eslint -c eslint.config.mjs --fix   # the ONLY formatter - never run prettier separately
-npm run test:package     # mocha test/packageFiles
+npm run test:package     # mocha test/packageFiles (downloads the schemas - fails without network)
+npm run test:unit        # mocha test/mibStore test/mibBrowser
+npm run test             # test:package + test:unit
 npm run test:integration # mocha test/integrationAdapter - fails if a js-controller is running
 npm run translate        # translate-adapter -b admin/i18n/en.json
+npm run npm              # npm i in the root and in src-admin
+npm run 0-clean ... 3-copy   # the single steps of tasks.ts, for debugging a failed admin build
 ```
+
+The admin component is built separately: `cd src-admin && npm i` once, then `npm run build` in the
+root drives it. `admin/custom/` and `src-admin/build/` are generated and gitignored.
 
 `build/` is generated and gitignored. There is **no** `prepare` script on purpose: the build runs
 in `npm run build` and in the CI (`build: true` in the GitHub action), nowhere else. Because
@@ -39,8 +48,13 @@ src/lib/utils.ts          name2id, ip2ipStr, oidFormat2StateType, oidObjType2Tex
 src/lib/varbind.ts        varbindDecode / varbindEncode - snmp value <-> ioBroker state value
 src/lib/snmpSession.ts    create / close a session, promisified get and set
 src/lib/installUtils.ts   migration of pre-2.0.0 configurations, defaults for newer attributes
-admin/jsonConfig.json     config dialog (4 tabs), labels are i18n keys like `lblOidGroup`
+src/lib/mib.ts            MibStore - parses the uploaded MIB files, resolves symbol <-> oid
+src/lib/mibTypes.ts       payload of the `mib*` sendTo commands (contract with the admin component)
+admin/jsonConfig.json     config dialog (5 tabs), labels are i18n keys like `lblOidGroup`
 admin/i18n/<lang>.json    flat translation files, 11 languages, `en.json` is the reference
+src-admin/src/MibBrowser.tsx  the MIB browser, a jsonConfig `type: "custom"` component
+src-admin/src/types.ts    copy of mibTypes.ts + the pure row/filter logic (unit tested)
+tasks.ts                  vite build of src-admin -> admin/custom/
 ```
 
 ### Lifecycle
@@ -72,6 +86,36 @@ what user scripts and charts refer to.
 State quality codes in use: `0x00` ok, `0x01` conversion error, `0x02` connection problem,
 `0x44` device reported an error, `0x84` sensor/varbind reported an error.
 
+
+### MIB browser
+
+The MIB files are uploaded by the `fileSelector` of the config dialog into the file storage of the
+`snmp.<instance>.mibs` meta object. `syncMibs()` materializes them in
+`<instanceDataDir>/mibs/` - net-snmp's parser can only read files and resolves a module's IMPORTS
+relative to the file it is reading, so all of them have to live in one directory.
+
+The component never touches the MIBs itself; it asks the running instance over `sendTo`:
+
+| command | payload | answer |
+| --- | --- | --- |
+| `mibModules` | - | the loaded modules plus the parse errors per file |
+| `mibReload` | - | same, but re-reads the uploaded files first |
+| `mibNodes` | `{ module }` | the tree of that module |
+| `mibDevices` | - | the configured devices, for the walk target |
+| `mibWalk` | `{ device, oid }` | live walk of a device, at most `MIB_WALK_LIMIT` varbinds |
+
+`src/lib/mibTypes.ts` and `src-admin/src/types.ts` describe the same payload but are separate files
+(the component is its own bundle and cannot import from `build/`). **Change both together** -
+`test/mibBrowser.js` has a `contract` block that catches a drift between them.
+
+net-snmp's MIB parser does not throw on a malformed file: it writes to `console.warn` and registers
+a module literally named `undefined`. `loadOneFile()` therefore captures the console and compares the
+module list before and after, so that the admin can show the user why an upload was rejected.
+
+With `optUseMibNames` the OID column may hold `IF-MIB::ifDescr.1`, `resolveConfiguredOid()` resolves
+it to the numeric oid and derives the state id from the MIB symbol instead of from `oidName`.
+Switching the option therefore changes existing object ids - that is documented and intended.
+
 ## Conventions
 
 - Parameters of the adapter's own functions are prefixed with `p` (`pCTX`, `pStateId`) — historical,
@@ -83,7 +127,11 @@ State quality codes in use: `0x00` ok, `0x01` conversion error, `0x02` connectio
 - Config values may arrive as strings from old configurations. Comparisons normalize with
   `Number(...)` before comparing — that is what the `==` comparisons of the JavaScript version did.
 - No `any`. Data coming from net-snmp is narrowed per `ObjectType` with a comment explaining which
-  JavaScript type that snmp type produces.
+  JavaScript type that snmp type produces. `createModuleStore()` is typed as `any` by
+  `@types/net-snmp`, so `src/lib/mib.ts` declares the part of that API it uses.
+- Everything the MIB browser decides (which row to build, how to filter) lives in
+  `src-admin/src/types.ts` as pure functions, so it can be unit tested without a DOM. The React
+  component only renders.
 
 ### Deliberate legacy behaviour (do not "fix" without a separate commit)
 

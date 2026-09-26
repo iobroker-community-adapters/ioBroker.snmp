@@ -240,3 +240,54 @@ export function snmpCloseSession(pSessCtx: SessionContext, pLog: ioBroker.Logger
         pSessCtx.session = null;
     }
 }
+
+/**
+ * snmpSessionSubtreeAsync - async version of snmp.session.subtree
+ *
+ *		Used by the MIB browser to walk a device. The walk is stopped as soon as pMaxCount varbinds
+ *		have been collected, so that a browse of 1.3.6.1 cannot flood the admin.
+ *
+ * @param pSession snmp session reference
+ * @param pOid oid to walk
+ * @param pMaxCount maximum number of varbinds to collect
+ * @param pLog logger
+ * @returns object containing { err, varbinds } and whether the walk has been cut off
+ */
+export async function snmpSessionSubtreeAsync(
+    pSession: Session | null,
+    pOid: string,
+    pMaxCount: number,
+    pLog: ioBroker.Logger,
+): Promise<SnmpResult & { truncated: boolean }> {
+    return new Promise<SnmpResult & { truncated: boolean }>(resolve => {
+        const ret: SnmpResult & { truncated: boolean } = {
+            err: null,
+            varbinds: [],
+            truncated: false,
+        };
+
+        if (!pSession) {
+            pLog.debug('session vanished, skipping subtree operation');
+            ret.err = 'no active session';
+            resolve(ret);
+            return;
+        }
+
+        pSession.subtree(
+            pOid,
+            (varbinds: Varbind[]): void => {
+                for (const varbind of varbinds) {
+                    if (ret.varbinds.length >= pMaxCount) {
+                        ret.truncated = true;
+                        return;
+                    }
+                    ret.varbinds.push(varbind);
+                }
+            },
+            (error: Error | null): void => {
+                ret.err = error;
+                resolve(ret);
+            },
+        );
+    });
+}

@@ -45,6 +45,8 @@ For details see documentation referenced below.
 -->
 
 ### **WORK IN PROGRESS**
+- (bluefox) New tab "MIB": MIB files can be uploaded and browsed, and a device can be read live - OIDs are taken over into the OID sets with one click
+- (bluefox) New option "use MIB names": the OID field then also accepts symbolic names like IF-MIB::ifDescr.1 and the object ids are built from the MIB symbol. Attention: switching this option changes the object ids of existing OIDs
 - (bluefox) The adapter has been refactored to TypeScript, the sources now live in `src/` and are compiled to `build/`
 - (bluefox) The admin translations have been moved from `admin/i18n/<lang>/translations.json` to `admin/i18n/<lang>.json`, `admin/words.js` has been removed
 - (bluefox) The npm `install` script has been removed - the configuration migration runs at adapter startup as before

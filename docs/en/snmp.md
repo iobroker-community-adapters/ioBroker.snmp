@@ -86,6 +86,28 @@ at column Auth-Id. At this tab you must select the desired security level as fol
 Please note, that the specified security level must be supported by the target device and username, password and encryption key must match 
 the data entered at the target device. You can use the same authorization block for multiple devices as long as they use the same data.
 
+### TAB MIB
+Here you upload the MIB files of your devices and browse their contents.
+
+| Parameter | Type | Description                       | Comment                                                                    |
+|-----------|------|-----------------------------------|----------------------------------------------------------------------------|
+| MIB files | file | MIB files of your devices         | all uploaded files are kept in one folder, so a MIB may IMPORT another one  |
+
+The MIBs shipped with the adapter (SNMPv2-MIB, RFC1213-MIB, IF-MIB and the other SMI base modules)
+are always available and do not have to be uploaded.
+
+Below the upload the **MIB browser** shows the contents of the MIB files. It has two sources:
+
+* **MIB file** - the structure as defined in the MIB: name, OID, syntax, access rights and the
+  DESCRIPTION text as a tooltip.
+* **Device (live)** - the adapter walks the selected device starting at the given OID and shows the
+  instances that really exist together with their current values. The result is limited to 500
+  values, so choose a start OID that is specific enough. This requires a running instance.
+
+The plus button of a row adds that OID to the OID sets, using the group entered next to the filter.
+The OID name is taken from the MIB, the format is set to *automatic* and *writeable* is taken over
+from the MAX-ACCESS clause of the MIB.
+
 ### TAB Options
 Here you specify some general options
 
@@ -95,11 +117,22 @@ Here you specify some general options
 |--------------------|-----------|-----------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 | Packetsize         | integer   | maximum number of OIDs sent within a single request | reduce this value in case of TOOBIG errors                                                               |
 | Compatibility mode | boolean   | if this option is activated, datapoint names are based on ip address | NOTE: outdated - do not use any longer. This flag will not work with IPv6 addresses. Might be removed in future releases.  |
+| Use MIB names      | boolean   | OID field accepts symbolic MIB names and the object ids follow the MIB | see below. NOTE: switching this option changes the object ids of existing OIDs |
 
 
 The option packet size can be used to reduce the number of OIDs queried within one request. Depending on the target device the number of 
 IODs queried with one request might be limited. In such a case the device might respond with error TOOBIG. In such a case try to 
 reduce to value for option packet size.
+
+The option **use MIB names** changes two things at once. The OID column of the OID sets then also
+accepts a symbolic name such as `IF-MIB::ifDescr.1` (or `ifDescr.1` without the module), which the
+adapter resolves to the numeric OID at startup using the uploaded MIB files. And the id of the
+ioBroker state is no longer built from the OID name but from the MIB symbol, so the example above
+ends up in `snmp.0.<device>.ifDescr.1` instead of `snmp.0.<device>.<OID-name>`.
+
+Attention: switching this option changes the ids of the states of all OIDs that a MIB covers. The
+objects written before keep their old ids and stay behind as orphans - delete them by hand if they
+are no longer wanted. OIDs that no loaded MIB covers keep using their OID name.
 
 ## OID Examples
 The search for the manufacturer and MIB is successful in most cases. In addition, you can use a mib browser software the 
