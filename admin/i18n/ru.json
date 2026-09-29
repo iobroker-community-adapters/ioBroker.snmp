@@ -1,4 +1,6 @@
 {
+    "errDevIpEmpty": "Укажите IP-адрес устройства",
+    "errDevNameEmpty": "Имя устройства не может быть пустым",
     "errOidEmpty": "Поле OID не должно быть пустым",
     "errOidGrpEmpty": "Поле группы OID не должно быть пустым",
     "errOidGrpMissing": "Требуется хотя бы одна группа OID",
@@ -40,7 +42,7 @@
     "lblDevTimeout": "время ожидания (сек)",
     "lblDevs": "Устройства",
     "lblDevsDevices": "Устройства",
-    "lblDevsInfo": "Вы должны указать хотя бы группу OID, чтобы добавить некоторые устройства",
+    "lblDevsInfo": "OID ещё не заданы - задайте их на вкладке \"наборы OID\" или выберите их в MIB-браузере",
     "lblJson": "Джейсон",
     "lblMib": "MIB",
     "lblMibUpload": "MIB-файлы",

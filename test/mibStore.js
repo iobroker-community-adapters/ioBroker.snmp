@@ -330,6 +330,15 @@ describe('MibStore', () => {
             assert.strictEqual(store.stateIdFor('1.2.3.4.5'), null);
             assert.strictEqual(store.stateIdFor('noSuchObject'), null);
         });
+
+        it('drops the ".0" of a scalar - it addresses the value, it is not part of the object', () => {
+            assert.strictEqual(store.stateIdFor('IF-MIB::ifNumber.0'), 'ifNumber');
+            assert.strictEqual(store.stateIdFor('1.3.6.1.2.1.2.1.0'), 'ifNumber');
+        });
+
+        it('keeps the index 0 of a table, it is a row like any other', () => {
+            assert.strictEqual(store.stateIdFor('IF-MIB::ifDescr.0'), 'ifDescr.0');
+        });
     });
 
     describe('getTree', () => {
@@ -352,6 +361,16 @@ describe('MibStore', () => {
             assert.strictEqual(counter.syntax, 'Integer32');
             assert.strictEqual(counter.access, 'read-only');
             assert.strictEqual(counter.description, 'A read only counter.');
+        });
+
+        it('marks a column of a table, so that the browser can ask for the index of a row', () => {
+            const table = store.getTree('TEST-SNMP-MIB')[0].children.find(n => n.name === 'testTable');
+            const name = table.children[0].children.find(n => n.name === 'testName');
+            assert.strictEqual(name.column, true);
+
+            const scalars = store.getTree('TEST-SNMP-MIB')[0].children[0];
+            const counter = scalars.children.find(n => n.name === 'testCounter');
+            assert.strictEqual(counter.column, false, 'a scalar is read at .0 instead');
         });
 
         it('marks a read-write object as writeable', () => {
@@ -378,37 +397,39 @@ describe('MibStore', () => {
         });
     });
 
-    describe('describeWalkResult', () => {
-        it('annotates the varbinds of a walk with their MIB names and instances', () => {
-            const tree = store.describeWalkResult([
-                { oid: '1.3.6.1.2.1.2.2.1.2.1', value: 'lo', type: 'OctetString' },
-                { oid: '1.3.6.1.2.1.2.2.1.2.2', value: 'eth0', type: 'OctetString' },
-            ]);
-            // both are instances of ifDescr, so they end up as siblings below ifTable/ifEntry/...
-            const leaves = [];
-            const collect = nodes => nodes.forEach(n => (n.children ? collect(n.children) : leaves.push(n)));
-            collect(tree);
-            assert.deepStrictEqual(
-                leaves.map(n => `${n.name}.${n.instance}=${n.value}`),
-                ['ifDescr.1=lo', 'ifDescr.2=eth0'],
-            );
-            assert.strictEqual(leaves[0].symbol, 'IF-MIB::ifDescr');
-            assert.strictEqual(leaves[0].oid, '1.3.6.1.2.1.2.2.1.2.1');
-            assert.strictEqual(leaves[0].type, 'OctetString');
-            assert.strictEqual(leaves[0].readable, true);
+    describe('nodeForVarbind', () => {
+        it('annotates a value read from the device with its MIB name and instance', () => {
+            const node = store.nodeForVarbind({ oid: '1.3.6.1.2.1.2.2.1.2.1', value: 'lo', type: 'OctetString' });
+            assert.strictEqual(node.name, 'ifDescr');
+            assert.strictEqual(node.instance, '1');
+            assert.strictEqual(node.symbol, 'IF-MIB::ifDescr');
+            assert.strictEqual(node.oid, '1.3.6.1.2.1.2.2.1.2.1');
+            assert.strictEqual(node.value, 'lo');
+            assert.strictEqual(node.type, 'OctetString');
+            assert.strictEqual(node.readable, true);
         });
 
         it('keeps an oid no MIB covers, using its last sub identifier as name', () => {
-            const tree = store.describeWalkResult([{ oid: '1.2.3.4.5', value: '7', type: 'Integer32' }]);
-            assert.strictEqual(tree.length, 1);
-            assert.strictEqual(tree[0].name, '5');
-            assert.strictEqual(tree[0].symbol, '');
-            assert.strictEqual(tree[0].value, '7');
-            assert.strictEqual(tree[0].readable, true, 'the device returned a value, so it is pollable');
+            const node = store.nodeForVarbind({ oid: '1.2.3.4.5', value: '7', type: 'Integer32' });
+            assert.strictEqual(node.name, '5');
+            assert.strictEqual(node.symbol, '');
+            assert.strictEqual(node.value, '7');
+            assert.strictEqual(node.readable, true, 'the device returned a value, so it is pollable');
+        });
+    });
+
+    describe('nodeForFolder', () => {
+        it('reports a node whose content has not been read yet', () => {
+            const node = store.nodeForFolder('1.3.6.1.2.1.2.2');
+            assert.strictEqual(node.name, 'ifTable');
+            assert.strictEqual(node.hasChildren, true);
+            assert.strictEqual(node.readable, false, 'the values sit in the rows, not in the table itself');
         });
 
-        it('returns an empty array for an empty walk', () => {
-            assert.deepStrictEqual(store.describeWalkResult([]), []);
+        it('describes a folder no MIB covers by its oid', () => {
+            const node = store.nodeForFolder('1.2.3.4');
+            assert.strictEqual(node.name, '4');
+            assert.strictEqual(node.hasChildren, true);
         });
     });
 });

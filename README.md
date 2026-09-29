@@ -21,16 +21,16 @@
 
 ## Sentry
 **This adapter uses Sentry libraries to automatically report exceptions and code errors to the developers.**
-For more details and for information how to disable the error reporting see [Sentry-Plugin Documentation](https://github.com/ioBroker/plugin-sentry#plugin-sentry)! Sentry reporting is used starting with js-controller 3.0.
+For more details and for information on how to disable the error reporting, see [Sentry-Plugin Documentation](https://github.com/ioBroker/plugin-sentry#plugin-sentry)! Sentry reporting is used starting with js-controller 3.0.
 
 ## Info
 This adapter can be used to poll information from devices like printers, network devices, etc. using SNMP protocol.
 
 ## Adapter-Configuration
-The adapter queries specified OIDs which are grouped within oid groups which in turn are assigned to devices.
-The configuration data is entered at several tabs. The adapter supports IPv4 adn IPv6 connections.
+The adapter queries specified OIDs, which are grouped within oid groups which in turn are assigned to devices.
+The configuration data is entered at several tabs. The adapter supports IPv4 and IPv6 connections.
 
-For details see documentation referenced below.
+For details see the documentation referenced below.
 
 ## Documentation
 
@@ -45,7 +45,15 @@ For details see documentation referenced below.
 -->
 
 ### **WORK IN PROGRESS**
-- (bluefox) New tab "MIB": MIB files can be uploaded and browsed, and a device can be read live - OIDs are taken over into the OID sets with one click
+- (bluefox) New tab "MIB": MIB files can be uploaded and browsed, and a device can be read live - the browser fills the OID group of the selected device, one OID at a time or all shown at once
+- (bluefox) An incomplete configuration no longer disables the instance: a device without OIDs is skipped with a warning, so that a new device can be set up with the MIB browser while the adapter is running
+- (bluefox) A folder of the MIB browser can be taken over as a whole: its plus button adds every value below it to the OID group, read in one walk
+- (bluefox) The MIB browser has one source now: it reads the device live, level by level, and names what comes back with the uploaded MIB files - the separate, offline tree of a MIB file is gone, the module list jumps to the beginning of a MIB instead
+- (bluefox) Fixed: with SNMP v1 the end of a subtree is reported as the error NoSuchName, which made every level of a v1 device fail
+- (bluefox) Fixed: the live view skipped every second row of a table - the rows carry their value at the oid of the row itself, so the jump behind a row has to start below it, not at the next row
+- (bluefox) An OID taken over from a MIB file now addresses a value: a scalar is stored as "<OID>.0" (the ".0" stays out of the object id), a column of a table is marked, because it needs the index of a row - which the live read of the device delivers
+- (bluefox) New setup wizard on the "Devices" tab: it asks for the device, lets you upload its MIB files and pick the values to read - including a live read of the device before it has ever been saved
+- (bluefox) The devices are configured first: the tab "Devices" comes before "OID sets", the device table is no longer hidden until an OID group exists, and an empty OID table no longer blocks the save button
 - (bluefox) New option "use MIB names": the OID field then also accepts symbolic names like IF-MIB::ifDescr.1 and the object ids are built from the MIB symbol. Attention: switching this option changes the object ids of existing OIDs
 - (bluefox) The adapter has been refactored to TypeScript, the sources now live in `src/` and are compiled to `build/`
 - (bluefox) The admin translations have been moved from `admin/i18n/<lang>/translations.json` to `admin/i18n/<lang>.json`, `admin/words.js` has been removed
@@ -58,7 +66,7 @@ For details see documentation referenced below.
 - (mcm1957) Dependencies have been updated
 
 ### 3.3.0 (2025-08-17)
-* (mcm1957) Adapter requires node.js 20, js-controller >= 6.0.11 and admin >= 7.6.17 now.
+* (mcm1957) Adapter requires node.js 20, js-controller >= 6.0.11, and admin >= 7.6.17 now.
 * (mcm1957) Dependencies have been updated
 
 ### 3.2.0 (2024-03-29)
@@ -67,7 +75,7 @@ For details see documentation referenced below.
 
 ### 3.1.0 (2023-10-13)
 * (mcm1957) Requirements have been updated. Adapter requires node.js 18 or newer now
-* (mcm1957) Packages have been update to cleanup open dependabot PRs
+* (mcm1957) Packages have been updated to clean up open dependabot PRs
 
 ### 3.0.0 (2023-10-12)
 * (bluefox) updated packages. Minimal node.js version is 16

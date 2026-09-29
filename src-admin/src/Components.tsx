@@ -1,3 +1,4 @@
 import MibBrowser from './MibBrowser';
+import SetupWizard from './SetupWizard';
 
-export default { MibBrowser };
+export default { MibBrowser, SetupWizard };

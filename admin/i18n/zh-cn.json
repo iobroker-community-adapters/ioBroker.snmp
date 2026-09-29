@@ -1,4 +1,6 @@
 {
+    "errDevIpEmpty": "请输入设备的 IP 地址",
+    "errDevNameEmpty": "设备名称不能为空",
     "errOidEmpty": "OID 字段不能为空",
     "errOidGrpEmpty": "OID 组字段不能为空",
     "errOidGrpMissing": "至少需要一个 OID 组",
@@ -40,7 +42,7 @@
     "lblDevTimeout": "超时（秒）",
     "lblDevs": "设备",
     "lblDevsDevices": "设备",
-    "lblDevsInfo": "您必须至少指定一个 OID 组才能添加一些设备",
+    "lblDevsInfo": "尚未定义 OID - 请在\"OID 集\"选项卡中添加，或在 MIB 浏览器中选择",
     "lblJson": "杰森",
     "lblMib": "MIB",
     "lblMibUpload": "MIB 文件",

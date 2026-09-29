@@ -28,6 +28,10 @@ interface MibEntry {
     'MAX-ACCESS'?: string;
     OID?: string;
     NameSpace?: string;
+    /** INDEX clause - only the row entry of a table has one */
+    INDEX?: unknown;
+    /** AUGMENTS clause - the row entry of a table which extends another table */
+    AUGMENTS?: unknown;
 }
 
 /**
@@ -171,7 +175,14 @@ function loadOneFile(pStore: ModuleStore, pFileName: string): string | null {
 export const MIB_SUB_DIR = 'mibs';
 
 export class MibStore {
-    private readonly log: ioBroker.Logger;
+    /**
+     * source of the logger
+     *
+     * The adapter passes a function here: adapter-core creates `adapter.log` only while the adapter
+     * initializes itself, which happens after the constructor has run, so the logger must be looked
+     * up on every call instead of being captured.
+     */
+    private readonly logSource: () => ioBroker.Logger;
     /** directory the MIB files are written to - net-snmp can only parse files, not strings */
     private readonly mibDir: string;
 
@@ -186,14 +197,19 @@ export class MibStore {
     private oidToSymbol: Record<string, string> = {};
     /** "MODULE::name" -> numeric oid */
     private symbolToOid: Record<string, string> = {};
-    /** bare object name -> numeric oid; if a name exists in several modules the first one wins */
+    /** bare object name -> numeric oid; if a name exists in several modules, the first one wins */
     private nameToOid: Record<string, string> = {};
     /** numeric oid -> parsed MIB entry */
     private entries: Record<string, MibEntry> = {};
 
-    public constructor(pLog: ioBroker.Logger, pDataDir: string) {
-        this.log = pLog;
+    public constructor(pLog: ioBroker.Logger | (() => ioBroker.Logger), pDataDir: string) {
+        this.logSource = typeof pLog === 'function' ? pLog : () => pLog;
         this.mibDir = join(pDataDir, MIB_SUB_DIR);
+    }
+
+    /** the logger, resolved on every use - see logSource */
+    private get log(): ioBroker.Logger {
+        return this.logSource();
     }
 
     /** directory the MIB files are stored in */
@@ -398,7 +414,21 @@ export class MibStore {
         if (!resolved?.name) {
             return null;
         }
-        return resolved.instance ? `${resolved.name}.${resolved.instance}` : resolved.name;
+        if (!resolved.instance) {
+            return resolved.name;
+        }
+
+        /*
+         * The ".0" of a scalar is how snmp addresses its only value, it says nothing about the
+         * object - so "SNMPv2-MIB::sysName.0" becomes the state "sysName", while the row of a table
+         * keeps its index and becomes "ifDescr.1".
+         */
+        const base = resolved.oid.slice(0, resolved.oid.length - (resolved.instance.length + 1));
+        if (resolved.instance === '0' && !this.isColumn(base)) {
+            return resolved.name;
+        }
+
+        return `${resolved.name}.${resolved.instance}`;
     }
 
     /**
@@ -412,9 +442,32 @@ export class MibStore {
             return module ? Object.values(module).filter(entry => !!entry.OID).length : 0;
         };
 
+        /*
+         * The browser jumps to this oid. A module may define more than one root - SNMPv2-SMI for
+         * example defines zeroDotZero besides internet - so the root with the most entries below it
+         * is the one which is meant.
+         */
+        const size = (node: MibTreeNode): number =>
+            1 + (node.children?.reduce((sum, child) => sum + size(child), 0) ?? 0);
+
+        const root = (moduleName: string): string => {
+            let oid = '';
+            let best = 0;
+
+            for (const node of this.getTree(moduleName)) {
+                const count = size(node);
+                if (count > best) {
+                    best = count;
+                    oid = node.oid;
+                }
+            }
+
+            return oid;
+        };
+
         return [
-            ...this.userModuleNames.map(name => ({ name, symbols: count(name), base: false })),
-            ...this.baseModuleNames.map(name => ({ name, symbols: count(name), base: true })),
+            ...this.userModuleNames.map(name => ({ name, oid: root(name), symbols: count(name), base: false })),
+            ...this.baseModuleNames.map(name => ({ name, oid: root(name), symbols: count(name), base: true })),
         ];
     }
 
@@ -444,6 +497,21 @@ export class MibStore {
         }
 
         return buildTree(nodes);
+    }
+
+    /**
+     * isColumn - true if the oid addresses a column of a table
+     *
+     * The parent of a column is the row entry of the table, and only that one carries an INDEX or
+     * an AUGMENTS clause.
+     *
+     * @param pOid numeric oid of the node
+     * @returns true if the oid needs the index of a row to address a value
+     */
+    private isColumn(pOid: string): boolean {
+        const parent = pOid.slice(0, pOid.lastIndexOf('.'));
+        const entry = this.entries[parent];
+        return !!entry && (entry.INDEX !== undefined || entry.AUGMENTS !== undefined);
     }
 
     /**
@@ -481,35 +549,48 @@ export class MibStore {
             // a node is pollable if it carries a value - tables and their entries do not
             readable: !!access && access !== 'not-accessible' && !syntax.startsWith('SEQUENCE'),
             writeable: access === 'read-write' || access === 'read-create',
+            column: this.isColumn(pOid),
         };
     }
 
     /**
-     * describeWalkResult - turn the varbinds of a live walk into a tree
+     * nodeForVarbind - one value read from a device as a tree node
      *
-     * @param pVarbinds oid, value and type of every varbind read from the device
-     * @returns the root nodes of the walk result
+     * @param pVarbind the value read from the device
+     * @param pVarbind.oid numeric oid the value was read from
+     * @param pVarbind.value the value, already converted to text
+     * @param pVarbind.type textual snmp object type of the value
+     * @returns the node, described by the MIB as far as one covers the oid
      */
-    public describeWalkResult(pVarbinds: { oid: string; value: string; type: string }[]): MibTreeNode[] {
-        const nodes: MibTreeNode[] = [];
+    public nodeForVarbind(pVarbind: { oid: string; value: string; type: string }): MibTreeNode {
+        const described = this.describe(pVarbind.oid);
+        const base = described ? pVarbind.oid.slice(0, pVarbind.oid.length - (described.instance.length + 1)) : '';
+        const node = this.toTreeNode(described && described.instance ? base : pVarbind.oid);
 
-        for (const varbind of pVarbinds) {
-            const described = this.describe(varbind.oid);
-            const base = described ? varbind.oid.slice(0, varbind.oid.length - (described.instance.length + 1)) : '';
-            const node = this.toTreeNode(described && described.instance ? base : varbind.oid);
+        return {
+            ...node,
+            oid: pVarbind.oid,
+            instance: described?.instance || undefined,
+            value: pVarbind.value,
+            type: pVarbind.type,
+            // a value the device reported is readable, whatever the MIB says about the object
+            readable: true,
+        };
+    }
 
-            nodes.push({
-                ...node,
-                oid: varbind.oid,
-                instance: described?.instance || undefined,
-                value: varbind.value,
-                type: varbind.type,
-                // the walk only returns oids which really carry a value
-                readable: true,
-            });
-        }
-
-        return buildTree(nodes);
+    /**
+     * nodeForFolder - a node whose content has not been read yet
+     *
+     * @param pOid numeric oid of the node
+     * @returns the node, described by the MIB as far as one covers the oid
+     */
+    public nodeForFolder(pOid: string): MibTreeNode {
+        return {
+            ...this.toTreeNode(pOid),
+            // the children carry the values, the folder itself does not
+            readable: false,
+            hasChildren: true,
+        };
     }
 }
 

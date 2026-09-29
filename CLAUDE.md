@@ -53,6 +53,8 @@ src/lib/mibTypes.ts       payload of the `mib*` sendTo commands (contract with t
 admin/jsonConfig.json     config dialog (5 tabs), labels are i18n keys like `lblOidGroup`
 admin/i18n/<lang>.json    flat translation files, 11 languages, `en.json` is the reference
 src-admin/src/MibBrowser.tsx  the MIB browser, a jsonConfig `type: "custom"` component
+src-admin/src/SetupWizard.tsx the three step wizard of the device tab, also `type: "custom"`
+src-admin/src/MibTree.tsx     the MIB tree as a table, used by both of them
 src-admin/src/types.ts    copy of mibTypes.ts + the pure row/filter logic (unit tested)
 tasks.ts                  vite build of src-admin -> admin/custom/
 ```
@@ -87,6 +89,18 @@ State quality codes in use: `0x00` ok, `0x01` conversion error, `0x02` connectio
 `0x44` device reported an error, `0x84` sensor/varbind reported an error.
 
 
+### Setup wizard
+
+`SetupWizard` is the second custom component, placed above the device table. It collects a device,
+uploads MIB files into the same file storage the `fileSelector` uses, and writes one row into
+`devs` plus one row per picked oid into `oids` - it saves nothing itself, the save button of the
+dialog does that. Its live read sends the whole device row as `dev` with `mibChildren`, so a device
+which has just been entered can be read before it is part of the instance configuration.
+
+Everything it decides (`buildDeviceRow`, `deviceIssues`, `pickNodes`) is a pure function in
+`src-admin/src/types.ts` and unit tested; the defaults of `buildDeviceRow` have to stay in sync
+with the column defaults of the device table in `admin/jsonConfig.json`.
+
 ### MIB browser
 
 The MIB files are uploaded by the `fileSelector` of the config dialog into the file storage of the
@@ -94,23 +108,46 @@ The MIB files are uploaded by the `fileSelector` of the config dialog into the f
 `<instanceDataDir>/mibs/` - net-snmp's parser can only read files and resolves a module's IMPORTS
 relative to the file it is reading, so all of them have to live in one directory.
 
-The component never touches the MIBs itself; it asks the running instance over `sendTo`:
+The component never touches the MIBs itself; it asks the running instance over `sendTo`. The
+devices it offers are not requested - they are read from the `devs` table of the dialog, so a device
+which has just been entered can be equipped with oids before the configuration is saved:
 
 | command | payload | answer |
 | --- | --- | --- |
 | `mibModules` | - | the loaded modules plus the parse errors per file |
 | `mibReload` | - | same, but re-reads the uploaded files first |
-| `mibNodes` | `{ module }` | the tree of that module |
-| `mibDevices` | - | the configured devices, for the walk target |
-| `mibWalk` | `{ device, oid }` | live walk of a device, at most `MIB_WALK_LIMIT` varbinds |
+| `mibChildren` | `{ device, oid }` or `{ dev, oid }` | the direct children of that oid on the device, at most `MIB_CHILDREN_LIMIT`; `dev` is a complete device row and lets the setup wizard read a device which is not saved yet |
+| `mibSubtree` | `{ device, oid }` or `{ dev, oid }` | every value below that oid as a flat list, at most `MIB_SUBTREE_LIMIT` - one walk, for "take over the whole subtree" |
 
 `src/lib/mibTypes.ts` and `src-admin/src/types.ts` describe the same payload but are separate files
 (the component is its own bundle and cannot import from `build/`). **Change both together** -
 `test/mibBrowser.js` has a `contract` block that catches a drift between them.
 
+The browser has one source: the device. It is read live and the MIB files only name what comes
+back - `getModules()` reports the root oid of every module so that the module list can jump there.
+
+A device is read one level at a time: `readChildren()` asks for the first value below the node with
+`getNext`, which names the first child, a second `getNext` tells whether that child carries more
+than this one value (folder or leaf), and the next request starts behind the whole child, so its
+subtree is skipped - with `<child>.<MAX_SUB_ID>`, because the rows of a table carry their value at
+`<column>.<n>` itself and a getNext for the next sub id of the level would jump over every second
+row. That is two requests per child instead of walking everything below the node -
+what makes the browser usable on a device with thousands of values. The component keeps the answer
+in the tree with `insertChildren()` and asks again when the next folder is opened.
+
+SNMP v1 has no "end of mib view": a `getNext` behind the last value answers with the error
+`NoSuchName`, which `readChildren()` has to read as "this level is complete" - otherwise every
+level of a v1 device ends in an error message.
+
 net-snmp's MIB parser does not throw on a malformed file: it writes to `console.warn` and registers
 a module literally named `undefined`. `loadOneFile()` therefore captures the console and compares the
 module list before and after, so that the admin can show the user why an upload was rejected.
+
+An oid of a MIB file addresses the object, not a value: a scalar is read at `<oid>.0`, a column of
+a table needs the index of a row. `MibStore.isColumn()` tells the two apart - the row entry of a
+table is the only entry with an INDEX resp. AUGMENTS clause - and reports it as `column` on the
+tree node. `buildOidRow()` appends the `.0` of a scalar, `stateIdFor()` drops it again, so the
+state of `SNMPv2-MIB::sysName.0` is `sysName` while `IF-MIB::ifDescr.1` stays `ifDescr.1`.
 
 With `optUseMibNames` the OID column may hold `IF-MIB::ifDescr.1`, `resolveConfiguredOid()` resolves
 it to the numeric oid and derives the state id from the MIB symbol instead of from `oidName`.

@@ -244,8 +244,8 @@ export function snmpCloseSession(pSessCtx: SessionContext, pLog: ioBroker.Logger
 /**
  * snmpSessionSubtreeAsync - async version of snmp.session.subtree
  *
- *		Used by the MIB browser to walk a device. The walk is stopped as soon as pMaxCount varbinds
- *		have been collected, so that a browse of 1.3.6.1 cannot flood the admin.
+ * Used when the user takes over a whole subtree: everything below the oid is wanted, so one walk is
+ * cheaper than the level by level reading the browser does otherwise.
  *
  * @param pSession snmp session reference
  * @param pOid oid to walk
@@ -289,5 +289,41 @@ export async function snmpSessionSubtreeAsync(
                 resolve(ret);
             },
         );
+    });
+}
+
+/**
+ * snmpSessionGetNextAsync - async version of snmp.session.getNext
+ *
+ * Used by the MIB browser to walk one level at a time: snmp cannot list the children of a node, it
+ * can only report the value behind a given oid.
+ *
+ * @param pSession snmp session reference
+ * @param pOids snmp oids array
+ * @param pLog logger
+ * @returns object containing { err, varbinds } as returned by snmp.session.getNext
+ */
+export async function snmpSessionGetNextAsync(
+    pSession: Session | null,
+    pOids: string[],
+    pLog: ioBroker.Logger,
+): Promise<SnmpResult> {
+    return new Promise<SnmpResult>(resolve => {
+        const ret: SnmpResult = {
+            err: null,
+            varbinds: [],
+        };
+
+        if (!pSession) {
+            pLog.debug('session vanished, skipping getNext operation');
+            ret.err = 'no active session';
+            resolve(ret);
+        } else {
+            pSession.getNext(pOids, function (error, varbinds) {
+                ret.err = error;
+                ret.varbinds = varbinds ?? [];
+                resolve(ret);
+            });
+        }
     });
 }

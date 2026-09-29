@@ -1,4 +1,6 @@
 {
+    "errDevIpEmpty": "Вкажіть IP-адресу пристрою",
+    "errDevNameEmpty": "Ім'я пристрою не може бути порожнім",
     "errOidEmpty": "Поле OID не повинно бути порожнім",
     "errOidGrpEmpty": "Поля групи OID не повинні бути порожніми",
     "errOidGrpMissing": "Потрібна принаймні одна група OID",
@@ -40,7 +42,7 @@
     "lblDevTimeout": "тайм-аут (с)",
     "lblDevs": "Пристрої",
     "lblDevsDevices": "Пристрої",
-    "lblDevsInfo": "Ви повинні вказати принаймні групу OID, щоб додати деякі пристрої",
+    "lblDevsInfo": "OID ще не задані - додайте їх на вкладці \"набори OID\" або виберіть у MIB-браузері",
     "lblJson": "Json",
     "lblMib": "MIB",
     "lblMibUpload": "MIB-файли",

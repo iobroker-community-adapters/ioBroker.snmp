@@ -26,18 +26,34 @@ export interface MibTreeNode {
     readable: boolean;
     /** true if the MIB declares the entry as writeable */
     writeable: boolean;
+    /**
+     * true if the entry is a column of a table
+     *
+     * Such an oid addresses a column, not a value: the index of the row has to be appended, and
+     * only the device knows which rows exist. A scalar in contrast is always read at "<oid>.0".
+     */
+    column?: boolean;
     /** live walk only - instance suffix, e.g. "1" for ifDescr.1 */
     instance?: string;
     /** live walk only - value read from the device */
     value?: string;
     /** live walk only - textual snmp object type of the value read */
     type?: string;
+    /**
+     * true if the node has children which have not been read yet
+     *
+     * The live browser reads one level at a time, so a folder is reported before its content is
+     * known - it is filled when the user opens it.
+     */
+    hasChildren?: boolean;
     children?: MibTreeNode[];
 }
 
 /** One loaded MIB module */
 export interface MibModuleInfo {
     name: string;
+    /** oid the module starts at - the browser jumps there */
+    oid: string;
     /** number of entries with an oid */
     symbols: number;
     /** true for the modules net-snmp ships itself - those cannot be deleted */
@@ -51,18 +67,13 @@ export interface MibModulesResponse {
     errors: Record<string, string>;
 }
 
-/** Response of the `mibNodes` and `mibWalk` commands */
+/** Response of the `mibNodes` and `mibChildren` commands */
 export interface MibNodesResponse {
     nodes: MibTreeNode[];
     /** set if the request failed */
     error?: string;
-    /** set by mibWalk if the walk has been stopped because the limit was reached */
+    /** set if the answer has been cut off because the limit was reached */
     truncated?: boolean;
-}
-
-/** Response of the `mibDevices` command */
-export interface MibDevicesResponse {
-    devices: { value: string; label: string }[];
 }
 
 /** An oid specification split into its base and the instance suffix */

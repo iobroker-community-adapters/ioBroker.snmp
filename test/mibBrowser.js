@@ -11,9 +11,23 @@
 
 const assert = require('node:assert');
 
-const { buildOidRow, collectOids, filterTree, matchesFilter, suggestGroup } = require('../src-admin/src/types.ts');
+const {
+    addableNodes,
+    buildDeviceRow,
+    buildOidRow,
+    DEFAULT_WIZARD_DEVICE,
+    deviceIssues,
+    deviceOptions,
+    filterTree,
+    findNode,
+    insertChildren,
+    isConfigured,
+    matchesFilter,
+    pickNodes,
+    suggestGroup,
+} = require('../src-admin/src/types.ts');
 
-/** a node as the backend delivers it */
+/** a node as the backend delivers it - ifDescr is a column of ifTable */
 function node(overrides) {
     return {
         symbol: 'IF-MIB::ifDescr',
@@ -24,8 +38,21 @@ function node(overrides) {
         access: 'read-only',
         readable: true,
         writeable: false,
+        column: true,
         ...overrides,
     };
+}
+
+/** a scalar, which is read at ".0" */
+function scalar(overrides) {
+    return node({
+        symbol: 'IF-MIB::ifNumber',
+        name: 'ifNumber',
+        oid: '1.3.6.1.2.1.2.1',
+        syntax: 'Integer32',
+        column: false,
+        ...overrides,
+    });
 }
 
 describe('buildOidRow', () => {
@@ -47,10 +74,25 @@ describe('buildOidRow', () => {
         assert.strictEqual(row.oidName, 'ifDescr.3', 'the name always comes from the MIB symbol');
     });
 
-    it('omits the instance suffix for a node without one', () => {
-        const row = buildOidRow(node({ name: 'ifNumber', symbol: 'IF-MIB::ifNumber' }), 'net', true);
+    it('reads a scalar at ".0" but keeps that out of the name', () => {
+        const row = buildOidRow(scalar(), 'net', true);
         assert.strictEqual(row.oidName, 'ifNumber');
-        assert.strictEqual(row.oidOid, 'IF-MIB::ifNumber');
+        assert.strictEqual(row.oidOid, 'IF-MIB::ifNumber.0');
+
+        const numeric = buildOidRow(scalar(), 'net', false);
+        assert.strictEqual(numeric.oidOid, '1.3.6.1.2.1.2.1.0');
+    });
+
+    it('leaves a column of a table without an instance - only the device knows the rows', () => {
+        const row = buildOidRow(node(), 'net', true);
+        assert.strictEqual(row.oidName, 'ifDescr');
+        assert.strictEqual(row.oidOid, 'IF-MIB::ifDescr');
+    });
+
+    it('keeps the instance a live read delivered, including the ".0" of a scalar', () => {
+        assert.strictEqual(buildOidRow(scalar({ instance: '0' }), 'net', true).oidOid, 'IF-MIB::ifNumber.0');
+        assert.strictEqual(buildOidRow(scalar({ instance: '0' }), 'net', true).oidName, 'ifNumber');
+        assert.strictEqual(buildOidRow(node({ instance: '3' }), 'net', true).oidName, 'ifDescr.3');
     });
 
     it('falls back to the numeric oid for a node without a symbol, even with the option on', () => {
@@ -142,22 +184,6 @@ describe('filterTree', () => {
     });
 });
 
-describe('collectOids', () => {
-    it('returns the oids of the whole tree, parents first', () => {
-        const tree = [
-            {
-                ...node({ oid: '1.2' }),
-                children: [node({ oid: '1.2.3' }), { ...node({ oid: '1.2.4' }), children: [node({ oid: '1.2.4.5' })] }],
-            },
-        ];
-        assert.deepStrictEqual(collectOids(tree), ['1.2', '1.2.3', '1.2.4', '1.2.4.5']);
-    });
-
-    it('returns an empty list for an empty tree', () => {
-        assert.deepStrictEqual(collectOids([]), []);
-    });
-});
-
 describe('suggestGroup', () => {
     it('uses the group of the last configured row', () => {
         assert.strictEqual(suggestGroup([{ oidGroup: 'first' }, { oidGroup: 'last' }]), 'last');
@@ -171,6 +197,238 @@ describe('suggestGroup', () => {
         assert.strictEqual(suggestGroup([]), 'default');
         assert.strictEqual(suggestGroup(undefined), 'default');
         assert.strictEqual(suggestGroup([{}]), 'default');
+    });
+});
+
+describe('deviceOptions', () => {
+    it('offers every named device with its oid group', () => {
+        assert.deepStrictEqual(
+            deviceOptions([
+                { devName: 'printer', devIpAddr: '10.0.0.5', devOidGroup: ' paper ' },
+                { devName: 'switch', devIpAddr: '10.0.0.6:1161', devOidGroup: 'net' },
+            ]),
+            [
+                { value: 'printer', label: 'printer (10.0.0.5)', group: 'paper' },
+                { value: 'switch', label: 'switch (10.0.0.6:1161)', group: 'net' },
+            ],
+        );
+    });
+
+    it('skips a row which has just been created', () => {
+        assert.deepStrictEqual(deviceOptions([{ devName: '', devIpAddr: '0.0.0.0', devOidGroup: 'default' }]), []);
+    });
+
+    it('accepts a device without an address or a group', () => {
+        assert.deepStrictEqual(deviceOptions([{ devName: 'ups' }]), [
+            { value: 'ups', label: 'ups', group: '' },
+        ]);
+    });
+
+    it('survives an empty or missing table', () => {
+        assert.deepStrictEqual(deviceOptions([]), []);
+        assert.deepStrictEqual(deviceOptions(undefined), []);
+    });
+});
+
+describe('isConfigured', () => {
+    const rows = [
+        { oidGroup: 'net', oidOid: '1.3.6.1.2.1.2.2.1.2' },
+        { oidGroup: 'other', oidOid: '1.3.6.1.2.1.1.5.0' },
+    ];
+
+    it('finds a numeric oid of the same group', () => {
+        assert.strictEqual(isConfigured(node(), rows, 'net', false), true);
+    });
+
+    it('ignores the same oid in another group', () => {
+        assert.strictEqual(isConfigured(node({ oid: '1.3.6.1.2.1.1.5.0' }), rows, 'net', false), false);
+    });
+
+    it('compares the symbolic name when the MIB name option is active', () => {
+        const symbolic = [{ oidGroup: 'net', oidOid: 'IF-MIB::ifDescr.3' }];
+        assert.strictEqual(isConfigured(node({ instance: '3' }), symbolic, 'net', true), true);
+        assert.strictEqual(isConfigured(node({ instance: '3' }), symbolic, 'net', false), false);
+    });
+
+    it('survives an empty table', () => {
+        assert.strictEqual(isConfigured(node(), undefined, 'net', false), false);
+        assert.strictEqual(isConfigured(node(), [], 'net', false), false);
+    });
+});
+
+describe('addableNodes', () => {
+    const tree = [
+        node({
+            name: 'ifTable',
+            oid: '1.3.6.1.2.1.2.2',
+            readable: false,
+            children: [
+                node({ name: 'ifDescr', oid: '1.3.6.1.2.1.2.2.1.2' }),
+                node({ name: 'ifSpeed', oid: '1.3.6.1.2.1.2.2.1.5' }),
+            ],
+        }),
+    ];
+
+    it('offers the readable nodes of the whole tree', () => {
+        const nodes = addableNodes(tree, [], 'net', false);
+        assert.deepStrictEqual(
+            nodes.map(entry => entry.name),
+            ['ifDescr', 'ifSpeed'],
+        );
+    });
+
+    it('leaves out what the group already contains', () => {
+        const nodes = addableNodes(tree, [{ oidGroup: 'net', oidOid: '1.3.6.1.2.1.2.2.1.2' }], 'net', false);
+        assert.deepStrictEqual(
+            nodes.map(entry => entry.name),
+            ['ifSpeed'],
+        );
+    });
+
+    it('returns an empty list for an empty tree', () => {
+        assert.deepStrictEqual(addableNodes([], [], 'net', false), []);
+    });
+});
+
+describe('buildDeviceRow', () => {
+    const device = { ...DEFAULT_WIZARD_DEVICE, name: 'printer', ipAddr: '10.0.0.5', authId: 'public' };
+
+    it('builds a complete row with the defaults of the device table', () => {
+        assert.deepStrictEqual(buildDeviceRow(device), {
+            devAct: true,
+            devName: 'printer',
+            devIpAddr: '10.0.0.5',
+            devIp6: false,
+            devOidGroup: 'printer',
+            devSnmpVers: 1,
+            devAuthId: 'public',
+            devTimeout: 5,
+            devRetryIntvl: 5,
+            devPollIntvl: 30,
+        });
+    });
+
+    it('names the group after the device if none was given', () => {
+        assert.strictEqual(buildDeviceRow({ ...device, group: '' }).devOidGroup, 'printer');
+        assert.strictEqual(buildDeviceRow({ ...device, group: ' shared ' }).devOidGroup, 'shared');
+    });
+
+    it('trims the name and the address', () => {
+        const row = buildDeviceRow({ ...device, name: ' printer ', ipAddr: ' 10.0.0.5 ' });
+        assert.strictEqual(row.devName, 'printer');
+        assert.strictEqual(row.devIpAddr, '10.0.0.5');
+    });
+});
+
+describe('deviceIssues', () => {
+    const device = { ...DEFAULT_WIZARD_DEVICE, name: 'printer', ipAddr: '10.0.0.5' };
+
+    it('accepts a complete device', () => {
+        assert.deepStrictEqual(deviceIssues(device, []), []);
+        assert.deepStrictEqual(deviceIssues(device, undefined), []);
+    });
+
+    it('reports a missing name and a missing address', () => {
+        assert.deepStrictEqual(deviceIssues({ ...device, name: '  ' }, []), ['name']);
+        assert.deepStrictEqual(deviceIssues({ ...device, ipAddr: '' }, []), ['ip']);
+        assert.deepStrictEqual(deviceIssues({ ...device, ipAddr: '0.0.0.0' }, []), ['ip']);
+    });
+
+    it('reports a name the adapter cannot build object ids from', () => {
+        assert.deepStrictEqual(deviceIssues({ ...device, name: 'printer.' }, []), ['nameInvalid']);
+        assert.deepStrictEqual(deviceIssues({ ...device, name: 'a..b' }, []), ['nameInvalid']);
+    });
+
+    it('reports a name which is already in use', () => {
+        assert.deepStrictEqual(deviceIssues(device, [{ devName: 'printer' }]), ['duplicate']);
+        assert.deepStrictEqual(deviceIssues(device, [{ devName: 'other' }]), []);
+    });
+});
+
+describe('pickNodes', () => {
+    const tree = [
+        node({
+            name: 'ifTable',
+            oid: '1.3.6.1.2.1.2.2',
+            readable: false,
+            children: [
+                node({ name: 'ifDescr', oid: '1.3.6.1.2.1.2.2.1.2' }),
+                node({ name: 'ifSpeed', oid: '1.3.6.1.2.1.2.2.1.5' }),
+            ],
+        }),
+    ];
+
+    it('returns the selected nodes in the order of the tree', () => {
+        const nodes = pickNodes(tree, ['1.3.6.1.2.1.2.2.1.5', '1.3.6.1.2.1.2.2.1.2']);
+        assert.deepStrictEqual(
+            nodes.map(entry => entry.name),
+            ['ifDescr', 'ifSpeed'],
+        );
+    });
+
+    it('ignores an oid which is not part of the tree', () => {
+        assert.deepStrictEqual(pickNodes(tree, ['1.2.3']), []);
+        assert.deepStrictEqual(pickNodes(tree, []), []);
+    });
+});
+
+describe('findNode', () => {
+    const tree = [
+        node({
+            name: 'ifTable',
+            oid: '1.3.6.1.2.1.2.2',
+            children: [node({ oid: '1.3.6.1.2.1.2.2.1.2' })],
+        }),
+    ];
+
+    it('finds a node at any depth', () => {
+        assert.strictEqual(findNode(tree, '1.3.6.1.2.1.2.2').name, 'ifTable');
+        assert.strictEqual(findNode(tree, '1.3.6.1.2.1.2.2.1.2').name, 'ifDescr');
+    });
+
+    it('returns null for an oid the tree does not contain', () => {
+        assert.strictEqual(findNode(tree, '1.2.3'), null);
+        assert.strictEqual(findNode([], '1.2.3'), null);
+    });
+});
+
+describe('insertChildren', () => {
+    const tree = [
+        node({ name: 'system', oid: '1.3.6.1.2.1.1', hasChildren: true, children: undefined }),
+        node({ name: 'interfaces', oid: '1.3.6.1.2.1.2', hasChildren: true, children: undefined }),
+    ];
+
+    it('fills the folder which has been opened', () => {
+        const filled = insertChildren(tree, '1.3.6.1.2.1.2', [node({ oid: '1.3.6.1.2.1.2.1', name: 'ifNumber' })]);
+        assert.deepStrictEqual(
+            filled[1].children.map(n => n.name),
+            ['ifNumber'],
+        );
+        assert.strictEqual(filled[0].children, undefined, 'the other folders stay untouched');
+    });
+
+    it('marks an empty folder as read, so that it is not asked for again', () => {
+        const filled = insertChildren(tree, '1.3.6.1.2.1.1', []);
+        assert.deepStrictEqual(filled[0].children, []);
+        assert.strictEqual(filled[0].hasChildren, false);
+    });
+
+    it('fills a folder below an already opened one', () => {
+        const opened = insertChildren(tree, '1.3.6.1.2.1.2', [
+            node({ oid: '1.3.6.1.2.1.2.2', name: 'ifTable', hasChildren: true, children: undefined }),
+        ]);
+        const deeper = insertChildren(opened, '1.3.6.1.2.1.2.2', [node({ oid: '1.3.6.1.2.1.2.2.1', name: 'ifEntry' })]);
+
+        assert.deepStrictEqual(
+            deeper[1].children[0].children.map(n => n.name),
+            ['ifEntry'],
+        );
+    });
+
+    it('does not modify the tree it was given', () => {
+        const before = JSON.stringify(tree);
+        insertChildren(tree, '1.3.6.1.2.1.2', [node({ oid: '1.3.6.1.2.1.2.1' })]);
+        assert.strictEqual(JSON.stringify(tree), before);
     });
 });
 
@@ -207,8 +465,9 @@ describe('contract between the backend and the component', () => {
         const counter = scalars.children.find(n => n.name === 'testCounter');
 
         const row = buildOidRow(counter, 'grp', true);
-        assert.strictEqual(row.oidOid, 'TEST-SNMP-MIB::testCounter');
-        assert.strictEqual(store.resolve(row.oidOid).oid, counter.oid);
+        assert.strictEqual(row.oidOid, 'TEST-SNMP-MIB::testCounter.0');
+        assert.strictEqual(store.resolve(row.oidOid).oid, `${counter.oid}.0`);
+        assert.strictEqual(store.stateIdFor(row.oidOid), 'testCounter', 'the ".0" stays out of the state id');
     });
 
     it('a numeric row built from a tree node resolves back to the same oid', () => {
@@ -216,33 +475,30 @@ describe('contract between the backend and the component', () => {
         const counter = scalars.children.find(n => n.name === 'testCounter');
 
         const row = buildOidRow(counter, 'grp', false);
-        assert.strictEqual(store.resolve(row.oidOid).oid, counter.oid);
+        assert.strictEqual(store.resolve(row.oidOid).oid, `${counter.oid}.0`);
     });
 
-    it('a row built from a walk result keeps the instance and resolves back', () => {
-        const walk = store.describeWalkResult([
-            { oid: '1.3.6.1.4.1.99999.2.1.2.7', value: 'row seven', type: 'OctetString' },
-        ]);
-        const leaves = [];
-        const collect = nodes => nodes.forEach(n => (n.children ? collect(n.children) : leaves.push(n)));
-        collect(walk);
+    it('a row built from a value read live keeps the instance and resolves back', () => {
+        const read = store.nodeForVarbind({
+            oid: '1.3.6.1.4.1.99999.2.1.2.7',
+            value: 'row seven',
+            type: 'OctetString',
+        });
 
-        assert.strictEqual(leaves.length, 1);
-        const row = buildOidRow(leaves[0], 'grp', true);
+        const row = buildOidRow(read, 'grp', true);
         assert.strictEqual(row.oidOid, 'TEST-SNMP-MIB::testName.7');
         assert.strictEqual(row.oidName, 'testName.7');
         assert.strictEqual(store.resolve(row.oidOid).oid, '1.3.6.1.4.1.99999.2.1.2.7');
     });
 
     it('the state id the adapter derives matches the name the component stored', () => {
-        const walk = store.describeWalkResult([
-            { oid: '1.3.6.1.4.1.99999.2.1.2.7', value: 'row seven', type: 'OctetString' },
-        ]);
-        const leaves = [];
-        const collect = nodes => nodes.forEach(n => (n.children ? collect(n.children) : leaves.push(n)));
-        collect(walk);
+        const read = store.nodeForVarbind({
+            oid: '1.3.6.1.4.1.99999.2.1.2.7',
+            value: 'row seven',
+            type: 'OctetString',
+        });
 
-        const row = buildOidRow(leaves[0], 'grp', true);
+        const row = buildOidRow(read, 'grp', true);
         assert.strictEqual(store.stateIdFor(row.oidOid), row.oidName);
     });
 

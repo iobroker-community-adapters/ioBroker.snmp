@@ -1,4 +1,6 @@
 {
+    "errDevIpEmpty": "Bitte die IP-Adresse des Geräts eintragen",
+    "errDevNameEmpty": "Der Gerätename darf nicht leer sein",
     "errOidEmpty": "OID-Feld darf nicht leer sein",
     "errOidGrpEmpty": "OID-Gruppenfelder dürfen nicht leer sein",
     "errOidGrpMissing": "Mindestens eine OID-Gruppe ist erforderlich",
@@ -40,7 +42,7 @@
     "lblDevTimeout": "Zeitüberschreitung (Sek.)",
     "lblDevs": "Geräte",
     "lblDevsDevices": "Geräte",
-    "lblDevsInfo": "Sie müssen mindestens eine OID-Gruppe angeben, um Geräte hinzuzufügen",
+    "lblDevsInfo": "Noch keine OIDs definiert - legen Sie sie auf dem Tab \"OID-Sets\" an oder wählen Sie sie im MIB-Browser aus",
     "lblJson": "Json",
     "lblMib": "MIB",
     "lblMibUpload": "MIB-Dateien",

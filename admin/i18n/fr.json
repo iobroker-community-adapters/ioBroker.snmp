@@ -1,4 +1,6 @@
 {
+    "errDevIpEmpty": "Veuillez saisir l'adresse IP de l'appareil",
+    "errDevNameEmpty": "Le nom de l'appareil ne doit pas être vide",
     "errOidEmpty": "Le champ OID ne doit pas être vide",
     "errOidGrpEmpty": "Les champs du groupe OID ne doivent pas être vides",
     "errOidGrpMissing": "Au moins un groupe d'OID est requis",
@@ -40,7 +42,7 @@
     "lblDevTimeout": "délai d'attente (sec)",
     "lblDevs": "Dispositifs",
     "lblDevsDevices": "Dispositifs",
-    "lblDevsInfo": "Vous devez spécifier au moins un groupe OID pour ajouter des appareils",
+    "lblDevsInfo": "Aucun OID défini pour le moment - ajoutez-les dans l'onglet \"Ensembles d'OID\" ou choisissez-les dans le navigateur MIB",
     "lblJson": "Json",
     "lblMib": "MIB",
     "lblMibUpload": "Fichiers MIB",

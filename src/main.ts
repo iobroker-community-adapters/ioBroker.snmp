@@ -27,11 +27,12 @@ import { isIPv4, isIPv6 } from 'node:net';
 import { DEFAULT_SNMP_PORT, F_TEXT, SNMP_V3 } from './lib/constants';
 import { InstallUtils } from './lib/installUtils';
 import { isNumericOid, MibStore } from './lib/mib';
-import type { MibDevicesResponse, MibModulesResponse, MibNodesResponse } from './lib/mibTypes';
+import type { MibModulesResponse, MibNodesResponse, MibTreeNode } from './lib/mibTypes';
 import {
     snmpCloseSession,
     snmpCreateSession,
     snmpSessionGetAsync,
+    snmpSessionGetNextAsync,
     snmpSessionSetAsync,
     snmpSessionSubtreeAsync,
 } from './lib/snmpSession';
@@ -52,7 +53,14 @@ interface StateValues {
 }
 
 /** maximum number of varbinds a single MIB browser walk returns */
-const MIB_WALK_LIMIT = 500;
+/** largest sub identifier of an oid - used to skip a whole subtree with one getNext */
+const MAX_SUB_ID = 4294967295;
+
+/** maximum number of children the MIB browser reads for one folder */
+const MIB_CHILDREN_LIMIT = 200;
+
+/** maximum number of values one subtree may contribute when it is taken over as a whole */
+const MIB_SUBTREE_LIMIT = 500;
 /** name of the meta object which holds the uploaded MIB files */
 const MIB_META_SUFFIX = 'mibs';
 
@@ -81,7 +89,9 @@ class Snmp extends utils.Adapter {
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({ ...options, name: 'snmp' });
 
-        this.mibStore = new MibStore(this.log, utils.getAbsoluteInstanceDataDir(this));
+        // `this.log` does not exist yet - adapter-core creates it after the constructor has finished,
+        // so the store gets a function which looks the logger up when it actually logs something
+        this.mibStore = new MibStore(() => this.log, utils.getAbsoluteInstanceDataDir(this));
 
         this.on('ready', () => void this.onReady());
         this.on('stateChange', (id, state) => void this.onStateChange(id, state));
@@ -782,9 +792,13 @@ class Snmp extends utils.Adapter {
         this.config.authSets = this.config.authSets || [];
         this.config.devs = this.config.devs || [];
 
+        /*
+         * An incomplete configuration is not an error: the adapter has to keep running while the
+         * oids are being collected, because the MIB browser of the config dialog asks the running
+         * instance for the MIB files and for the live data of a device.
+         */
         if (!this.config.oids.length) {
-            this.log.error('no oids configured, please add configuration.');
-            ok = false;
+            this.log.warn('no oids configured, please add configuration.');
         }
 
         for (let ii = 0; ii < this.config.oids.length; ii++) {
@@ -893,8 +907,7 @@ class Snmp extends utils.Adapter {
         this.log.debug('validateConfig - verifying devices');
 
         if (!this.config.devs.length) {
-            this.log.error('no devices configured, please add configuration.');
-            ok = false;
+            this.log.warn('no devices configured, please add configuration.');
         }
 
         for (let ii = 0; ii < this.config.devs.length; ii++) {
@@ -988,18 +1001,28 @@ class Snmp extends utils.Adapter {
                 }
             }
 
+            /*
+             * A device without usable oids is skipped instead of disabling the instance: the oid
+             * group of a newly created device is filled in afterwards - with the MIB browser or by
+             * hand - and until then the other devices have to keep running.
+             *
+             * Only the runtime copy of the configuration is changed, the device stays active in the
+             * config dialog.
+             */
             if (!dev.devOidGroup) {
-                this.log.error(
-                    `device "${dev.devName}" (${dev.devIpAddr}) does not specify a oid group. Please correct configuration.`,
+                this.log.warn(
+                    `device "${dev.devName}" (${dev.devIpAddr}) does not specify a oid group and is skipped. Please correct configuration.`,
                 );
-                ok = false;
+                dev.devAct = false;
+                continue;
             }
 
-            if (dev.devOidGroup && !oidSets[dev.devOidGroup]) {
+            if (!oidSets[dev.devOidGroup]) {
                 this.log.warn(
-                    `device "${dev.devName}" (${dev.devIpAddr}) references unknown or completly inactive oid group ${dev.devOidGroup}. Please correct configuration.`,
+                    `device "${dev.devName}" (${dev.devIpAddr}) references unknown or completly inactive oid group ${dev.devOidGroup} and is skipped. Please correct configuration.`,
                 );
-                //ok = false;
+                dev.devAct = false;
+                continue;
             }
 
             /*
@@ -1333,16 +1356,115 @@ class Snmp extends utils.Adapter {
     }
 
     /**
-     * walkDevice - walk one device and annotate the result with the MIB names
+     * readChildren - read the direct children of one oid from a device
      *
-     * @param pDeviceName name of the device as configured at tab "Devices"
-     * @param pOid oid to walk, numeric or symbolic
-     * @returns the tree of everything the device reported below that oid
+     *		SNMP cannot list the children of a node, it only reports the value behind an oid. The
+     *		children are therefore collected with getNext: the first value below the node names the
+     *		first child, a second getNext tells whether that child carries more than this one value,
+     *		and the next request starts behind the whole child, so that its subtree is skipped.
+     *
+     *		That costs two requests per child instead of walking everything below the node, which is
+     *		what lets the browser open one folder at a time.
+     *
+     * @param pCTX context of the device to read
+     * @param pOid oid whose children are wanted
+     * @returns the children, folders without their content
      */
-    private async walkDevice(pDeviceName: string, pOid: string): Promise<MibNodesResponse> {
-        const dev = (this.config.devs || []).find(entry => entry.devName === pDeviceName);
+    private async readChildren(pCTX: DeviceContext, pOid: string): Promise<MibNodesResponse> {
+        const sessCtx = snmpCreateSession(pCTX, this.log);
+        if (!sessCtx.session) {
+            return { nodes: [], error: `cannot open a snmp session for device "${pCTX.name}"` };
+        }
+
+        const nodes: MibTreeNode[] = [];
+        let truncated = false;
+
+        try {
+            let cursor = pOid;
+
+            while (nodes.length < MIB_CHILDREN_LIMIT) {
+                const result = await snmpSessionGetNextAsync(sessCtx.session, [cursor], this.log);
+                if (result.err) {
+                    /*
+                     * snmp v1 does not know an "end of mib view": it answers a getNext behind the
+                     * last value with the error NoSuchName, which here only means that this level
+                     * is complete.
+                     */
+                    if (result.err.toString().includes('NoSuchName')) {
+                        break;
+                    }
+                    return { nodes, error: result.err.toString() };
+                }
+
+                const varbind = result.varbinds[0];
+                if (!varbind || isVarbindError(varbind) || !varbind.oid.startsWith(`${pOid}.`)) {
+                    // the device left the subtree - there is nothing more below this node
+                    break;
+                }
+
+                const subId = varbind.oid.slice(pOid.length + 1).split('.')[0];
+                const childOid = `${pOid}.${subId}`;
+                // the value of the child itself, as opposed to a value somewhere below it
+                const single = !varbind.oid.slice(childOid.length + 1).includes('.');
+
+                let more = false;
+                if (single) {
+                    // an error of the probe means the same as an answer outside the child: no more
+                    const probe = await snmpSessionGetNextAsync(sessCtx.session, [varbind.oid], this.log);
+                    const next = probe.varbinds[0];
+                    more = !!next && !isVarbindError(next) && next.oid.startsWith(`${childOid}.`);
+                }
+
+                if (single && !more) {
+                    // the browser only displays the values, so the textual format is good enough
+                    const decoded = varbindDecode(varbind, F_TEXT, pCTX.id, varbind.oid, this.log);
+                    nodes.push(
+                        this.mibStore.nodeForVarbind({
+                            oid: varbind.oid,
+                            value: decoded.val === null ? '' : String(decoded.val),
+                            type: oidObjType2Text(varbind.type),
+                        }),
+                    );
+
+                    // nothing else lives below this child, so the next request continues behind it
+                    cursor = varbind.oid;
+                } else {
+                    nodes.push(this.mibStore.nodeForFolder(childOid));
+
+                    /*
+                     * Everything below the child is smaller than "<child>.<largest sub id>", so this
+                     * skips the whole subtree with one request. The next sub id of the level must
+                     * not be used for that: the rows of a table carry their value at "<column>.<n>"
+                     * itself, and a getNext for that oid would jump over the row.
+                     */
+                    cursor = `${childOid}.${MAX_SUB_ID}`;
+                }
+            }
+
+            truncated = nodes.length >= MIB_CHILDREN_LIMIT;
+            this.log.debug(`readChildren - ${nodes.length} child(ren) of ${pOid} read from "${pCTX.name}"`);
+
+            return { nodes, truncated: truncated || undefined };
+        } finally {
+            snmpCloseSession(sessCtx, this.log);
+        }
+    }
+
+    /**
+     * valuesOfDevice - every value below one oid, for "take over the whole subtree"
+     *
+     * @param pDeviceName name of a configured device
+     * @param pOid oid to read below
+     * @param pDevice a device which is not part of the configuration yet - the setup wizard
+     * @returns the values, as a flat list, at most `MIB_SUBTREE_LIMIT` of them
+     */
+    private async valuesOfDevice(pDeviceName: string, pOid: string, pDevice?: DeviceConfig): Promise<MibNodesResponse> {
+        const dev = this.deviceForBrowser(pDeviceName, pDevice);
         if (!dev) {
-            return { nodes: [], error: `device "${pDeviceName}" is not configured` };
+            return {
+                nodes: [],
+                error: `device "${pDeviceName}" is unknown - please save the configuration before reading a device`,
+            };
         }
 
         if (!this.mibStore.loaded) {
@@ -1354,41 +1476,93 @@ class Snmp extends utils.Adapter {
             return { nodes: [], error: `oid "${pOid}" cannot be resolved` };
         }
 
-        this.log.debug(`walkDevice - device "${pDeviceName}", oid ${resolved.oid}`);
-
         const CTX = this.buildDeviceContext(dev);
         const sessCtx = snmpCreateSession(CTX, this.log);
         if (!sessCtx.session) {
-            return { nodes: [], error: `cannot open a snmp session for device "${pDeviceName}"` };
+            return { nodes: [], error: `cannot open a snmp session for device "${CTX.name}"` };
         }
 
         try {
-            const result = await snmpSessionSubtreeAsync(sessCtx.session, resolved.oid, MIB_WALK_LIMIT, this.log);
-            if (result.err) {
+            const result = await snmpSessionSubtreeAsync(sessCtx.session, resolved.oid, MIB_SUBTREE_LIMIT, this.log);
+
+            // snmp v1 ends the walk with NoSuchName - whatever was collected until then is valid
+            if (result.err && !result.err.toString().includes('NoSuchName')) {
                 return { nodes: [], error: result.err.toString() };
             }
 
-            const varbinds = result.varbinds
+            const nodes = result.varbinds
                 .filter(varbind => !isVarbindError(varbind))
                 .map(varbind => {
                     // the browser only displays the values, so the textual format is good enough
                     const decoded = varbindDecode(varbind, F_TEXT, CTX.id, varbind.oid, this.log);
-                    return {
+                    return this.mibStore.nodeForVarbind({
                         oid: varbind.oid,
                         value: decoded.val === null ? '' : String(decoded.val),
                         type: oidObjType2Text(varbind.type),
-                    };
+                    });
                 });
 
-            this.log.debug(`walkDevice - ${varbinds.length} varbind(s) read from "${pDeviceName}"`);
+            this.log.debug(`valuesOfDevice - ${nodes.length} value(s) below ${resolved.oid} read from "${CTX.name}"`);
 
-            return {
-                nodes: this.mibStore.describeWalkResult(varbinds),
-                truncated: result.truncated || undefined,
-            };
+            return { nodes, truncated: result.truncated || undefined };
         } finally {
             snmpCloseSession(sessCtx, this.log);
         }
+    }
+
+    /**
+     * childrenOfDevice - the children of one oid, for the MIB browser
+     *
+     * @param pDeviceName name of a configured device
+     * @param pOid oid whose children are wanted
+     * @param pDevice a device which is not part of the configuration yet - the setup wizard
+     * @returns the children of that oid
+     */
+    private async childrenOfDevice(
+        pDeviceName: string,
+        pOid: string,
+        pDevice?: DeviceConfig,
+    ): Promise<MibNodesResponse> {
+        const dev = this.deviceForBrowser(pDeviceName, pDevice);
+        if (!dev) {
+            return {
+                nodes: [],
+                error: `device "${pDeviceName}" is unknown - please save the configuration before reading a device`,
+            };
+        }
+
+        if (!this.mibStore.loaded) {
+            await this.syncMibs();
+        }
+
+        const resolved = this.mibStore.resolve(pOid);
+        if (!resolved) {
+            return { nodes: [], error: `oid "${pOid}" cannot be resolved` };
+        }
+
+        return this.readChildren(this.buildDeviceContext(dev), resolved.oid);
+    }
+
+    /**
+     * deviceForBrowser - the device a request of the MIB browser refers to
+     *
+     * @param pDeviceName name of a configured device
+     * @param pDevice a device which is not part of the configuration yet - the setup wizard sends
+     *		the whole row, because the instance cannot know a device which has just been entered
+     * @returns the device or undefined if the name is unknown
+     */
+    private deviceForBrowser(pDeviceName: string, pDevice?: DeviceConfig): DeviceConfig | undefined {
+        if (pDevice?.devIpAddr) {
+            return {
+                ...pDevice,
+                // a row from the dialog may carry anything in the timings
+                devTimeout: Number(pDevice.devTimeout) || 5,
+                devRetryIntvl: Number(pDevice.devRetryIntvl) || 5,
+                devPollIntvl: Number(pDevice.devPollIntvl) || 30,
+            };
+        }
+
+        return (this.config.devs || []).find(entry => entry.devName === pDeviceName);
     }
 
     /**
@@ -1428,33 +1602,15 @@ class Snmp extends utils.Adapter {
                     return;
                 }
 
-                case 'mibNodes': {
-                    const moduleName = (obj.message as { module?: string })?.module || '';
-                    if (!this.mibStore.loaded) {
-                        await this.syncMibs();
-                    }
-                    const nodes = this.mibStore.getTree(moduleName);
-                    const response: MibNodesResponse = { nodes };
-                    if (!nodes.length) {
-                        response.error = `mib module "${moduleName}" is not loaded`;
-                    }
-                    reply(response);
+                case 'mibSubtree': {
+                    const request = obj.message as { device?: string; dev?: DeviceConfig; oid?: string };
+                    reply(await this.valuesOfDevice(request?.device || '', request?.oid || '', request?.dev));
                     return;
                 }
 
-                case 'mibDevices': {
-                    const response: MibDevicesResponse = {
-                        devices: (this.config.devs || [])
-                            .filter(dev => !!dev.devName)
-                            .map(dev => ({ value: dev.devName, label: `${dev.devName} (${dev.devIpAddr})` })),
-                    };
-                    reply(response);
-                    return;
-                }
-
-                case 'mibWalk': {
-                    const request = obj.message as { device?: string; oid?: string };
-                    reply(await this.walkDevice(request?.device || '', request?.oid || ''));
+                case 'mibChildren': {
+                    const request = obj.message as { device?: string; dev?: DeviceConfig; oid?: string };
+                    reply(await this.childrenOfDevice(request?.device || '', request?.oid || '', request?.dev));
                     return;
                 }
 

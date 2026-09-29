@@ -1,4 +1,6 @@
 {
+    "errDevIpEmpty": "Podaj adres IP urządzenia",
+    "errDevNameEmpty": "Nazwa urządzenia nie może być pusta",
     "errOidEmpty": "Pole OID nie może być puste",
     "errOidGrpEmpty": "Pola grupy OID nie mogą być puste",
     "errOidGrpMissing": "Wymagana jest co najmniej jedna grupa OID",
@@ -40,7 +42,7 @@
     "lblDevTimeout": "limit czasu (s)",
     "lblDevs": "Urządzenia",
     "lblDevsDevices": "Urządzenia",
-    "lblDevsInfo": "Aby dodać niektóre urządzenia, musisz określić co najmniej grupę OID",
+    "lblDevsInfo": "Nie zdefiniowano jeszcze OID - dodaj je na karcie \"zestawy OID\" lub wybierz w przeglądarce MIB",
     "lblJson": "Json",
     "lblMib": "MIB",
     "lblMibUpload": "Pliki MIB",

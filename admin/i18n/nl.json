@@ -1,4 +1,6 @@
 {
+    "errDevIpEmpty": "Voer het IP-adres van het apparaat in",
+    "errDevNameEmpty": "De apparaatnaam mag niet leeg zijn",
     "errOidEmpty": "OID-veld mag niet leeg zijn",
     "errOidGrpEmpty": "OID-groepsvelden mogen niet leeg zijn",
     "errOidGrpMissing": "Er is ten minste één OID-groep vereist",
@@ -40,7 +42,7 @@
     "lblDevTimeout": "time-out (sec)",
     "lblDevs": "Apparaten",
     "lblDevsDevices": "Apparaten",
-    "lblDevsInfo": "U moet minimaal een OID-groep specificeren om sommige apparaten toe te voegen",
+    "lblDevsInfo": "Nog geen OID's gedefinieerd - voeg ze toe op het tabblad \"OID-sets\" of kies ze in de MIB-browser",
     "lblJson": "Json",
     "lblMib": "MIB",
     "lblMibUpload": "MIB-bestanden",
