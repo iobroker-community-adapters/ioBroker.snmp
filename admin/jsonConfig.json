@@ -2,6 +2,161 @@
     "i18n": true,
     "type": "tabs",
     "items": {
+        "devices": {
+            "type": "panel",
+            "label": "lblDevs",
+            "items": {
+                "_devWizard": {
+                    "type": "custom",
+                    "i18n": true,
+                    "url": "custom/customComponents.js",
+                    "name": "SnmpComponentSet/Components/SetupWizard",
+                    "guiApi": 2,
+                    "doNotSave": true,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+				"_errDevices_1": {
+					"type": "staticText",
+					"text": "lblDevsInfo",
+					"newLine": true,
+					"hidden": "data.oids&&data.oids.length",
+					"style": {
+						"fontSize": 16,
+						"textAlign": "center"
+					},
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+				},
+				"divider":{
+					"type": "divider"
+				},
+                "devs": {
+                    "type": "table",
+					"newLine": true,
+                    "label": "lblDevsDevices",
+                    "showSecondAddAt":5,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12,
+                    "items": [
+                        {
+                            "type": "checkbox",
+                            "attr": "devAct",
+                            "width": "5% ",
+                            "title": "lblDevAct",
+                            "filter": false,
+                            "sort": false,
+                            "default": true
+                        },
+                        {
+                            "type": "text",
+                            "attr": "devName",
+                            "width": "30% ",
+                            "title": "lblDevName",
+                            "filter": false,
+                            "sort": false,
+                            "validator": "!data.devAct||(data.devName&&data.devName!='')",
+                            "validatorErrorText": "errDevNameEmpty",
+                            "validatorNoSaveOnError": true,
+                            "default": ""
+                        },
+                        {
+                            "type": "text",
+                            "attr": "devIpAddr",
+                            "width": "30% ",
+                            "title": "lblDevIpAddr",
+                            "filter": false,
+                            "sort": false,
+                            "validator": "!data.devAct||(data.devIpAddr&&data.devIpAddr!=''&&data.devIpAddr!='0.0.0.0')",
+                            "validatorErrorText": "errDevIpEmpty",
+                            "validatorNoSaveOnError": true,
+                            "default": "0.0.0.0"
+                        },
+                        {
+                            "type": "checkbox",
+                            "attr": "devIp6",
+                            "width": "5% ",
+                            "title": "lblDevIp6",
+                            "filter": false,
+                            "sort": false,
+                            "default": false
+                        },
+                        {
+                            "type": "text",
+                            "attr": "devOidGroup",
+                            "width": "10% ",
+                            "title": "lblDevOidGroup",
+                            "filter": false,
+                            "sort": false,
+                            "default": "default"
+                        },
+                        {
+                            "type": "select",
+                            "attr": "devSnmpVers",
+                            "width": "10% ",
+                            "title": "lblDevSnmpVers",
+                            "options": [
+                                { "label": "SNMP v1", "value": 1},
+                                { "label": "SNMP v2c", "value": 2},
+                                { "label": "SNMP v3", "value": 3}
+                            ],
+                            "filter": false,
+                            "sort": false,
+                            "default": 1                        },
+                        {
+                            "type": "text",
+                            "attr": "devAuthId",
+                            "width": "20% ",
+                            "title": "lblDevAuthId",
+                            "filter": false,
+                            "sort": false,
+                            "default": ""
+                        },
+                        {
+                            "type": "number",
+                            "attr": "devTimeout",
+                            "width": "5% ",
+                            "title": "lblDevTimeout",
+                            "filter": false,
+                            "sort": false,
+                            "min": 1,
+                            "default": 5
+                        },
+                        {
+                            "type": "number",
+                            "attr": "devRetryIntvl",
+                            "width": "5% ",
+                            "title": "lblDevRetryIntvl",
+                            "filter": false,
+                            "sort": false,
+                            "min": 1,
+                            "default": 5
+                        },
+                        {
+                            "type": "number",
+                            "attr": "devPollIntvl",
+                            "width": "5% ",
+                            "title": "lblDevPollIntvl",
+                            "filter": false,
+                            "sort": false,
+                            "min": 1,
+                            "default": 30
+                        }
+                    ]
+                }
+            }
+        },
+        
         "oidSets": {
             "type": "panel",
             "label": "lblOidSets",
@@ -18,13 +173,25 @@
                     "lg": 12,
                     "xl": 12
 				},
+				"_oidsMibInfo":{
+					"type": "staticText",
+					"text": "infoOidMibNames",
+					"newLine": true,
+					"hidden": "!data.optUseMibNames",
+					"style": {
+						"fontSize": 16
+					},
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+				},
 				"_oidsErr_1":{
 					"type": "staticText",
 					"text": "errOidGrpMissing",
 					"newLine": true,
 					"hidden": "data.oids&&data.oids.length",
-					"validator":"data.oids&&data.oids.length",
-					"validatorNoSaveOnError": true,
 					"style": {
 						"fontSize": 16,
 						"color": "red"
@@ -40,8 +207,6 @@
 					"text": "errOidGrpEmpty",
 					"newLine": true,
 					"hidden": "if (!data.oids) return 0; for(let ii=0; ii<(data.oids.length); ii++) {if (data.oids[ii].oidGroup != ''){return 1;}}; return 0;",
-					"validator": "if (!data.oids) return 0; for(let ii=0; ii<(data.oids.length); ii++) {if (data.oids[ii].oidGroup != ''){return 1;}}; return 0;",
-					"validatorNoSaveOnError": true,
 					"style": {
 						"fontSize": 16,
 						"color": "red"
@@ -56,9 +221,7 @@
 					"type": "staticText",
 					"text": "errOidEmpty",
 					"newLine": true,
-					"hidden": "if (!data.oids) return 0; for(let ii=0; ii<(data.oids.length); ii++) {if (data.oids[ii].oid != ''){return 1;}}; return 0;",
-					"validator": "if (!data.oids) return 0; for(let ii=0; ii<(data.oids.length); ii++) {if (data.oids[ii].oid != ''){return 1;}}; return 0;",
-					"validatorNoSaveOnError": true,
+					"hidden": "if (!data.oids) return 0; for(let ii=0; ii<(data.oids.length); ii++) {if (data.oids[ii].oidOid != ''){return 1;}}; return 0;",
 					"style": {
 						"fontSize": 16,
 						"color": "red"
@@ -101,7 +264,7 @@
 							"validator": "data.oidGroup&&data.oidGroup!=''",
 							"validatorErrorText": "errOidGrpEmpty",
 							"validatorNoSaveOnError": true,
-                            "default": ""
+                            "default": "default"
                         },
                         {
                             "type": "text",
@@ -165,144 +328,6 @@
 				}
 			}
 		},
-        
-        "devices": {
-            "type": "panel",
-            "label": "lblDevs",
-            "items": {
-				"_errDevices_1": {
-					"type": "staticText",
-					"text": "lblDevsInfo",
-					"newLine": true,
-					"hidden": "data.oids&&data.oids.length",
-					"validator":"data.oids&&data.oids.length",
-					"validatorNoSaveOnError": true,
-					"style": {
-						"fontSize": 16,
-						"textAlign": "center"
-					},
-                    "xs": 12,
-                    "sm": 12,
-                    "md": 12,
-                    "lg": 12,
-                    "xl": 12
-				},
-				"divider":{
-					"type": "divider"
-				},
-                "devs": {
-                    "type": "table",
-					"newLine": true,
-					"hidden": "!(data.oids&&data.oids.length)",
-                    "label": "lblDevsDevices",
-                    "showSecondAddAt":5,
-                    "xs": 12,
-                    "sm": 12,
-                    "md": 12,
-                    "lg": 12,
-                    "xl": 12,
-                    "items": [
-                        {
-                            "type": "checkbox",
-                            "attr": "devAct",
-                            "width": "5% ",
-                            "title": "lblDevAct",
-                            "filter": false,
-                            "sort": false,
-                            "default": true
-                        },
-                        {
-                            "type": "text",
-                            "attr": "devName",
-                            "width": "30% ",
-                            "title": "lblDevName",
-                            "filter": false,
-                            "sort": false,
-                            "default": ""
-                        },
-                        {
-                            "type": "text",
-                            "attr": "devIpAddr",
-                            "width": "30% ",
-                            "title": "lblDevIpAddr",
-                            "filter": false,
-                            "sort": false,
-                            "default": "0.0.0.0"
-                        },
-                        {
-                            "type": "checkbox",
-                            "attr": "devIp6",
-                            "width": "5% ",
-                            "title": "lblDevIp6",
-                            "filter": false,
-                            "sort": false,
-                            "default": false
-                        },
-                        {
-                            "type": "text",
-                            "attr": "devOidGroup",
-                            "width": "10% ",
-                            "title": "lblDevOidGroup",
-                            "filter": false,
-                            "sort": false,
-                            "default": ""
-                        },
-                        {
-                            "type": "select",
-                            "attr": "devSnmpVers",
-                            "width": "10% ",
-                            "title": "lblDevSnmpVers",
-                            "options": [
-                                { "label": "SNMP v1", "value": 1},
-                                { "label": "SNMP v2c", "value": 2},
-                                { "label": "SNMP v3", "value": 3}
-                            ],
-                            "filter": false,
-                            "sort": false,
-                            "default": 1                        },
-                        {
-                            "type": "text",
-                            "attr": "devAuthId",
-                            "width": "20% ",
-                            "title": "lblDevAuthId",
-                            "filter": false,
-                            "sort": false,
-                            "default": ""
-                        },
-                        {
-                            "type": "number",
-                            "attr": "devTimeout",
-                            "width": "5% ",
-                            "title": "lblDevTimeout",
-                            "filter": false,
-                            "sort": false,
-                            "min": 1,
-                            "default": 5
-                        },
-                        {
-                            "type": "number",
-                            "attr": "devRetryIntvl",
-                            "width": "5% ",
-                            "title": "lblDevRetryIntvl",
-                            "filter": false,
-                            "sort": false,
-                            "min": 1,
-                            "default": 5
-                        },
-                        {
-                            "type": "number",
-                            "attr": "devPollIntvl",
-                            "width": "5% ",
-                            "title": "lblDevPollIntvl",
-                            "filter": false,
-                            "sort": false,
-                            "min": 1,
-                            "default": 30
-                        }
-                    ]
-                }
-            }
-        },
         
         "authorization": {
             "type": "panel",
@@ -437,6 +462,60 @@
 			}
 		},
         
+        "mibs": {
+            "type": "panel",
+            "label": "lblMib",
+            "items": {
+				"_mibInfo":{
+					"type": "staticText",
+					"text": "infoMib",
+					"style": {
+						"fontSize": 16
+					},
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+				},
+                "_mibUpload": {
+                    "type": "fileSelector",
+                    "label": "lblMibUpload",
+                    "objectID": "snmp.%INSTANCE%.mibs",
+                    "upload": "/",
+                    "pattern": "*.*",
+                    "delete": true,
+                    "refresh": true,
+                    "noNone": true,
+                    "doNotSave": true,
+                    "help": "hlpMibUpload",
+					"newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 6,
+                    "xl": 4
+                },
+				"divider":{
+					"type": "divider"
+				},
+                "_mibBrowser": {
+                    "type": "custom",
+                    "i18n": true,
+                    "url": "custom/customComponents.js",
+                    "name": "SnmpComponentSet/Components/MibBrowser",
+                    "guiApi": 2,
+                    "doNotSave": true,
+					"newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                }
+            }
+		},
+
         "options": {
             "type": "panel",
             "label": "lblOptions",
@@ -475,6 +554,19 @@
                     "default": false,
                     "tooltip": "ttOptNoCloseOnError",
                     "help": "hlpOptNoCloseOnError",
+                    "xs": 12,
+                    "sm": 8,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 2
+                },
+				"optUseMibNames": 	{
+                    "type": "checkbox",
+                    "label": "lblOptUseMibNames",
+					"newLine": true,
+                    "default": false,
+                    "tooltip": "ttOptUseMibNames",
+                    "help": "hlpOptUseMibNames",
                     "xs": 12,
                     "sm": 8,
                     "md": 6,

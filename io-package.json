@@ -126,6 +126,11 @@
     "connectionType": "local",
     "dataSource": "poll",
     "compact": true,
+    "nogit": true,
+    "messagebox": true,
+    "supportedMessages": {
+      "custom": true
+    },
     "authors": [
       "Marcolotti <info@ct-j.de>",
       "mcm1957 <mcm57@gmx.at>",
@@ -261,9 +266,28 @@
       }
     ]
   },
-  "native": {},
+  "native": {
+    "oids": [],
+    "devs": [],
+    "authSets": [],
+    "optChunkSize": 20,
+    "optUseName": false,
+    "optNoCloseOnError": false,
+    "optRawStates": false,
+    "optTypeStates": false,
+    "optUseMibNames": false
+  },
   "objects": [],
   "instanceObjects": [
+    {
+      "_id": "mibs",
+      "type": "meta",
+      "common": {
+        "name": "Uploaded MIB files",
+        "type": "meta.user"
+      },
+      "native": {}
+    },
     {
       "_id": "info",
       "type": "channel",

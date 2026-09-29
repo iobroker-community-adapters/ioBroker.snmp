@@ -17,12 +17,13 @@ The SNMP adapter uses the so-called OID's (Object Identifier) to read these valu
 
 ## Configuration
 The adapter queries specified OIDs (object identifiers) which are grouped within oid groups which in turn are assigned to devices. The 
-configuration data is entered at several tabs:
+configuration data is entered at several tabs, in the order in which they appear: first the devices, then the OIDs they read. A device
+whose OID group does not exist yet can be saved - the adapter warns about it and skips that device until its OIDs have been defined.
 
 ### TAB OID-Groups
 Here you specify all OIDs to be queried by the adapter, one oid per line.
 
-<p align=center><img src="img/snmp_tab_oids.jpg" width="600" /></p>
+<p align="center"><img src="img/snmp_tab_oids.jpg" width="600" /></p>
 
 | Parameter     | Type       | Description                               | Comment                                                                                               |
 |---------------|------------|-------------------------------------------|-------------------------------------------------------------------------------------------------------|
@@ -38,13 +39,25 @@ You can simply activate/deactivate any oid by setting the active flag. Note that
 normally constructed by combining the device name (see tab devices) and the OID-name specified here. You can use dots within the OID-name 
 to construct a folder structure.
 
-If some OIDs are not always available, consider setting the optional flag to avoid unnecessary errors. Please note, that this 
+If some OIDs are not always available, consider setting the optional flag to avoid unnecessary errors. Please note that this 
 requires the use of snmp v2c or SNMPv3 protocol versions.
  
 ### TAB Devices
 Here you specify which devices should be queried.
 
-<p align=center><img src="img/snmp_tab_devices.jpg" width="600" /></p>
+The button **Set up device** opens a wizard which walks through the three steps a new device needs:
+the device itself (name, address, SNMP version, community), its MIB files - which are optional and
+can be uploaded right there - and the values it should read. The last step reads the device live,
+even though it has not been saved yet, so you can tick the values you actually get. The wizard
+writes the device and its OIDs into the tables of this dialog; saving stays with the save button.
+
+The button **Set up device** opens a wizard which walks through the three steps a new device needs:
+the device itself (name, address, SNMP version, community), its MIB files - which are optional and
+can be uploaded right there - and the values it should read. The last step reads the device live,
+even though it has not been saved yet, so you can tick the values you actually get. The wizard
+writes the device and its OIDs into the tables of this dialog; saving stays with the save button.
+
+<p align="center"><img src="img/snmp_tab_devices.jpg" width="600" /></p>
 
 | Parameter                             | Type    | Description                                                       | Comment                                                                                                                                               |
 |---------------------------------------|---------|-------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -77,32 +90,84 @@ This tab contains SNMP V3 authorization information.
 
 Note that Name(id) must be unique.
 
-When selection snmp V3 protocol an extended authentication is required. At tha devices you specify the name of an authentication block
-at column Auth-Id. At this tab you must select the desired security level as following:
+When selection snmp V3 protocol, an extended authentication is required. At the devices you specify the name of an authentication block
+at column Auth-Id. At this tab you must select the desired security level as follows:
 * minimum - only a username is required
 * authentication - username and password are required
 * authentication and encryption - username, password and encryption key are required.
 
-Please note, that the specified security level must be supported by the target device and username, password and encryption key must match 
+Please note that the specified security level must be supported by the target device and username, password and encryption key must match 
 the data entered at the target device. You can use the same authorization block for multiple devices as long as they use the same data.
+
+### TAB MIB
+Here you upload the MIB files of your devices and browse their contents.
+
+| Parameter | Type | Description                       | Comment                                                                     |
+|-----------|------|-----------------------------------|-----------------------------------------------------------------------------|
+| MIB files | file | MIB files of your devices         | all uploaded files are kept in one folder, so a MIB may IMPORT another one  |
+
+The MIBs shipped with the adapter (SNMPv2-MIB, RFC1213-MIB, IF-MIB and the other SMI base modules)
+are always available and do not have to be uploaded.
+
+Below the upload the **MIB browser** shows the device itself. At the top you choose the **device**
+the OIDs are collected for - its OID group is filled in automatically, so you normally never have to
+type a group name.
+
+The tree below is always the device, read live and one level at a time: the start OID gives the
+first level, opening a folder reads what is inside it. So only what you actually look at is read,
+and what you see are the values that really exist. The uploaded MIB files give those values their
+names - `1.3.6.1.4.1.48690.10.2.1.2.1` becomes `pName.1`, with syntax, access rights and the
+DESCRIPTION text as a tooltip. An OID no MIB covers keeps its numbers. The **MIB module** list jumps
+to the beginning of a MIB, so you do not have to know its OID; the start OID can also be typed.
+
+This requires a running instance, and the device must have been saved once - a device that only
+exists in the dialog cannot be read yet. In the setup wizard on the *Devices* tab it can, because
+there the whole device is sent along with the request.
+
+A value read from a table row brings its index, so it is taken over as it is. A column itself does
+not address a value - it is marked, and opening it shows the rows to pick from. A scalar is taken
+over as `<OID>.0`, which is where SNMP keeps its only value, and the `.0` is left out of the
+object id again.
+
+The plus button of a row adds that OID to the OID group shown above, **Add all** adds everything the
+filter currently shows. An OID the group already contains is marked with a check mark instead of the
+plus, so it cannot be added twice. The OID name is taken from the MIB, the format is set to
+*automatic* and *writeable* is taken over from the MAX-ACCESS clause of the MIB.
+
+So the usual procedure for a new device is: create the device with its IP address on the *Devices*
+tab, upload its MIB here if you have one, then select the device in the MIB browser and pick the
+values you want - or enter the OIDs by hand on the *OID groups* tab. Until the OID group of a device
+contains at least one active OID, the adapter skips that device with a warning and keeps running, so
+that the MIB browser can still read the MIB files and the device itself.
 
 ### TAB Options
 Here you specify some general options
 
 <p align=center><img src="img/snmp_tab_options.jpg" width="600" /></p>
 
-| Parameter          | Type      | Description                       | Comment                                                                                                                    |
-|--------------------|-----------|-----------------------------------|----------------------------------------------------------------------------------------------------------------------------|
-| Packetsize         | integer   | maximum number of OIDs sent within a single request | reduce this value in case of TOOBIG errors                                                               |
-| Compatibility mode | boolean   | if this option is activated, datapoint names are based on ip address | NOTE: outdated - do not use any longer. This flag will not work with IPv6 addresses. Might be removed in future releases.  |
+| Parameter          | Type      | Description                                                            | Comment                                                                                                                     |
+|--------------------|-----------|------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
+| Packetsize         | integer   | maximum number of OIDs sent within a single request                    | reduce this value in case of TOOBIG errors                                                                                  |
+| Compatibility mode | boolean   | if this option is activated, datapoint names are based on ip address   | NOTE: outdated - do not use any longer. This flag will not work with IPv6 addresses. Might be removed in future releases.   |
+| Use MIB names      | boolean   | OID field accepts symbolic MIB names and the object ids follow the MIB | see below. NOTE: switching this option changes the object ids of existing OIDs                                              |
 
 
-The option packet size can be used to reduce the number of OIDs queried within one request. Depending on the target device the number of 
+The option packet size can be used to reduce the number of OIDs queried within one request. Depending on the target device, the number of 
 IODs queried with one request might be limited. In such a case the device might respond with error TOOBIG. In such a case try to 
 reduce to value for option packet size.
 
+The option **use MIB names** changes two things at once. The OID column of the OID sets then also
+accepts a symbolic name such as `IF-MIB::ifDescr.1` (or `ifDescr.1` without the module), which the
+adapter resolves to the numeric OID at startup using the uploaded MIB files. And the id of the
+ioBroker state is no longer built from the OID name but from the MIB symbol, so the example above
+ends up in `snmp.0.<device>.ifDescr.1` instead of `snmp.0.<device>.<OID-name>`.
+
+Attention: switching this option changes the ids of the states of all OIDs that a MIB covers. The
+objects written before keep their old ids and stay behind as orphans - delete them by hand if they
+are no longer wanted. OIDs that no loaded MIB covers keep using their OID name.
+
 ## OID Examples
-The search for the manufacturer and MIB is successful in most cases. In addition, you can use a mib browser software the 
+The search for the manufacturer and MIB is successful in most cases. In addition, you can use MIB browser software to 
 query your target device, i.e. https://www.ireasoning.com/mibbrowser.shtml
 
 ### Printers
@@ -110,21 +175,15 @@ For most printers, there is a standard. (PRINTER MIB)
 http://www.oidview.com/mibs/0/Printer-MIB.html
 
 For the Samsung CLP320 color laser, e.g. the following OIDs are valid.
-
-Number of printed pages: 1.3.6.1.2.1.43.10.2.1.4.1.1
-
-Black toner: 1.3.6.1.2.1.43.11.1.1.9.1.1
-
-Toner cyan: 1.3.6.1.2.1.43.11.1.1.9.1.2
-
-Toner magenta: 1.3.6.1.2.1.43.11.1.1.9.1.3
-
-Toner yellow: 1.3.6.1.2.1.43.11.1.1.9.1.4
-
-Life_drum unit: 1.3.6.1.2.1.43.11.1.1.9.1.7
+- Number of printed pages: 1.3.6.1.2.1.43.10.2.1.4.1.1
+- Black toner: 1.3.6.1.2.1.43.11.1.1.9.1.1
+- Toner cyan: 1.3.6.1.2.1.43.11.1.1.9.1.2
+- Toner magenta: 1.3.6.1.2.1.43.11.1.1.9.1.3
+- Toner yellow: 1.3.6.1.2.1.43.11.1.1.9.1.4
+- Life_drum unit: 1.3.6.1.2.1.43.11.1.1.9.1.7
 
 ### NAS Systems - Synology
-Synology: By default, SNMP is disabled on Synology Diskstations and must be enabled in the WebUI. It is important that the port 161 by default remains and community is set correctly. Mostly it is public.
+Synology: By default, SNMP is disabled on Synology Diskstations and must be enabled in the WebUI. It is important that port 161 by default remains and community is set correctly. Mostly it is public.
 
 https://global.download.synology.com/download/Document/MIBGuide/Synology_DiskStation_MIB_Guide.pdf
 

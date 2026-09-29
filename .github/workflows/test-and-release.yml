@@ -31,7 +31,11 @@ jobs:
           node-version: '24.x'
           # Uncomment the following line if your adapter cannot be installed using 'npm ci'
           # install-command: 'npm install'
+          type-checking: true
           lint: true
+          # run the unit tests too, not only test:package
+          test-command: 'npm run test'
+
 
   # Runs adapter tests on all supported node versions and OSes
   adapter-tests:
@@ -51,6 +55,7 @@ jobs:
           os: ${{ matrix.os }}
           # Uncomment the following line if your adapter cannot be installed using 'npm ci'
           # install-command: 'npm install'
+          build: true
 
   # Deploys the final package to NPM
   deploy:
@@ -72,6 +77,7 @@ jobs:
       - uses: ioBroker/testing-action-deploy@v1
         with:
           node-version: '24.x'
+          build: true
           # npm-token: ${{ secrets.NPM_TOKEN }}  # Commented out for migration to Trusted Publishing
           github-token: ${{ secrets.GITHUB_TOKEN }}
           
