@@ -32,7 +32,8 @@ Hier geben Sie alle OIDs an, die vom Adapter abgefragt werden sollen, eine OID p
 | OID-Gruppe   | Text      | Name der OID-Gruppe                                       | wird verwendet, um die Gruppe dem Gerät zuzuweisen                                                                    |
 | OID-Name     | Text      | Name, der der OID zugeordnet ist                          | wird verwendet, um den Datenpunkt zu benennen                                                                         |
 | OID          | Text      | oid-Zeichenfolge (1.2.3.4.)                               | oid-Zeichenfolge, wie vom Gerätehersteller angegeben                                                                  |
-| beschreibbar | boolesch  | sollte auf true gesetzt werden, wenn OID beschreibbar ist | reserviert für zukünftige Verwendung                                                                                  |
+| Format       | Auswahl   | wie der gelesene Wert abgelegt wird                       | Text, Zahl, Boolesch, JSON oder Automatisch - siehe *Format und State-Typ* unten                                      |
+| beschreibbar | boolesch  | sollte auf true gesetzt werden, wenn OID beschreibbar ist | der State wird beschreibbar angelegt und auf das Gerät zurückgeschrieben, siehe *Schreiben* unten                     |
 | optional     | boolesch  | sollte auf true gesetzt werden, wenn OID optional ist     | wenn auf true gesetzt, wird kein Fehler ausgelöst wenn oid unbekannt ist (Funktionalität nicht verfügbar mit snmp V1) |
 
 
@@ -42,6 +43,24 @@ um eine Ordnerstruktur aufzubauen.
 
 Wenn einige OIDs nicht immer verfügbar sind, sollten Sie das Flag optional setzen, um unnötige Fehler zu vermeiden. Bitte beachten Sie, dass dies
 die Verwendung der Protokollversionen snmp v2c oder snpm v3 erfordert.
+
+#### Format und State-Typ
+
+Das Format entscheidet, wie der gelesene Wert abgelegt wird, und damit über den Typ des
+ioBroker-States:
+
+| Format       | State-Typ | Wert                                                                                       |
+|--------------|-----------|--------------------------------------------------------------------------------------------|
+| Text         | string    | der Wert als Text                                                                            |
+| Zahl         | number    | der numerische Wert; nicht numerische Daten setzen die Qualität auf 0x01                    |
+| Boolesch     | boolean   | false bei 0 bzw. leerem Wert, sonst true                                                     |
+| JSON         | string    | `{"type":"<typ>","data":<wert>}`, damit Skripte den Wert samt Typ bekommen                   |
+| Automatisch  | mixed     | der Typ richtet sich nach dem SNMP-Typ des Wertes                                            |
+
+Bei **Automatisch** wird aus einem Ganzzahltyp (Integer32, Counter32, Gauge32, TimeTicks, Counter64,
+…) eine Zahl, aus Boolean ein boolescher Wert und aus allem anderen (OctetString, OID, IpAddress,
+Opaque) ein Text. Der State wird als `mixed` angelegt, weil das Gerät entscheidet, was ankommt.
+Wenn ein Skript oder ein Diagramm einen festen Typ braucht, wählen Sie eines der festen Formate.
  
 ### TAB Geräte
 Hier legen Sie fest, welche Geräte abgefragt werden sollen.
@@ -78,9 +97,9 @@ Diese Registerkarte enthält SNMP V3-Autorisierungsinformationen.
 | Name (ID)                 | Text    | ID der Berechtigungsdaten          | muss mit Auth-Id bei Tab-Geräten übereinstimmen |
 | Sicherheitsstufe          | Auswahl | gewünschte Sicherheitsmethode      | siehe Beschreibung                              |
 | Benutzername              | Text    | Benutzername zur Authentifizierung |                                                 |
-| Methode                   | Auswahl | Passwort-Hashing-Methode           | Unterstützte Methoden sind md5 oder sha         |
+| Methode                   | Auswahl | Passwort-Hashing-Methode           | md5, sha, sha224, sha256, sha384 oder sha512    |
 | Autorisierungsschlüssel   | Text    | Passwort zur Authentifizierung     |                                                 |
-| Verschlüsselung           | Auswahl | Verschlüsselungsverfahren          |                                                 |
+| Verschlüsselung           | Auswahl | Verschlüsselungsverfahren          | des, aes, aes256b oder aes256r                  |
 | Verschlüsselungsschlüssel | Text    | Verschlüsselungsschlüssel          |                                                 |
 
 Beachten Sie, dass Name(id) eindeutig sein muss.
@@ -129,7 +148,8 @@ zur Auswahl. Ein skalarer Wert wird als `<OID>.0` übernommen - dort führt SNMP
 und das `.0` fällt in der Objekt-ID wieder weg.
 
 Mit dem Plus-Symbol einer Zeile wird diese OID in die oben angezeigte OID-Gruppe übernommen, mit
-**Alle übernehmen** alles, was der Filter gerade zeigt. Eine OID, die die Gruppe bereits enthält,
+**Alle übernehmen** alles, was der Filter gerade zeigt, und mit dem Symbol an einem Ordner jeder
+Wert unterhalb dieses Knotens - also eine ganze Tabelle mit einem Klick. Eine OID, die die Gruppe bereits enthält,
 wird mit einem Haken statt des Plus markiert und kann nicht doppelt übernommen werden. Der OID-Name
 kommt aus der MIB, das Format wird auf *Automatisch* gesetzt und *schreibbar* wird aus der
 MAX-ACCESS-Klausel der MIB übernommen.
@@ -150,7 +170,10 @@ Hier legen Sie einige allgemeine Optionen fest
 |-----------------------|----------|-----------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
 | Paketgröße            | Ganzzahl | maximale Anzahl von OIDs, die innerhalb einer einzigen Anfrage gesendet werden    | reduzieren Sie diesen Wert bei TOOBIG-Fehlern                                                                                               |
 | Kompatibilitätsmodus  | boolesch | wenn diese Option aktiviert ist, basieren die Datenpunktnamen auf der IP-Adresse  | HINWEIS: veraltet - nicht mehr verwenden. Dieses Flag funktioniert nicht mit IPv6-Adressen. Kann in zukünftigen Versionen entfernt werden.  |
+| Sitzung offen halten  | boolesch | die Lese-Sitzung eines Geräts bei einem Fehler nicht schließen und neu öffnen     | einen Versuch wert, wenn ein Gerät nach einer einzelnen fehlgeschlagenen Anfrage nicht mehr antwortet                                       |
 | MIB-Namen verwenden   | boolean  | OID-Feld akzeptiert symbolische MIB-Namen, Objekt-IDs folgen der MIB              | siehe unten. ACHTUNG: Das Umschalten ändert die Objekt-IDs bestehender OIDs                                                                 |
+| Raw-States            | boolesch | je OID einen zusätzlichen State `<OID-Name>-raw` anlegen                          | das Varbind als JSON, für alles, was die Formate oben nicht abdecken                                                                       |
+| Typ-States            | boolesch | je OID einen zusätzlichen State `<OID-Name>-type` anlegen                         | der SNMP-Typ, mit dem das Gerät geantwortet hat, z. B. `OctetString`                                                                        |
 
 
 Die Option packetsize kann verwendet werden, um die Anzahl der abgefragten OIDs innerhalb einer Anfrage zu reduzieren. Je nach Zielgerät ist die Anzahl der
@@ -167,6 +190,47 @@ Achtung: Das Umschalten dieser Option ändert die IDs der States aller OIDs, die
 abgedeckt sind. Die vorher geschriebenen Objekte behalten ihre alten IDs und bleiben als Waisen
 zurück - löschen Sie sie bei Bedarf von Hand. OIDs, die von keiner geladenen MIB abgedeckt sind,
 verwenden weiterhin ihren OID-Namen.
+
+## States und Objekte
+
+Für jedes aktive Gerät legt der Adapter ein Geräteobjekt an, einen Ordner `info` mit dem Status
+dieses Geräts und je einen State pro aktiver OID der zugeordneten OID-Gruppe:
+
+| ID                              | Typ     | Rolle                | Bedeutung                                                            |
+|---------------------------------|---------|----------------------|----------------------------------------------------------------------|
+| `snmp.<Instanz>.info.connection` | boolean | indicator.connected  | true, solange mindestens ein Gerät antwortet                         |
+| `<Gerät>`                       | device  | -                    | `common.statusStates` zeigt auf die beiden States darunter           |
+| `<Gerät>.info.online`           | boolean | indicator.reachable  | true, solange das Gerät antwortet                                    |
+| `<Gerät>.info.error`            | boolean | indicator.reachable  | true nach einem Fehler, nach dem nächsten erfolgreichen Lesen wieder false |
+| `<Gerät>.info.error_text`       | string  | text                 | die Meldung des letzten Fehlers                                      |
+| `<Gerät>.<OID-Name>`            | siehe Format | value           | der gelesene Wert; Punkte im OID-Namen werden zu Ordnern             |
+| `<Gerät>.<OID-Name>-type`       | string  | type.encoding        | SNMP-Typ des Wertes, nur mit der Option *Typ-States*                 |
+| `<Gerät>.<OID-Name>-raw`        | string  | json                 | das Varbind, wie es ankam, nur mit der Option *Raw-States*           |
+
+`<Gerät>` ist der Gerätename; im Kompatibilitätsmodus ist es die IP-Adresse mit `_` statt `.`.
+Auf diese IDs beziehen sich Skripte und Diagramme, deshalb ändern sie sich nicht - mit der einen
+Ausnahme, die die Option *MIB-Namen verwenden* oben beschreibt.
+
+### Qualität
+
+Jeder Wert trägt den ioBroker-Qualitätscode, ein Skript kann also einen echten Wert von einem
+fehlenden unterscheiden:
+
+| Qualität | Bedeutung                                                                            |
+|----------|---------------------------------------------------------------------------------------|
+| 0x00     | in Ordnung                                                                             |
+| 0x01     | der Wert ließ sich nicht in das eingestellte Format umwandeln                          |
+| 0x02     | das Gerät hat nicht geantwortet (Timeout), der letzte Wert bleibt stehen               |
+| 0x44     | das Gerät meldet einen Fehler, der Wert wird auf null gesetzt                          |
+| 0x84     | die OID gibt es auf diesem Gerät nicht (NoSuchInstance), der Wert wird auf null gesetzt |
+
+### Schreiben
+
+Eine als *beschreibbar* markierte OID erzeugt einen beschreibbaren State, den der Adapter abonniert.
+Wird er ohne `ack` gesetzt, schreibt der Adapter den Wert mit einem SNMP-`set` auf das Gerät. Der
+Wert wird dabei in den SNMP-Typ des zuletzt gelesenen Wertes zurückverwandelt, eine solche OID muss
+also einmal gelesen worden sein, bevor sie geschrieben werden kann - bis dahin meldet der Adapter
+"cannot write to uninitialized state".
 
 ## OID-Beispiele
 Die Suche nach Hersteller und MIB ist in den meisten Fällen erfolgreich. Zusätzlich können Sie eine MIB-Browser-Software verwenden,

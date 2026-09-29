@@ -47,6 +47,7 @@ For details see the documentation referenced below.
 ### **WORK IN PROGRESS**
 - (bluefox) New tab "MIB": MIB files can be uploaded and browsed, and a device can be read live - the browser fills the OID group of the selected device, one OID at a time or all shown at once
 - (bluefox) An incomplete configuration no longer disables the instance: a device without OIDs is skipped with a warning, so that a new device can be set up with the MIB browser while the adapter is running
+- (bluefox) The documentation has been brought up to date: the format of an OID and the state type it produces, the objects and states the adapter creates with their roles and quality codes, writing back to a device, the three options which were missing, and the MIB tab plus the setup wizard in the russian documentation
 - (bluefox) A folder of the MIB browser can be taken over as a whole: its plus button adds every value below it to the OID group, read in one walk
 - (bluefox) The MIB browser has one source now: it reads the device live, level by level, and names what comes back with the uploaded MIB files - the separate, offline tree of a MIB file is gone, the module list jumps to the beginning of a MIB instead
 - (bluefox) Fixed: with SNMP v1 the end of a subtree is reported as the error NoSuchName, which made every level of a v1 device fail
