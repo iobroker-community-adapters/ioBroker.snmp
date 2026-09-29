@@ -43,6 +43,7 @@
     "lblDevs": "设备",
     "lblDevsDevices": "设备",
     "lblDevsInfo": "尚未定义 OID - 请在\"OID 集\"选项卡中添加，或在 MIB 浏览器中选择",
+    "lblHexdump": "十六进制转储",
     "lblJson": "杰森",
     "lblMib": "MIB",
     "lblMibUpload": "MIB 文件",

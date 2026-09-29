@@ -55,7 +55,16 @@ ioBroker-States:
 | Zahl         | number    | der numerische Wert; nicht numerische Daten setzen die Qualität auf 0x01                    |
 | Boolesch     | boolean   | false bei 0 bzw. leerem Wert, sonst true                                                     |
 | JSON         | string    | `{"type":"<typ>","data":<wert>}`, damit Skripte den Wert samt Typ bekommen                   |
+| Hex-Dump     | string    | die Bytes des Wertes als `76 01 04 00 27 10`, so wie ein MIB-Browser Binärdaten zeigt         |
 | Automatisch  | mixed     | der Typ richtet sich nach dem SNMP-Typ des Wertes                                            |
+
+**Hex-Dump** ist für die Binärdaten gedacht, die manche Geräte liefern - etwa die Wartungszähler
+eines Druckers. Ein solcher OctetString liest sich mit jedem anderen Format als `vy'swz'tx{'u`, als
+Hex-Dump bleibt er verwertbar: die Paare sind durch Leerzeichen getrennt, ein `val.split(' ')` im
+Skript liefert also die Bytes. Das Format gilt für OctetString, Opaque und Counter64, stellt eine
+Ganzzahl als ihre eigene Hexadezimaldarstellung dar (aus 10000 wird `27 10`) und wird für OID und
+IP-Adresse abgelehnt, die keine eigenen Bytes haben. Eine beschreibbare OID nimmt einen Hex-Dump
+auch wieder entgegen, mit oder ohne Leerzeichen und mit oder ohne führendes `0x`.
 
 Bei **Automatisch** wird aus einem Ganzzahltyp (Integer32, Counter32, Gauge32, TimeTicks, Counter64,
 …) eine Zahl, aus Boolean ein boolescher Wert und aus allem anderen (OctetString, OID, IpAddress,
@@ -125,6 +134,8 @@ Hier laden Sie die MIB-Dateien Ihrer Geräte hoch und sehen sich deren Inhalt an
 
 Die mit dem Adapter ausgelieferten MIBs (SNMPv2-MIB, RFC1213-MIB, IF-MIB und die weiteren
 SMI-Basismodule) sind immer verfügbar und müssen nicht hochgeladen werden.
+
+<p align="center"><img src="img/snmp_tab_mib.jpg" width="600" /></p>
 
 Unter dem Upload zeigt der **MIB-Browser** das Gerät selbst. Ganz oben wählen Sie das **Gerät**, für
 das die OIDs gesammelt werden - dessen OID-Gruppe wird automatisch eingetragen, ein Gruppenname muss

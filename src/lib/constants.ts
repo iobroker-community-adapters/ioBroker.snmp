@@ -13,6 +13,7 @@ export const F_TEXT = 0;
 export const F_NUMERIC = 1;
 export const F_BOOLEAN = 2;
 export const F_JSON = 3;
+export const F_HEX = 4;
 export const F_AUTO = 99;
 
 /*

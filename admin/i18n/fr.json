@@ -43,6 +43,7 @@
     "lblDevs": "Dispositifs",
     "lblDevsDevices": "Dispositifs",
     "lblDevsInfo": "Aucun OID défini pour le moment - ajoutez-les dans l'onglet \"Ensembles d'OID\" ou choisissez-les dans le navigateur MIB",
+    "lblHexdump": "Vidage hexa",
     "lblJson": "Json",
     "lblMib": "MIB",
     "lblMibUpload": "Fichiers MIB",

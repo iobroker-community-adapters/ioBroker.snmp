@@ -43,6 +43,7 @@
     "lblDevs": "Urządzenia",
     "lblDevsDevices": "Urządzenia",
     "lblDevsInfo": "Nie zdefiniowano jeszcze OID - dodaj je na karcie \"zestawy OID\" lub wybierz w przeglądarce MIB",
+    "lblHexdump": "Zrzut szesnastkowy",
     "lblJson": "Json",
     "lblMib": "MIB",
     "lblMibUpload": "Pliki MIB",

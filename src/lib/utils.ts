@@ -7,7 +7,7 @@
 
 import { ObjectType } from 'net-snmp';
 
-import { F_AUTO, F_BOOLEAN, F_JSON, F_NUMERIC, F_TEXT } from './constants';
+import { F_AUTO, F_BOOLEAN, F_HEX, F_JSON, F_NUMERIC, F_TEXT } from './constants';
 
 /**
  * Convert name to id
@@ -54,6 +54,9 @@ export function oidFormat2StateType(pOidFormat: number, pLog: ioBroker.Logger): 
             return 'boolean';
         }
         case F_JSON /* 3 */: {
+            return 'string';
+        }
+        case F_HEX /* 4 */: {
             return 'string';
         }
         case F_AUTO /* 99 */: {
@@ -107,4 +110,33 @@ for (const [code, text] of [
  */
 export function oidObjType2Text(pOidObjType: ObjectType | undefined): string {
     return OBJECT_TYPE[pOidObjType as number] || `Unknown (${pOidObjType})`;
+}
+
+/**
+ * hexDump - the bytes of a value as a hex dump, e.g. "76 01 04 00 27 10"
+ *
+ *		That is the notation a MIB browser uses for binary data. The pairs are separated by blanks,
+ *		so a script can cut the value apart without any further parsing.
+ *
+ *		A number is rendered as its own hexadecimal representation ("10000" -> "27 10"), a negative
+ *		one as its 32 bit two's complement ("-128" -> "FF FF FF 80"), which is how it sits on the
+ *		wire.
+ *
+ * @param pValue buffer or number to convert
+ * @returns the bytes as upper case pairs, separated by blanks; an empty string for no bytes
+ */
+export function hexDump(pValue: Buffer | number): string {
+    let digits: string;
+
+    if (typeof pValue === 'number') {
+        const value = Math.trunc(pValue);
+        digits = (value < 0 ? value >>> 0 : value).toString(16).toUpperCase();
+        if (digits.length % 2) {
+            digits = `0${digits}`;
+        }
+    } else {
+        digits = pValue.toString('hex').toUpperCase();
+    }
+
+    return digits.match(/../g)?.join(' ') ?? '';
 }

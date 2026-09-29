@@ -43,6 +43,7 @@
     "lblDevs": "Пристрої",
     "lblDevsDevices": "Пристрої",
     "lblDevsInfo": "OID ще не задані - додайте їх на вкладці \"набори OID\" або виберіть у MIB-браузері",
+    "lblHexdump": "Hex-дамп",
     "lblJson": "Json",
     "lblMib": "MIB",
     "lblMibUpload": "MIB-файли",

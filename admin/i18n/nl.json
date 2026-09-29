@@ -43,6 +43,7 @@
     "lblDevs": "Apparaten",
     "lblDevsDevices": "Apparaten",
     "lblDevsInfo": "Nog geen OID's gedefinieerd - voeg ze toe op het tabblad \"OID-sets\" of kies ze in de MIB-browser",
+    "lblHexdump": "Hex-dump",
     "lblJson": "Json",
     "lblMib": "MIB",
     "lblMibUpload": "MIB-bestanden",

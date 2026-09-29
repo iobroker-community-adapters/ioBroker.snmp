@@ -21,7 +21,7 @@ npm run check-tasks      # type check tasks.ts
 npm run lint             # eslint -c eslint.config.mjs
 npx eslint -c eslint.config.mjs --fix   # the ONLY formatter - never run prettier separately
 npm run test:package     # mocha test/packageFiles (downloads the schemas - fails without network)
-npm run test:unit        # mocha test/mibStore test/mibBrowser
+npm run test:unit        # mocha test/mibStore test/mibBrowser test/varbind
 npm run test             # test:package + test:unit
 npm run test:integration # mocha test/integrationAdapter - fails if a js-controller is running
 npm run translate        # translate-adapter -b admin/i18n/en.json
@@ -46,6 +46,7 @@ src/lib/types.ts          DeviceContext (CTX), OidChunk, StateCacheEntry, config
 src/lib/adapter-config.d.ts  typed `this.config` - keep in sync with io-package.json + jsonConfig
 src/lib/utils.ts          name2id, ip2ipStr, oidFormat2StateType, oidObjType2Text
 src/lib/varbind.ts        varbindDecode / varbindEncode - snmp value <-> ioBroker state value
+                          (F_HEX renders the bytes as "76 01 04", hex2buffer() reads them back)
 src/lib/snmpSession.ts    create / close a session, promisified get and set
 src/lib/installUtils.ts   migration of pre-2.0.0 configurations, defaults for newer attributes
 src/lib/mib.ts            MibStore - parses the uploaded MIB files, resolves symbol <-> oid

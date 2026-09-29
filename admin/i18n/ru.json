@@ -43,6 +43,7 @@
     "lblDevs": "Устройства",
     "lblDevsDevices": "Устройства",
     "lblDevsInfo": "OID ещё не заданы - задайте их на вкладке \"наборы OID\" или выберите их в MIB-браузере",
+    "lblHexdump": "Hex-дамп",
     "lblJson": "Джейсон",
     "lblMib": "MIB",
     "lblMibUpload": "MIB-файлы",

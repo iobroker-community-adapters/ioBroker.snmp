@@ -53,7 +53,16 @@ The format decides how the value read is stored, and with it the type of the ioB
 | Number    | number     | the numeric value; data that is not numeric sets the quality to 0x01                          |
 | Boolean   | boolean    | false for 0 resp. an empty value, true otherwise                                               |
 | JSON      | string     | `{"type":"<type>","data":<value>}`, so that scripts get the value together with its type       |
+| Hex dump  | string     | the bytes of the value as `76 01 04 00 27 10`, the way a MIB browser shows binary data         |
 | Automatic | mixed      | the type follows the SNMP type of the value                                                    |
+
+**Hex dump** is meant for the binary data some devices answer with - maintenance counters of a
+printer for example. Such an OctetString reads as `vy'swz'tx{'u` with any of the other formats,
+while the hex dump keeps it usable: the pairs are separated by blanks, so `val.split(' ')` in a
+script gives the bytes. It works for OctetString, Opaque and Counter64, renders an integer as its
+own hexadecimal representation (10000 becomes `27 10`) and is refused for an OID or an IP address,
+which carry no bytes of their own. A writeable OID takes a hex dump back, with or without blanks and
+with or without a leading `0x`.
 
 With **Automatic** an integer type (Integer32, Counter32, Gauge32, TimeTicks, Counter64, …) becomes
 a number, Boolean becomes a boolean and everything else (OctetString, OID, IpAddress, Opaque) a

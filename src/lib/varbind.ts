@@ -43,9 +43,9 @@
 
 import { ObjectType, type Varbind } from 'net-snmp';
 
-import { F_AUTO, F_BOOLEAN, F_JSON, F_NUMERIC, F_TEXT } from './constants';
+import { F_AUTO, F_BOOLEAN, F_HEX, F_JSON, F_NUMERIC, F_TEXT } from './constants';
 import type { CachedVarbind, DecodedVarbind, StateCacheEntry } from './types';
-import { oidObjType2Text } from './utils';
+import { hexDump, oidObjType2Text } from './utils';
 
 /**
  * varbindDecode - convert varbind data to native data
@@ -118,6 +118,9 @@ export function varbindDecode(
                 case F_JSON /* 3 */:
                     retval.val = JSON.stringify({ type: 'boolean', data: value });
                     break;
+                case F_HEX /* 4 */:
+                    retval.val = value ? '01' : '00';
+                    break;
             }
             break;
         }
@@ -157,6 +160,9 @@ export function varbindDecode(
                 case F_JSON /* 3 */:
                     retval.val = JSON.stringify({ type: 'number', data: value });
                     break;
+                case F_HEX /* 4 */:
+                    retval.val = hexDump(value);
+                    break;
             }
             break;
         }
@@ -195,6 +201,9 @@ export function varbindDecode(
                 case F_JSON /* 3 */:
                     retval.val = JSON.stringify({ type: 'number', data: buffer });
                     break;
+                case F_HEX /* 4 */:
+                    retval.val = hexDump(buffer);
+                    break;
             }
             break;
         }
@@ -228,6 +237,9 @@ export function varbindDecode(
                 }
                 case F_JSON /* 3 */:
                     retval.val = JSON.stringify(value); /* type: Buffer */
+                    break;
+                case F_HEX /* 4 */:
+                    retval.val = hexDump(value);
                     break;
             }
             break;
@@ -266,6 +278,13 @@ export function varbindDecode(
                         `[${pDevId}] ${pStateId} cannot convert data of type oid to boolean ${JSON.stringify(pVarbind)}`,
                     );
                     break;
+                case F_HEX /* 4 */:
+                    retval.val = null;
+                    retval.qual = 0x1; // general error
+                    pLog.warn(
+                        `[${pDevId}] ${pStateId} cannot convert data of type oid to a hex dump ${JSON.stringify(pVarbind)}`,
+                    );
+                    break;
                 case F_JSON /* 3 */:
                     retval.val = JSON.stringify(value); /* Buffer */
                     break;
@@ -297,6 +316,13 @@ export function varbindDecode(
                         `[${pDevId}] ${pStateId} cannot convert data of type ipaddress to boolean ${JSON.stringify(pVarbind)}`,
                     );
                     break;
+                case F_HEX /* 4 */:
+                    retval.val = null;
+                    retval.qual = 0x1; // general error
+                    pLog.warn(
+                        `[${pDevId}] ${pStateId} cannot convert data of type ipaddress to a hex dump ${JSON.stringify(pVarbind)}`,
+                    );
+                    break;
                 case F_JSON /* 3 */:
                     retval.val = JSON.stringify(value); /* Buffer */
                     break;
@@ -308,6 +334,13 @@ export function varbindDecode(
         // NOTE: currently only a heuristic implementation for floating point number is implemented for formats other than json.
         case ObjectType.Opaque: {
             const buffer = pVarbind.value as Buffer;
+
+            // the hex dump is the one format which works for opaque data of any content
+            if (pFormat === F_HEX) {
+                retval.val = hexDump(buffer);
+                break;
+            }
+
             if (buffer.length === 7 && buffer[0] === 159 && buffer[1] === 120 && buffer[2] === 4) {
                 const value = buffer.readFloatBE(3);
                 switch (pFormat) {
@@ -447,6 +480,31 @@ function json2number(pJson: string, pLog: ioBroker.Logger): number | null {
 }
 
 /**
+ * hex2buffer - the bytes of a hex dump, the counterpart of hexDump()
+ *
+ *		Blanks and a leading "0x" are ignored, so everything a MIB browser or the adapter itself
+ *		writes can be fed back in.
+ *
+ * @param pHex hex dump, e.g. "76 01 04" or "760104"
+ * @param pLog logger
+ * @returns the bytes or null if the text is not a hex dump
+ */
+function hex2buffer(pHex: string, pLog: ioBroker.Logger): Buffer | null {
+    const digits = pHex.replace(/0x/gi, '').replace(/[\s:-]/g, '');
+
+    if (!digits) {
+        return Buffer.alloc(0);
+    }
+
+    if (digits.length % 2 || !/^[0-9a-f]+$/i.test(digits)) {
+        pLog.warn(`cannot convert hex data, expected pairs of hex digits - ${pHex}`);
+        return null;
+    }
+
+    return Buffer.from(digits, 'hex');
+}
+
+/**
  * varbindEncode - convert native data to varbind data
  *
  * @param pState state cache entry containing the varbind template
@@ -484,6 +542,9 @@ export function varbindEncode(
             if (pState.format === F_JSON) {
                 dataType = 'json';
             } /* json must be handled special */
+            if (pState.format === F_HEX) {
+                dataType = 'hex';
+            } /* the same for a hex dump */
             break; /* ok, we can handle it */
 
         default:
@@ -508,6 +569,11 @@ export function varbindEncode(
                 case 'json':
                     retval.value = json2boolean(pData as string, pLog);
                     break;
+                case 'hex': {
+                    const buffer = hex2buffer(pData as string, pLog);
+                    retval.value = buffer ? buffer.some(byte => byte !== 0) : null;
+                    break;
+                }
             }
             break;
         }
@@ -538,6 +604,12 @@ export function varbindEncode(
                 case 'json':
                     retval.value = json2number(pData as string, pLog);
                     break;
+                case 'hex': {
+                    const buffer = hex2buffer(pData as string, pLog);
+                    // the bytes are read as one number, the way they sit on the wire
+                    retval.value = buffer ? buffer.reduce((value, byte) => value * 256 + byte, 0) : null;
+                    break;
+                }
             }
             break;
         }
@@ -567,6 +639,9 @@ export function varbindEncode(
                     break;
                 case 'json':
                     retval.value = json2buffer(pData as string, pLog);
+                    break;
+                case 'hex':
+                    retval.value = hex2buffer(pData as string, pLog);
                     break;
             }
             break;
@@ -600,6 +675,10 @@ export function varbindEncode(
                 case 'json':
                     retval.value = json2buffer(pData as string, pLog);
                     break;
+                case 'hex':
+                    retval.value = null;
+                    pLog.warn(`[${pDevId}] ${pStateId} cannot encode a hex dump (target OID) - ${pData}`);
+                    break;
             }
             break;
         }
@@ -620,6 +699,10 @@ export function varbindEncode(
                     break;
                 case 'json':
                     retval.value = json2buffer(pData as string, pLog);
+                    break;
+                case 'hex':
+                    retval.value = null;
+                    pLog.warn(`[${pDevId}] ${pStateId} cannot encode a hex dump (target ipaddress) - ${pData}`);
                     break;
             }
             break;
@@ -642,6 +725,9 @@ export function varbindEncode(
                     break;
                 case 'json':
                     retval.value = json2buffer(pData as string, pLog);
+                    break;
+                case 'hex':
+                    retval.value = hex2buffer(pData as string, pLog);
                     break;
             }
             break;

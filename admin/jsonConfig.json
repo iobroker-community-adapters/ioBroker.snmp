@@ -302,6 +302,7 @@
                                 { "label": "lblNumber", "value": 1},
                                 { "label": "lblBoolean", "value": 2},
                                 { "label": "lblJson", "value": 3},
+                                { "label": "lblHexdump", "value": 4},
                                 { "label": "lblAutomatic", "value": 99}
                             ],
                             "default": 99
@@ -528,11 +529,11 @@
                     "default": 20,
                     "tooltip": "ttOptChunkSize",
                     "help": "hlpOptChunkSize",
-                    "xs": 8,
-                    "sm": 4,
-                    "md": 3,
-                    "lg": 2,
-                    "xl": 1
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
                 },
 				"optUseName": 	{
                     "type": "checkbox",
@@ -542,10 +543,10 @@
                     "tooltip": "ttOptUseIp",
                     "help": "hlpOptUseIp",
                     "xs": 12,
-                    "sm": 8,
-                    "md": 6,
-                    "lg": 4,
-                    "xl": 2
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 6,
+                    "xl": 6
                 },
 				"optNoCloseOnError": 	{
                     "type": "checkbox",
@@ -555,10 +556,10 @@
                     "tooltip": "ttOptNoCloseOnError",
                     "help": "hlpOptNoCloseOnError",
                     "xs": 12,
-                    "sm": 8,
-                    "md": 6,
-                    "lg": 4,
-                    "xl": 2
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 6,
+                    "xl": 6
                 },
 				"optUseMibNames": 	{
                     "type": "checkbox",
@@ -568,10 +569,10 @@
                     "tooltip": "ttOptUseMibNames",
                     "help": "hlpOptUseMibNames",
                     "xs": 12,
-                    "sm": 8,
-                    "md": 6,
-                    "lg": 4,
-                    "xl": 2
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 6,
+                    "xl": 6
                 },
 				"optRawStates": 	{
                     "type": "checkbox",
@@ -581,10 +582,10 @@
                     "tooltip": "ttOptRawStates",
                     "help": "hlpOptRawStates",
                     "xs": 12,
-                    "sm": 8,
-                    "md": 6,
-                    "lg": 4,
-                    "xl": 2
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 6,
+                    "xl": 6
                 },
 				"optTypeStates": 	{
                     "type": "checkbox",
@@ -594,10 +595,10 @@
                     "tooltip": "ttOptTypeStates",
                     "help": "hlpOptTypeStates",
                     "xs": 12,
-                    "sm": 8,
-                    "md": 6,
-                    "lg": 4,
-                    "xl": 2
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 6,
+                    "xl": 6
                 }
             }
 		}        

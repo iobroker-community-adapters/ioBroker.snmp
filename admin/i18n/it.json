@@ -43,6 +43,7 @@
     "lblDevs": "Dispositivi",
     "lblDevsDevices": "Dispositivi",
     "lblDevsInfo": "Nessun OID ancora definito - aggiungerli nella scheda \"Insiemi OID\" o selezionarli nel browser MIB",
+    "lblHexdump": "Dump esadecimale",
     "lblJson": "Json",
     "lblMib": "MIB",
     "lblMibUpload": "File MIB",
