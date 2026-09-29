@@ -207,15 +207,24 @@ that device, and one state per active OID of the OID group assigned to it:
 | `snmp.<instance>.info.connection` | boolean | indicator.connected  | true while at least one device answers                               |
 | `<device>`                      | device  | -                    | `common.statusStates` points to the two states below                 |
 | `<device>.info.online`          | boolean | indicator.reachable  | true while the device answers                                        |
-| `<device>.info.error`           | boolean | indicator.reachable  | true after an error, false again after the next successful read      |
+| `<device>.info.error`           | boolean | indicator.error      | true after an error, false again after the next successful read      |
 | `<device>.info.error_text`      | string  | text                 | the message of the last error                                        |
-| `<device>.<OID-name>`           | see format | value             | the value read; dots in the OID name become folders                  |
-| `<device>.<OID-name>-type`      | string  | type.encoding        | SNMP type of the value, only with the option *type states*           |
+| `<device>.<OID-name>`           | see format | see below         | the value read; dots in the OID name become folders                  |
+| `<device>.<OID-name>-type`      | string  | text                 | SNMP type of the value, only with the option *type states*           |
 | `<device>.<OID-name>-raw`       | string  | json                 | the varbind as it arrived, only with the option *raw states*         |
 
 `<device>` is the name of the device; with the compatibility mode it is the IP address with `_`
 instead of `.`. These ids are what scripts and charts refer to, so they do not change - with one
 exception, which the option *use MIB names* documents above.
+
+The role of the value state follows its type, so that a visualization knows what it is:
+
+| state type | read only   | writeable |
+|------------|-------------|-----------|
+| number     | `value`     | `level`   |
+| boolean    | `indicator` | `switch`  |
+| string     | `text`      | `text`    |
+| mixed (format *automatic*) | `state` | `state` |
 
 ### Quality
 

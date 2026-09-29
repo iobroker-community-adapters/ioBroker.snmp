@@ -58,7 +58,7 @@
     "check-tasks": "tsc -p tsconfig.tasks.json",
     "lint": "eslint -c eslint.config.mjs",
     "test:package": "mocha test/packageFiles --exit",
-    "test:unit": "npm run build-backend && mocha --require tsx/cjs test/mibStore test/mibBrowser test/varbind --exit",
+    "test:unit": "npm run build-backend && mocha --require tsx/cjs test/mibStore test/mibBrowser test/utils test/varbind --exit",
     "test:integration": "mocha test/integrationAdapter --exit",
     "test": "npm run test:package && npm run test:unit",
     "release": "release-script",

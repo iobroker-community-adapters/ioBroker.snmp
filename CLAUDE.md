@@ -21,7 +21,7 @@ npm run check-tasks      # type check tasks.ts
 npm run lint             # eslint -c eslint.config.mjs
 npx eslint -c eslint.config.mjs --fix   # the ONLY formatter - never run prettier separately
 npm run test:package     # mocha test/packageFiles (downloads the schemas - fails without network)
-npm run test:unit        # mocha test/mibStore test/mibBrowser test/varbind
+npm run test:unit        # mocha test/mibStore test/mibBrowser test/utils test/varbind
 npm run test             # test:package + test:unit
 npm run test:integration # mocha test/integrationAdapter - fails if a js-controller is running
 npm run translate        # translate-adapter -b admin/i18n/en.json
@@ -85,6 +85,11 @@ session (unless `optNoCloseOnError`), which in turn triggers the retry through `
 `<devId>` is the device name, or the ip address with `_` instead of `.` when `optUseName` is set
 (compatibility mode for configurations from before 1.0.0). State ids must not change — they are
 what user scripts and charts refer to.
+
+The role of a state follows its type, `oidStateRole()` decides it: `value`/`level` for numbers,
+`indicator`/`switch` for booleans, `text` for strings and the generic `state` for the format
+"automatic". Only roles of the ioBroker role list may be used - the adapter checker reports the
+others, which is how the former `type.encoding` of the `-type` states was found.
 
 State quality codes in use: `0x00` ok, `0x01` conversion error, `0x02` connection problem,
 `0x44` device reported an error, `0x84` sensor/varbind reported an error.

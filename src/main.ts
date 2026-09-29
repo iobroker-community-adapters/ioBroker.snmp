@@ -37,7 +37,7 @@ import {
     snmpSessionSubtreeAsync,
 } from './lib/snmpSession';
 import type { AuthConfig, DeviceConfig, DeviceContext, OidConfig, SessionContext, StateCacheEntry } from './lib/types';
-import { ip2ipStr, name2id, oidFormat2StateType, oidObjType2Text } from './lib/utils';
+import { ip2ipStr, name2id, oidFormat2StateType, oidObjType2Text, oidStateRole } from './lib/utils';
 import { varbindDecode, varbindEncode } from './lib/varbind';
 
 /** Object definition as passed to `initObject` */
@@ -193,7 +193,16 @@ class Snmp extends utils.Adapter {
                             `reinitializing obj "${pObj._id}" state-type change ${this.STATEs[fullId].commonType} -> ${pObj.common.type}`,
                         );
                     }
-                    await this.extendObjectAsync(pObj._id, { common: { type: pObj.common.type } });
+                    /*
+                     * The role belongs to the type - a state which turns out to hold a text is a
+                     * "text", not the "state" the format "automatic" started with.
+                     */
+                    await this.extendObjectAsync(pObj._id, {
+                        common: {
+                            type: pObj.common.type,
+                            role: pObj.common.role,
+                        },
+                    });
                     this.STATEs[fullId].commonType = pObj.common.type;
                 } catch (e) {
                     this.log.error(`error reinitializing obj "${pObj._id}" ${(e as Error).message}`);
@@ -264,7 +273,7 @@ class Snmp extends utils.Adapter {
                     write: false,
                     read: true,
                     type: 'boolean',
-                    role: 'indicator.reachable',
+                    role: 'indicator.error',
                 },
                 native: {},
             });
@@ -319,6 +328,7 @@ class Snmp extends utils.Adapter {
             // id ........ normal data returned (string, json, number, boolean)
             // id.type ... iod type code
             // id.raw .... json stringified origianl data received (optional)
+            const stateType = oidFormat2StateType(pOID.oidFormat, this.log);
             await this.initObject({
                 _id: pId,
                 type: 'state',
@@ -326,8 +336,8 @@ class Snmp extends utils.Adapter {
                     name: pId,
                     write: !!pOID.oidWriteable,
                     read: true,
-                    type: oidFormat2StateType(pOID.oidFormat, this.log),
-                    role: 'value',
+                    type: stateType,
+                    role: oidStateRole(stateType, !!pOID.oidWriteable),
                 },
                 native: {},
             });
@@ -347,7 +357,7 @@ class Snmp extends utils.Adapter {
                         write: false,
                         read: true,
                         type: 'string',
-                        role: 'type.encoding',
+                        role: 'text',
                     },
                     native: {},
                 });
@@ -633,6 +643,7 @@ class Snmp extends utils.Adapter {
         this.log.debug(`[${devId}] update ${pStateId}: ${state.val}`);
 
         // data OK
+        const stateType = oidFormat2StateType(state.format, this.log);
         await this.initObject({
             _id: pStateId,
             type: 'state',
@@ -640,8 +651,8 @@ class Snmp extends utils.Adapter {
                 name: devId,
                 write: !!pWriteable,
                 read: true,
-                type: oidFormat2StateType(state.format, this.log),
-                role: 'value',
+                type: stateType,
+                role: oidStateRole(stateType, !!pWriteable),
             },
             native: {},
         });

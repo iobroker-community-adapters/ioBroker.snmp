@@ -140,3 +140,33 @@ export function hexDump(pValue: Buffer | number): string {
 
     return digits.match(/../g)?.join(' ') ?? '';
 }
+
+/**
+ * oidStateRole - the role of the ioBroker state which holds the value of one oid
+ *
+ *		The role tells a visualization what a state is. It depends on the type of the state and on
+ *		whether it can be written, see https://www.iobroker.net/#en/documentation/dev/stateroles.md:
+ *		numbers are a `value` resp. a `level`, booleans an `indicator` resp. a `switch`, a text stays
+ *		`text`, and everything the device decides itself (format "automatic") is the generic `state`.
+ *
+ * @param pStateType type of the state as oidFormat2StateType reports it
+ * @param pWriteable true if the oid is configured as writeable
+ * @returns the role for `common.role`
+ */
+export function oidStateRole(pStateType: ioBroker.CommonType, pWriteable: boolean): string {
+    switch (pStateType) {
+        case 'number': {
+            return pWriteable ? 'level' : 'value';
+        }
+        case 'boolean': {
+            return pWriteable ? 'switch' : 'indicator';
+        }
+        case 'string': {
+            return 'text';
+        }
+        default: {
+            // "mixed" - the snmp type of the answer decides what arrives here
+            return 'state';
+        }
+    }
+}

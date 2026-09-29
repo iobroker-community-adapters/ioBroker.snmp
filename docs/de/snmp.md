@@ -212,15 +212,25 @@ dieses Geräts und je einen State pro aktiver OID der zugeordneten OID-Gruppe:
 | `snmp.<Instanz>.info.connection` | boolean | indicator.connected  | true, solange mindestens ein Gerät antwortet                         |
 | `<Gerät>`                       | device  | -                    | `common.statusStates` zeigt auf die beiden States darunter           |
 | `<Gerät>.info.online`           | boolean | indicator.reachable  | true, solange das Gerät antwortet                                    |
-| `<Gerät>.info.error`            | boolean | indicator.reachable  | true nach einem Fehler, nach dem nächsten erfolgreichen Lesen wieder false |
+| `<Gerät>.info.error`            | boolean | indicator.error      | true nach einem Fehler, nach dem nächsten erfolgreichen Lesen wieder false |
 | `<Gerät>.info.error_text`       | string  | text                 | die Meldung des letzten Fehlers                                      |
-| `<Gerät>.<OID-Name>`            | siehe Format | value           | der gelesene Wert; Punkte im OID-Namen werden zu Ordnern             |
-| `<Gerät>.<OID-Name>-type`       | string  | type.encoding        | SNMP-Typ des Wertes, nur mit der Option *Typ-States*                 |
+| `<Gerät>.<OID-Name>`            | siehe Format | siehe unten     | der gelesene Wert; Punkte im OID-Namen werden zu Ordnern             |
+| `<Gerät>.<OID-Name>-type`       | string  | text                 | SNMP-Typ des Wertes, nur mit der Option *Typ-States*                 |
 | `<Gerät>.<OID-Name>-raw`        | string  | json                 | das Varbind, wie es ankam, nur mit der Option *Raw-States*           |
 
 `<Gerät>` ist der Gerätename; im Kompatibilitätsmodus ist es die IP-Adresse mit `_` statt `.`.
 Auf diese IDs beziehen sich Skripte und Diagramme, deshalb ändern sie sich nicht - mit der einen
 Ausnahme, die die Option *MIB-Namen verwenden* oben beschreibt.
+
+Die Rolle des Wert-States richtet sich nach seinem Typ, damit eine Visualisierung weiß, womit sie
+es zu tun hat:
+
+| State-Typ  | nur lesbar  | beschreibbar |
+|------------|-------------|--------------|
+| number     | `value`     | `level`      |
+| boolean    | `indicator` | `switch`     |
+| string     | `text`      | `text`       |
+| mixed (Format *Automatisch*) | `state` | `state` |
 
 ### Qualität
 
