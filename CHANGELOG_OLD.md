@@ -1,4 +1,7 @@
 # Older Changelogs
+## 3.0.0 (2023-10-12)
+* (bluefox) updated packages. Minimal node.js version is 16
+
 ## 2.4.11 (2023-07-13)
 * (McM1957) Node-net-snmp has been updated to improve uint32 handling (#282)
 * (McM1957) Several other dependencies have been updated

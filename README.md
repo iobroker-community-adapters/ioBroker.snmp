@@ -46,8 +46,7 @@ For details see the documentation referenced below.
 <!--
    ### **WORK IN PROGRESS**
 -->
-
-### **WORK IN PROGRESS**
+### 4.0.0 (2026-09-30)
 - (bluefox) New tab "Traps": the adapter can listen for snmp traps and informs of v1, v2c and v3. A received trap is written into "<device>.trap.oid", ".name", ".json" and ".count" - the counter is the state to subscribe to - and into "info.trap.*" for the last trap of any sender. The sender address decides which device a trap belongs to, and the oid of a v1 trap is derived from its pdu the way RFC 3584 describes it, so v1 and v2c traps can be compared (#22)
 - (bluefox) OID groups can be exchanged as templates: a group is written into a json file with "save as template" and a file like that is imported into a group again, adding to it or replacing it. Delivered are templates for the system group, the first port of a switch, a computer, a printer and a UPS (#202)
 - (bluefox) Fixed: rows which the setup wizard, the MIB browser or a template added stayed invisible in the table until the dialog was opened again
@@ -90,9 +89,6 @@ For details see the documentation referenced below.
 ### 3.1.0 (2023-10-13)
 * (mcm1957) Requirements have been updated. Adapter requires node.js 18 or newer now
 * (mcm1957) Packages have been updated to clean up open dependabot PRs
-
-### 3.0.0 (2023-10-12)
-* (bluefox) updated packages. Minimal node.js version is 16
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 
