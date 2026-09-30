@@ -61,5 +61,21 @@
     "snmp_wiz_cancel": "Annuleren",
     "snmp_mib_columnTooltip": "Kolom van een tabel - die wordt zonder index overgenomen en leest nog niets. Klap hem liever uit en kies een rij",
     "snmp_mib_moduleNone": "Geen MIB-modules - draait de instantie met de huidige versie?",
-    "snmp_mib_addSubtreeTooltip": "Alle waarden onder dit knooppunt aan de OID-groep toevoegen"
+    "snmp_mib_addSubtreeTooltip": "Alle waarden onder dit knooppunt aan de OID-groep toevoegen",
+    "snmp_tpl_title": "Sjablonen",
+    "snmp_tpl_group": "OID-groep",
+    "snmp_tpl_inGroup": "%s OID's",
+    "snmp_tpl_export": "Als sjabloon opslaan",
+    "snmp_tpl_exportTooltip": "De OID's van deze groep in een deelbaar bestand schrijven",
+    "snmp_tpl_delivered": "Meegeleverd sjabloon",
+    "snmp_tpl_fromFile": "Uit bestand",
+    "snmp_tpl_import": "Aan \"%s\" toevoegen",
+    "snmp_tpl_importReplace": "\"%s\" vervangen",
+    "snmp_tpl_modeAdd": "modus: toevoegen",
+    "snmp_tpl_modeReplace": "modus: vervangen",
+    "snmp_tpl_imported": "Het sjabloon is in \"%s\" overgenomen - vergeet niet op te slaan",
+    "snmp_tpl_err_notATemplate": "Dit bestand is geen SNMP-sjabloon",
+    "snmp_tpl_err_noOids": "Het sjabloon bevat geen OID's",
+    "snmp_tpl_err_noName": "Het sjabloon heeft geen naam",
+    "snmp_tpl_err_incompleteOid": "Het sjabloon bevat een OID zonder naam of zonder OID"
 }

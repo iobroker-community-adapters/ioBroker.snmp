@@ -16,7 +16,7 @@ const buildDir = `${src}build`;
 
 function clean(): void {
     // everything in admin/ except the files which are maintained by hand
-    deleteFoldersRecursive(`${__dirname}/admin`, ['snmp.png', 'jsonConfig.json', 'i18n']);
+    deleteFoldersRecursive(`${__dirname}/admin`, ['snmp.png', 'jsonConfig.json', 'i18n', 'templates']);
     deleteFoldersRecursive(buildDir);
 }
 

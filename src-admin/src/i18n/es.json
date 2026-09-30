@@ -61,5 +61,21 @@
     "snmp_wiz_cancel": "Cancelar",
     "snmp_mib_columnTooltip": "Columna de una tabla: se añade sin índice y todavía no lee nada. Mejor ábrala y elija una fila",
     "snmp_mib_moduleNone": "¿Sin módulos MIB? Compruebe si la instancia ejecuta la versión actual",
-    "snmp_mib_addSubtreeTooltip": "Añadir al grupo de OID todos los valores por debajo de este nodo"
+    "snmp_mib_addSubtreeTooltip": "Añadir al grupo de OID todos los valores por debajo de este nodo",
+    "snmp_tpl_title": "Plantillas",
+    "snmp_tpl_group": "Grupo de OID",
+    "snmp_tpl_inGroup": "%s OID",
+    "snmp_tpl_export": "Guardar como plantilla",
+    "snmp_tpl_exportTooltip": "Escribir los OID de este grupo en un archivo que se puede compartir",
+    "snmp_tpl_delivered": "Plantilla incluida",
+    "snmp_tpl_fromFile": "Desde archivo",
+    "snmp_tpl_import": "Añadir a \"%s\"",
+    "snmp_tpl_importReplace": "Reemplazar \"%s\"",
+    "snmp_tpl_modeAdd": "modo: añadir",
+    "snmp_tpl_modeReplace": "modo: reemplazar",
+    "snmp_tpl_imported": "La plantilla se ha importado en \"%s\" - no olvide guardar",
+    "snmp_tpl_err_notATemplate": "Este archivo no es una plantilla SNMP",
+    "snmp_tpl_err_noOids": "La plantilla no contiene OID",
+    "snmp_tpl_err_noName": "La plantilla no tiene nombre",
+    "snmp_tpl_err_incompleteOid": "La plantilla contiene un OID sin nombre o sin OID"
 }

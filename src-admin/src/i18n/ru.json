@@ -61,5 +61,21 @@
     "snmp_wiz_cancel": "Отмена",
     "snmp_mib_columnTooltip": "Столбец таблицы - он добавляется без индекса и ничего не читает. Лучше раскрыть его и выбрать строку",
     "snmp_mib_moduleNone": "Нет MIB-модулей - запущена ли текущая версия экземпляра?",
-    "snmp_mib_addSubtreeTooltip": "Добавить все значения под этим узлом в группу OID"
+    "snmp_mib_addSubtreeTooltip": "Добавить все значения под этим узлом в группу OID",
+    "snmp_tpl_title": "Шаблоны",
+    "snmp_tpl_group": "Группа OID",
+    "snmp_tpl_inGroup": "%s OID",
+    "snmp_tpl_export": "Сохранить как шаблон",
+    "snmp_tpl_exportTooltip": "Записать OID этой группы в файл, которым можно поделиться",
+    "snmp_tpl_delivered": "Готовый шаблон",
+    "snmp_tpl_fromFile": "Из файла",
+    "snmp_tpl_import": "Добавить в «%s»",
+    "snmp_tpl_importReplace": "Заменить «%s»",
+    "snmp_tpl_modeAdd": "режим: добавить",
+    "snmp_tpl_modeReplace": "режим: заменить",
+    "snmp_tpl_imported": "Шаблон добавлен в «%s» - не забудьте сохранить",
+    "snmp_tpl_err_notATemplate": "Этот файл не является шаблоном SNMP",
+    "snmp_tpl_err_noOids": "Шаблон не содержит OID",
+    "snmp_tpl_err_noName": "У шаблона нет имени",
+    "snmp_tpl_err_incompleteOid": "В шаблоне есть OID без имени или без самой OID"
 }

@@ -71,6 +71,55 @@ Bei **Automatisch** wird aus einem Ganzzahltyp (Integer32, Counter32, Gauge32, T
 Opaque) ein Text. Der State wird als `mixed` angelegt, weil das Gerät entscheidet, was ankommt.
 Wenn ein Skript oder ein Diagramm einen festen Typ braucht, wählen Sie eines der festen Formate.
  
+#### Vorlagen
+
+Über der Tabelle tauscht **Vorlagen** eine ganze OID-Gruppe als Datei aus, sodass ein einmal
+zusammengestellter Satz von OIDs wiederverwendet werden kann - auf einer anderen Instanz, für ein
+zweites Gerät desselben Typs oder von jemand anderem im Forum.
+
+*Als Vorlage speichern* schreibt die OIDs der gewählten Gruppe in `<Gruppe>.snmp-template.json`. Die
+Gruppe selbst steht nicht in der Datei: sie gehört zur Installation, nicht zur Geräteklasse, und
+wird beim Import neu gewählt.
+
+Für den Import gibt es zwei Quellen: *Mitgelieferte Vorlage* bietet die Sätze an, die der Adapter
+mitbringt, *Aus Datei* nimmt eine Vorlage entgegen, die Ihnen jemand geschickt hat. Der Knopf
+daneben fügt die OIDs zur gewählten Gruppe hinzu, der Schalter dahinter stellt auf *Modus: ersetzen*
+um, was die vorhandenen OIDs der Gruppe verwirft. Gespeichert wird nichts, bis der Speichern-Knopf
+des Dialogs gedrückt wird.
+
+Mitgeliefert sind `System` (die Systemgruppe, die jedes Gerät beantwortet), `Interface 1` (die
+Zähler des ersten Ports eines Switches), `Host` (Laufzeit, Speicher und Prozessorlast eines
+Rechners), `Printer` (Seitenzähler, Toner und Zustand eines Druckers) und `UPS` (Batterie und
+Restlaufzeit). Sie verwenden die OIDs der Standard-MIBs - ein Gerät, das nur die MIB seines
+Herstellers beantwortet, wird stattdessen mit dem MIB-Browser bestückt.
+
+Eine Vorlage ist einfaches JSON und lässt sich auch von Hand schreiben:
+
+```json
+{
+    "format": "snmp-template",
+    "version": 1,
+    "name": "Brother HL-L2350DW",
+    "deviceClass": "network printer",
+    "description": "what the template is good for",
+    "mib": "Printer-MIB",
+    "oids": [
+        {
+            "oidName": "pages",
+            "oidOid": "1.3.6.1.2.1.43.10.2.1.4.1.1",
+            "oidFormat": 1,
+            "oidWriteable": false,
+            "oidOptional": false
+        }
+    ]
+}
+```
+
+`format` und `name` müssen vorhanden sein, `oids` darf nicht leer sein und jeder Eintrag braucht
+`oidName` und `oidOid`; `deviceClass`, `description` und `mib` werden beim Import angezeigt und sind
+optional. `oidFormat` ist das Format der Tabelle als Zahl - 0 Text, 1 Zahl, 2 boolesch, 3 JSON,
+4 Hex-Dump, 99 automatisch - ein Eintrag ohne diese Angabe wird als automatisch gelesen.
+
 ### TAB Geräte
 Hier legen Sie fest, welche Geräte abgefragt werden sollen.
 

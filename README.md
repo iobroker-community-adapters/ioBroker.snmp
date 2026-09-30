@@ -48,6 +48,8 @@ For details see the documentation referenced below.
 -->
 
 ### **WORK IN PROGRESS**
+- (bluefox) OID groups can be exchanged as templates: a group is written into a json file with "save as template" and a file like that is imported into a group again, adding to it or replacing it. Delivered are templates for the system group, the first port of a switch, a computer, a printer and a UPS (#202)
+- (bluefox) Fixed: rows which the setup wizard, the MIB browser or a template added stayed invisible in the table until the dialog was opened again
 - (bluefox) New option "trace all snmp requests and answers": every request and every answer is written into the log as json, marked with "[trace]" and the device it belongs to - for a support case, and it covers the polls, the writes and the requests of the MIB browser (#241)
 - (bluefox) The option "do not close session on error" is documented, and the option table uses the labels of the dialog, so that every option can be found under the name it has there (#288)
 - (bluefox) A device using SNMP v3 whose authorization id is empty or refers to nothing is skipped with a warning instead of asking without a user name - such a request is answered with "Unknown User Name", which named neither the device nor the missing authorization set (#409). The ids of device and authorization set are compared without leading and trailing blanks now

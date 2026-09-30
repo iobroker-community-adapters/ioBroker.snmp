@@ -69,6 +69,54 @@ a number, Boolean becomes a boolean and everything else (OctetString, OID, IpAdd
 string. The state is created as `mixed`, because the device decides what arrives. Choose one of the
 fixed formats if a script or a chart needs a stable type.
  
+#### Templates
+
+Above the table, **Templates** exchanges a whole OID group as a file, so that a set of OIDs which
+has been put together once can be used again - on another instance, on a second device of the same
+type, or by somebody else in the forum.
+
+*Save as template* writes the OIDs of the selected group into `<group>.snmp-template.json`. The
+group itself is not part of the file: it belongs to the installation, not to the device class, and
+is chosen again on import.
+
+The import has two sources: *Delivered template* offers the sets which come with the adapter, and
+*From file* takes a template somebody sent you. The button next to them adds the OIDs to the
+selected group; the switch behind it changes to *mode: replace*, which drops the OIDs the group
+already has. Nothing is stored until the save button of the dialog is pressed.
+
+Delivered are `System` (the system group every device answers), `Interface 1` (the counters of the
+first port of a switch), `Host` (uptime, memory and processor load of a computer), `Printer` (page
+counter, toner and the state of a printer) and `UPS` (battery and remaining runtime). They use the
+OIDs of the standard MIBs - a device which only answers the MIB of its manufacturer is equipped with
+the MIB browser instead.
+
+A template is plain json and can be written by hand:
+
+```json
+{
+    "format": "snmp-template",
+    "version": 1,
+    "name": "Brother HL-L2350DW",
+    "deviceClass": "network printer",
+    "description": "what the template is good for",
+    "mib": "Printer-MIB",
+    "oids": [
+        {
+            "oidName": "pages",
+            "oidOid": "1.3.6.1.2.1.43.10.2.1.4.1.1",
+            "oidFormat": 1,
+            "oidWriteable": false,
+            "oidOptional": false
+        }
+    ]
+}
+```
+
+`format` and `name` have to be there, `oids` must not be empty and every entry needs `oidName` and
+`oidOid`; `deviceClass`, `description` and `mib` are shown on import and are optional. `oidFormat`
+is the format of the table as a number - 0 string, 1 number, 2 boolean, 3 json, 4 hex dump,
+99 automatic - and an entry without it is read as automatic.
+
 ### TAB Devices
 Here you specify which devices should be queried.
 

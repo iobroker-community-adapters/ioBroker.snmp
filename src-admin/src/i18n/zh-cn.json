@@ -61,5 +61,21 @@
     "snmp_wiz_cancel": "取消",
     "snmp_mib_columnTooltip": "表格的列 - 添加时没有索引，暂时读不到任何值。最好展开它并选择具体的行",
     "snmp_mib_moduleNone": "没有 MIB 模块 - 实例运行的是当前版本吗？",
-    "snmp_mib_addSubtreeTooltip": "将该节点下的所有值添加到 OID 组"
+    "snmp_mib_addSubtreeTooltip": "将该节点下的所有值添加到 OID 组",
+    "snmp_tpl_title": "模板",
+    "snmp_tpl_group": "OID 组",
+    "snmp_tpl_inGroup": "%s 个 OID",
+    "snmp_tpl_export": "另存为模板",
+    "snmp_tpl_exportTooltip": "把该组的 OID 写入可分享的文件",
+    "snmp_tpl_delivered": "随附模板",
+    "snmp_tpl_fromFile": "从文件",
+    "snmp_tpl_import": "添加到 \"%s\"",
+    "snmp_tpl_importReplace": "替换 \"%s\"",
+    "snmp_tpl_modeAdd": "模式：添加",
+    "snmp_tpl_modeReplace": "模式：替换",
+    "snmp_tpl_imported": "模板已导入 \"%s\" - 别忘了保存",
+    "snmp_tpl_err_notATemplate": "该文件不是 SNMP 模板",
+    "snmp_tpl_err_noOids": "模板中没有 OID",
+    "snmp_tpl_err_noName": "模板没有名称",
+    "snmp_tpl_err_incompleteOid": "模板中有缺少名称或缺少 OID 的条目"
 }

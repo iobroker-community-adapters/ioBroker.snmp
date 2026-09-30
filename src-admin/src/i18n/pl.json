@@ -61,5 +61,21 @@
     "snmp_wiz_cancel": "Anuluj",
     "snmp_mib_columnTooltip": "Kolumna tabeli - jest dodawana bez indeksu i nic jeszcze nie odczytuje. Lepiej ją rozwinąć i wybrać wiersz",
     "snmp_mib_moduleNone": "Brak modułów MIB - czy instancja działa w bieżącej wersji?",
-    "snmp_mib_addSubtreeTooltip": "Dodaj do grupy OID wszystkie wartości poniżej tego węzła"
+    "snmp_mib_addSubtreeTooltip": "Dodaj do grupy OID wszystkie wartości poniżej tego węzła",
+    "snmp_tpl_title": "Szablony",
+    "snmp_tpl_group": "Grupa OID",
+    "snmp_tpl_inGroup": "%s OID",
+    "snmp_tpl_export": "Zapisz jako szablon",
+    "snmp_tpl_exportTooltip": "Zapisz OID tej grupy do pliku, którym można się podzielić",
+    "snmp_tpl_delivered": "Szablon dołączony",
+    "snmp_tpl_fromFile": "Z pliku",
+    "snmp_tpl_import": "Dodaj do \"%s\"",
+    "snmp_tpl_importReplace": "Zastąp \"%s\"",
+    "snmp_tpl_modeAdd": "tryb: dodaj",
+    "snmp_tpl_modeReplace": "tryb: zastąp",
+    "snmp_tpl_imported": "Szablon został zaimportowany do \"%s\" - nie zapomnij zapisać",
+    "snmp_tpl_err_notATemplate": "Ten plik nie jest szablonem SNMP",
+    "snmp_tpl_err_noOids": "Szablon nie zawiera OID",
+    "snmp_tpl_err_noName": "Szablon nie ma nazwy",
+    "snmp_tpl_err_incompleteOid": "Szablon zawiera OID bez nazwy lub bez OID"
 }

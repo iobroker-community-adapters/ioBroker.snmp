@@ -21,7 +21,7 @@ npm run check-tasks      # type check tasks.ts
 npm run lint             # eslint -c eslint.config.mjs
 npx eslint -c eslint.config.mjs --fix   # the ONLY formatter - never run prettier separately
 npm run test:package     # mocha test/packageFiles (downloads the schemas - fails without network)
-npm run test:unit        # mocha test/mibStore test/mibBrowser test/snmpSession test/utils test/varbind
+npm run test:unit        # mocha test/mibStore test/mibBrowser test/snmpSession test/templates test/utils test/varbind
 npm run test             # test:package + test:unit
 npm run test:integration # mocha test/integrationAdapter - fails if a js-controller is running
 npm run translate        # translate-adapter -b admin/i18n/en.json
@@ -54,9 +54,12 @@ src/lib/mib.ts            MibStore - parses the uploaded MIB files, resolves sym
 src/lib/mibTypes.ts       payload of the `mib*` sendTo commands (contract with the admin component)
 admin/jsonConfig.json     config dialog (5 tabs), labels are i18n keys like `lblOidGroup`
 admin/i18n/<lang>.json    flat translation files, 11 languages, `en.json` is the reference
+admin/templates/*.json    the OID templates delivered with the adapter, listed in `index.json`
 src-admin/src/MibBrowser.tsx  the MIB browser, a jsonConfig `type: "custom"` component
 src-admin/src/SetupWizard.tsx the three step wizard of the device tab, also `type: "custom"`
+src-admin/src/Templates.tsx   export / import of an oid group, above the oid table
 src-admin/src/MibTree.tsx     the MIB tree as a table, used by both of them
+src-admin/src/configTable.ts  `writeTable()` - store a table and make the dialog show the new rows
 src-admin/src/types.ts    copy of mibTypes.ts + the pure row/filter logic (unit tested)
 tasks.ts                  vite build of src-admin -> admin/custom/
 ```
@@ -107,6 +110,24 @@ which has just been entered can be read before it is part of the instance config
 Everything it decides (`buildDeviceRow`, `deviceIssues`, `pickNodes`) is a pure function in
 `src-admin/src/types.ts` and unit tested; the defaults of `buildDeviceRow` have to stay in sync
 with the column defaults of the device table in `admin/jsonConfig.json`.
+
+A table of the json config reads its value when it is mounted and works on its own copy from then
+on, so a component which writes `devs` or `oids` has to go through `writeTable()` of
+`src-admin/src/configTable.ts` - a plain `onChange` stores the rows but leaves the table on screen
+unchanged until the dialog is opened again.
+
+### Templates
+
+`Templates` sits above the oid table and exchanges one oid group as a json file: `buildTemplate()`
+writes it, `parseTemplate()` reads it, `importTemplate()` puts it back into a group - all of them
+pure functions in `src-admin/src/types.ts`. The group itself is never part of a template, it is
+chosen again on import.
+
+The templates delivered with the adapter live in `admin/templates/`, `index.json` names them and
+`test/templates.js` checks that every listed file exists and can be parsed. They are read over
+`/adapter/snmp/templates/<file>`, the path under which the admin serves the adapter's own files -
+so `clean()` in `tasks.ts` must keep the directory, otherwise the next build deletes it and the
+list stays empty.
 
 ### MIB browser
 

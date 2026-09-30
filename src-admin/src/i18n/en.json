@@ -61,5 +61,21 @@
     "snmp_wiz_cancel": "Cancel",
     "snmp_mib_columnTooltip": "Column of a table - it is added without an index and reads nothing yet. Better open it and pick a row",
     "snmp_mib_moduleNone": "No MIB modules - is the instance running the current version?",
-    "snmp_mib_addSubtreeTooltip": "Add every value below this node to the OID group"
+    "snmp_mib_addSubtreeTooltip": "Add every value below this node to the OID group",
+    "snmp_tpl_title": "Templates",
+    "snmp_tpl_group": "OID group",
+    "snmp_tpl_inGroup": "%s OIDs",
+    "snmp_tpl_export": "Save as template",
+    "snmp_tpl_exportTooltip": "Write the OIDs of this group into a file which can be shared",
+    "snmp_tpl_delivered": "Delivered template",
+    "snmp_tpl_fromFile": "From file",
+    "snmp_tpl_import": "Add to \"%s\"",
+    "snmp_tpl_importReplace": "Replace \"%s\"",
+    "snmp_tpl_modeAdd": "mode: add",
+    "snmp_tpl_modeReplace": "mode: replace",
+    "snmp_tpl_imported": "The template has been imported into \"%s\" - do not forget to save",
+    "snmp_tpl_err_notATemplate": "This file is not an SNMP template",
+    "snmp_tpl_err_noOids": "The template contains no OIDs",
+    "snmp_tpl_err_noName": "The template has no name",
+    "snmp_tpl_err_incompleteOid": "The template contains an OID without a name or without an OID"
 }

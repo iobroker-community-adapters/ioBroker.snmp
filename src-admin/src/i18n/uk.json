@@ -61,5 +61,21 @@
     "snmp_wiz_cancel": "Скасувати",
     "snmp_mib_columnTooltip": "Стовпець таблиці - його додано без індексу, і він ще нічого не читає. Краще розгорнути його та вибрати рядок",
     "snmp_mib_moduleNone": "Немає MIB-модулів - чи працює екземпляр з поточною версією?",
-    "snmp_mib_addSubtreeTooltip": "Додати до групи OID усі значення під цим вузлом"
+    "snmp_mib_addSubtreeTooltip": "Додати до групи OID усі значення під цим вузлом",
+    "snmp_tpl_title": "Шаблони",
+    "snmp_tpl_group": "Група OID",
+    "snmp_tpl_inGroup": "%s OID",
+    "snmp_tpl_export": "Зберегти як шаблон",
+    "snmp_tpl_exportTooltip": "Записати OID цієї групи у файл, яким можна поділитися",
+    "snmp_tpl_delivered": "Готовий шаблон",
+    "snmp_tpl_fromFile": "З файлу",
+    "snmp_tpl_import": "Додати до «%s»",
+    "snmp_tpl_importReplace": "Замінити «%s»",
+    "snmp_tpl_modeAdd": "режим: додати",
+    "snmp_tpl_modeReplace": "режим: замінити",
+    "snmp_tpl_imported": "Шаблон імпортовано до «%s» - не забудьте зберегти",
+    "snmp_tpl_err_notATemplate": "Цей файл не є шаблоном SNMP",
+    "snmp_tpl_err_noOids": "Шаблон не містить OID",
+    "snmp_tpl_err_noName": "Шаблон не має назви",
+    "snmp_tpl_err_incompleteOid": "Шаблон містить OID без назви або без самої OID"
 }

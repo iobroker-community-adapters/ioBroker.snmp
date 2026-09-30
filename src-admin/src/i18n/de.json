@@ -61,5 +61,21 @@
     "snmp_wiz_cancel": "Abbrechen",
     "snmp_mib_columnTooltip": "Spalte einer Tabelle - sie wird ohne Index übernommen und liest noch nichts. Besser aufklappen und eine Zeile auswählen",
     "snmp_mib_moduleNone": "Keine MIB-Module - läuft die Instanz mit der aktuellen Version?",
-    "snmp_mib_addSubtreeTooltip": "Alle Werte unter diesem Knoten in die OID-Gruppe übernehmen"
+    "snmp_mib_addSubtreeTooltip": "Alle Werte unter diesem Knoten in die OID-Gruppe übernehmen",
+    "snmp_tpl_title": "Vorlagen",
+    "snmp_tpl_group": "OID-Gruppe",
+    "snmp_tpl_inGroup": "%s OIDs",
+    "snmp_tpl_export": "Als Vorlage speichern",
+    "snmp_tpl_exportTooltip": "Die OIDs dieser Gruppe in eine Datei schreiben, die sich weitergeben lässt",
+    "snmp_tpl_delivered": "Mitgelieferte Vorlage",
+    "snmp_tpl_fromFile": "Aus Datei",
+    "snmp_tpl_import": "Zu \"%s\" hinzufügen",
+    "snmp_tpl_importReplace": "\"%s\" ersetzen",
+    "snmp_tpl_modeAdd": "Modus: hinzufügen",
+    "snmp_tpl_modeReplace": "Modus: ersetzen",
+    "snmp_tpl_imported": "Die Vorlage wurde in \"%s\" übernommen - bitte nicht vergessen zu speichern",
+    "snmp_tpl_err_notATemplate": "Diese Datei ist keine SNMP-Vorlage",
+    "snmp_tpl_err_noOids": "Die Vorlage enthält keine OIDs",
+    "snmp_tpl_err_noName": "Die Vorlage hat keinen Namen",
+    "snmp_tpl_err_incompleteOid": "Die Vorlage enthält eine OID ohne Namen oder ohne OID"
 }

@@ -57,6 +57,7 @@ import {
     type OidRow,
     type WizardDevice,
 } from './types';
+import { writeTable } from './configTable';
 
 /** the steps of the wizard */
 const STEPS = ['snmp_wiz_stepDevice', 'snmp_wiz_stepMib', 'snmp_wiz_stepOids'];
@@ -349,8 +350,8 @@ export default class SetupWizard extends ConfigGeneric<ConfigGenericProps, Setup
         const device = buildDeviceRow(this.state.device);
         const nodes = pickNodes(this.state.nodes, this.state.selected);
 
-        await this.onChange('devs', [...this.deviceRows, device]);
-        await this.onChange('oids', [
+        await writeTable(this, 'devs', [...this.deviceRows, device]);
+        await writeTable(this, 'oids', [
             ...this.oidRows,
             ...nodes.map(node => buildOidRow(node, device.devOidGroup, this.useMibNames)),
         ]);

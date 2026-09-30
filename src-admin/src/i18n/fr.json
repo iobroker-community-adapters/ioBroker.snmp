@@ -61,5 +61,21 @@
     "snmp_wiz_cancel": "Annuler",
     "snmp_mib_columnTooltip": "Colonne d'une table : elle est ajoutée sans index et ne lit encore rien. Ouvrez-la plutôt et choisissez une ligne",
     "snmp_mib_moduleNone": "Aucun module MIB - l'instance exécute-t-elle la version actuelle ?",
-    "snmp_mib_addSubtreeTooltip": "Ajouter au groupe d'OID toutes les valeurs sous ce nœud"
+    "snmp_mib_addSubtreeTooltip": "Ajouter au groupe d'OID toutes les valeurs sous ce nœud",
+    "snmp_tpl_title": "Modèles",
+    "snmp_tpl_group": "Groupe d'OID",
+    "snmp_tpl_inGroup": "%s OID",
+    "snmp_tpl_export": "Enregistrer comme modèle",
+    "snmp_tpl_exportTooltip": "Écrire les OID de ce groupe dans un fichier partageable",
+    "snmp_tpl_delivered": "Modèle fourni",
+    "snmp_tpl_fromFile": "Depuis un fichier",
+    "snmp_tpl_import": "Ajouter à « %s »",
+    "snmp_tpl_importReplace": "Remplacer « %s »",
+    "snmp_tpl_modeAdd": "mode : ajouter",
+    "snmp_tpl_modeReplace": "mode : remplacer",
+    "snmp_tpl_imported": "Le modèle a été importé dans « %s » - n'oubliez pas d'enregistrer",
+    "snmp_tpl_err_notATemplate": "Ce fichier n'est pas un modèle SNMP",
+    "snmp_tpl_err_noOids": "Le modèle ne contient aucun OID",
+    "snmp_tpl_err_noName": "Le modèle n'a pas de nom",
+    "snmp_tpl_err_incompleteOid": "Le modèle contient un OID sans nom ou sans OID"
 }

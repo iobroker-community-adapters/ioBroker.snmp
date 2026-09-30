@@ -50,6 +50,7 @@ import {
     type MibTreeNode,
     type OidRow,
 } from './types';
+import { writeTable } from './configTable';
 
 interface MibBrowserState extends ConfigGenericState {
     /** all MIB modules the adapter has loaded */
@@ -328,7 +329,8 @@ export default class MibBrowser extends ConfigGeneric<ConfigGenericProps, MibBro
             return;
         }
 
-        await this.onChange(
+        await writeTable(
+            this,
             'devs',
             rows.map(row => (row?.devName === name ? { ...row, devOidGroup: group } : row)),
         );
@@ -354,7 +356,7 @@ export default class MibBrowser extends ConfigGeneric<ConfigGenericProps, MibBro
 
         // a device created before this version may still carry an empty group
         await this.attachGroup(group);
-        await this.onChange('oids', rows);
+        await writeTable(this, 'oids', rows);
     }
 
     /**

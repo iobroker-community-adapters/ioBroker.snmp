@@ -425,3 +425,163 @@ export function insertChildren(pNodes: MibTreeNode[], pOid: string, pChildren: M
         return node;
     });
 }
+
+/** the marker every template file carries, so that a wrong file is recognized as such */
+export const TEMPLATE_FORMAT = 'snmp-template';
+
+/** One OID of a template - a row of the OID table without the group, which is chosen on import */
+export interface TemplateOid {
+    oidName: string;
+    oidOid: string;
+    oidFormat: number;
+    oidWriteable: boolean;
+    oidOptional: boolean;
+}
+
+/** A set of OID definitions for one device or device class, exchangeable as a json file */
+export interface OidTemplate {
+    format: typeof TEMPLATE_FORMAT;
+    version: number;
+    /** name of the template, shown in the import list */
+    name: string;
+    /** the device or the class of devices the template was made for */
+    deviceClass?: string;
+    description?: string;
+    /** the MIB the oids come from - information for the reader, the oids are numeric */
+    mib?: string;
+    oids: TemplateOid[];
+}
+
+/**
+ * buildTemplate - the template of one oid group
+ *
+ * The group itself is not part of it: it belongs to the installation, not to the device class, and
+ * is chosen again when the template is imported.
+ *
+ * @param pRows current content of the OID table
+ * @param pGroup name of the oid group to export
+ * @param pName name of the template
+ * @returns the template, with the oids of that group in the order of the table
+ */
+export function buildTemplate(pRows: OidRow[] | undefined, pGroup: string, pName: string): OidTemplate {
+    const group = (pGroup || '').trim();
+
+    return {
+        format: TEMPLATE_FORMAT,
+        version: 1,
+        name: (pName || '').trim() || group,
+        oids: (pRows || [])
+            .filter(row => row?.oidGroup === group)
+            .map(row => ({
+                oidName: row.oidName,
+                oidOid: row.oidOid,
+                oidFormat: row.oidFormat,
+                oidWriteable: !!row.oidWriteable,
+                oidOptional: !!row.oidOptional,
+            })),
+    };
+}
+
+/**
+ * parseTemplate - read a template file
+ *
+ * @param pText content of the file
+ * @returns the template, or the reason why the file cannot be used
+ */
+export function parseTemplate(pText: string): { template?: OidTemplate; error?: string } {
+    let data: Partial<OidTemplate>;
+    try {
+        data = JSON.parse(pText) as Partial<OidTemplate>;
+    } catch (e) {
+        return { error: (e as Error).message };
+    }
+
+    if (data?.format !== TEMPLATE_FORMAT) {
+        return { error: 'notATemplate' };
+    }
+    if (!Array.isArray(data.oids) || !data.oids.length) {
+        return { error: 'noOids' };
+    }
+    // a name is missing in a hand written file more often than anything else
+    if (!data.name) {
+        return { error: 'noName' };
+    }
+
+    for (const oid of data.oids) {
+        if (!oid?.oidName || !oid?.oidOid) {
+            return { error: 'incompleteOid' };
+        }
+    }
+
+    return { template: data as OidTemplate };
+}
+
+/**
+ * templateRows - the rows a template adds to one oid group
+ *
+ * @param pTemplate the template
+ * @param pGroup oid group the rows belong to
+ * @returns one row per oid of the template, active and with the defaults of the table
+ */
+export function templateRows(pTemplate: OidTemplate, pGroup: string): OidRow[] {
+    const group = (pGroup || '').trim();
+
+    return pTemplate.oids.map(oid => ({
+        oidAct: true,
+        oidGroup: group,
+        oidName: oid.oidName,
+        oidOid: oid.oidOid,
+        // an old template may miss the format - "automatic" is what the dialog offers as default
+        oidFormat: typeof oid.oidFormat === 'number' ? oid.oidFormat : 99,
+        oidWriteable: !!oid.oidWriteable,
+        oidOptional: !!oid.oidOptional,
+    }));
+}
+
+/**
+ * importTemplate - the OID table after importing a template
+ *
+ * @param pRows current content of the OID table
+ * @param pTemplate the template to import
+ * @param pGroup oid group the template is imported into
+ * @param pReplace true to drop the rows the group already has, false to add to them
+ * @returns the new content of the OID table
+ */
+export function importTemplate(
+    pRows: OidRow[] | undefined,
+    pTemplate: OidTemplate,
+    pGroup: string,
+    pReplace: boolean,
+): OidRow[] {
+    const group = (pGroup || '').trim();
+    const rows = pRows || [];
+    const kept = pReplace ? rows.filter(row => row?.oidGroup !== group) : rows;
+
+    return [...kept, ...templateRows(pTemplate, group)];
+}
+
+/**
+ * oidGroups - the oid groups a configuration knows
+ *
+ * @param pRows current content of the OID table
+ * @param pDevices current content of the device table
+ * @returns every group name which appears in one of the two tables, without duplicates
+ */
+export function oidGroups(pRows: OidRow[] | undefined, pDevices: DeviceRow[] | undefined): string[] {
+    const groups = new Set<string>();
+
+    for (const row of pRows || []) {
+        const group = (row?.oidGroup || '').trim();
+        if (group) {
+            groups.add(group);
+        }
+    }
+    for (const device of pDevices || []) {
+        const group = (device?.devOidGroup || '').trim();
+        if (group) {
+            groups.add(group);
+        }
+    }
+
+    return [...groups].sort();
+}
