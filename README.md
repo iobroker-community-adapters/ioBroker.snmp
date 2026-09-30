@@ -48,9 +48,7 @@ For details see the documentation referenced below.
 -->
 
 ### **WORK IN PROGRESS**
-- (copilot) Adapter requires node.js >= 22 now
-- (copilot) Adapter requires js-controlelr >= 7.2.2 now
-- (copilot) Adapter requires admin >= 8.0.14 now
+- (copilot) Adapter requires node.js >= 22, js-controller >= 7.2.2 and admin >= 8.0.14 now.
 - (bluefox) State roles have been corrected.(#524)
 - (bluefox) New value format "hex dump": binary data of an OctetString, Opaque or Counter64 is stored as "76 01 04 00 27 10", the way a MIB browser shows it, and a writeable OID takes that notation back (#623)
 - (bluefox) New tab "MIB": MIB files can be uploaded and browsed, and a device can be read live - the browser fills the OID group of the selected device, one OID at a time or all shown at once
