@@ -182,8 +182,11 @@ Switching the option therefore changes existing object ids - that is documented 
   net-snmp aliases those codes and the later table entry wins. The `-type` states have always
   contained this wording.
 - `json2boolean` / `json2number` reject `data: false` resp. `data: 0` as "data element missing".
-- `validateConfig()` does not reject an snmp v3 device without an authorization id: the original
-  check tested a misspelled attribute and never fired. Enabling it would disable existing instances.
+- ~~`validateConfig()` does not reject an snmp v3 device without an authorization id~~ - the check
+  is active since the incomplete configuration only skips the device instead of disabling the
+  instance. A v3 device without a resolvable authorization set would ask with an empty user name,
+  which a device answers with "Unknown User Name" (issue #409). `findAuthSet()` compares both ids
+  trimmed, `validateConfig()` and `buildDeviceContext()` use it.
 - The state cache `STATEs` is used for two different purposes under the same key (see the comment
   on `StateCacheEntry`); `onStateChange` reports "cannot write to uninitialized state" when the
   entry currently holds the other shape.

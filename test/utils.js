@@ -8,7 +8,7 @@
 
 const assert = require('node:assert');
 
-const { hexDump, name2id, oidFormat2StateType, oidStateRole } = require('../src/lib/utils.ts');
+const { findAuthSet, hexDump, name2id, oidFormat2StateType, oidStateRole } = require('../src/lib/utils.ts');
 const { F_TEXT, F_NUMERIC, F_BOOLEAN, F_JSON, F_HEX, F_AUTO } = require('../src/lib/constants.ts');
 
 /** a logger which keeps the warnings */
@@ -66,6 +66,26 @@ describe('oidStateRole', () => {
     it('falls back to the generic role when the device decides the type', () => {
         assert.strictEqual(oidStateRole('mixed', false), 'state');
         assert.strictEqual(oidStateRole('mixed', true), 'state');
+    });
+});
+
+describe('findAuthSet', () => {
+    const sets = [{ authId: 'ccu', authUser: 'snmpuser' }, { authId: ' spaced ', authUser: 'other' }];
+
+    it('finds the set a device refers to', () => {
+        assert.strictEqual(findAuthSet(sets, 'ccu').authUser, 'snmpuser');
+    });
+
+    it('compares both ids trimmed - a stray blank must not separate them (#409)', () => {
+        assert.strictEqual(findAuthSet(sets, 'spaced').authUser, 'other');
+        assert.strictEqual(findAuthSet(sets, ' ccu ').authUser, 'snmpuser');
+    });
+
+    it('returns nothing for an empty or unknown id, so that the caller can report it', () => {
+        assert.strictEqual(findAuthSet(sets, ''), undefined);
+        assert.strictEqual(findAuthSet(sets, '   '), undefined);
+        assert.strictEqual(findAuthSet(sets, 'nosuchset'), undefined);
+        assert.strictEqual(findAuthSet(undefined, 'ccu'), undefined);
     });
 });
 

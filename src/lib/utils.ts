@@ -170,3 +170,23 @@ export function oidStateRole(pStateType: ioBroker.CommonType, pWriteable: boolea
         }
     }
 }
+
+/**
+ * findAuthSet - the authorization set a device refers to
+ *
+ *		Both ids are compared trimmed: a blank which slipped into one of the two fields would
+ *		otherwise leave the device without a user name, and an snmp v3 agent answers a request
+ *		without a user name with "Unknown User Name" - which says nothing about the real cause.
+ *
+ * @param pAuthSets content of `native.authSets`
+ * @param pAuthId authorization id of the device
+ * @returns the authorization set, or undefined if the id is empty or refers to nothing
+ */
+export function findAuthSet<T extends { authId: string }>(pAuthSets: T[] | undefined, pAuthId: string): T | undefined {
+    const wanted = (pAuthId || '').trim();
+    if (!wanted) {
+        return undefined;
+    }
+
+    return (pAuthSets || []).find(authSet => (authSet?.authId || '').trim() === wanted);
+}

@@ -115,7 +115,10 @@ This tab contains SNMP V3 authorization information.
 | Encryption        | selection   | encryption method                 | des, aes, aes256b or aes256r        |
 | Encryption Key    | text        | encryption key                    |                                     |
 
-Note that Name(id) must be unique.
+Note that Name(id) must be unique. The Auth-Id of a device on the *Devices* tab has to match one
+of these names - leading and trailing blanks are ignored on both sides. A device using SNMP v3 whose
+Auth-Id matches nothing is skipped with a warning, because the adapter would otherwise ask without a
+user name and the device would answer "Unknown User Name", which says nothing about the real cause.
 
 When selection snmp V3 protocol, an extended authentication is required. At the devices you specify the name of an authentication block
 at column Auth-Id. At this tab you must select the desired security level as follows:

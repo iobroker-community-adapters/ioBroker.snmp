@@ -197,6 +197,11 @@ export function snmpCreateSession(pCTX: DeviceContext, pLog: ioBroker.Logger): S
             privKey: pCTX.authEncKey,
         };
 
+        // the keys never belong into the log, the user name is what a failed authorization is about
+        pLog.debug(
+            `snmpCreateSession - device ${pCTX.name} asks as snmp v3 user "${snmpUser.name}", security level ${snmpSecurityLevel}`,
+        );
+
         const snmpTransport = pCTX.isIPv6 ? 'udp6' : 'udp4';
         const snmpVersion = snmp.Version3;
         // ??? engineID: "8000B98380XXXXXXXXXXXXXXXXXXXXXXXX", // where the X's are random hex digits

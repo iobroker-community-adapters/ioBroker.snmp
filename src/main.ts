@@ -37,7 +37,7 @@ import {
     snmpSessionSubtreeAsync,
 } from './lib/snmpSession';
 import type { AuthConfig, DeviceConfig, DeviceContext, OidConfig, SessionContext, StateCacheEntry } from './lib/types';
-import { ip2ipStr, name2id, oidFormat2StateType, oidObjType2Text, oidStateRole } from './lib/utils';
+import { findAuthSet, ip2ipStr, name2id, oidFormat2StateType, oidObjType2Text, oidStateRole } from './lib/utils';
 import { varbindDecode, varbindEncode } from './lib/varbind';
 
 /** Object definition as passed to `initObject` */
@@ -896,6 +896,8 @@ class Snmp extends utils.Adapter {
 
         for (let ii = 0; ii < this.config.authSets.length; ii++) {
             const authSet = this.config.authSets[ii];
+            // trimmed like the ids of the devices, so that a stray blank cannot separate the two
+            authSet.authId = (authSet.authId || '').trim();
             const authId = authSet.authId;
             if (!authId) {
                 this.log.error('empty authorization id detected, please correct configuration.');
@@ -1044,11 +1046,17 @@ class Snmp extends utils.Adapter {
              * refactoring.
              */
 
-            if (Number(dev.devSnmpVers) === SNMP_V3 && dev.devAuthId !== '' && !authSets[dev.devAuthId]) {
-                this.log.error(
-                    `device "${dev.devName}" (${dev.devIpAddr}) references unknown authorization group ${dev.devAuthId}. Please correct configuration.`,
+            /*
+             * An snmp v3 device needs the user name of an authorization set. Without one the adapter
+             * would ask with an empty user name, and the device answers "Unknown User Name" - an
+             * error message which says nothing about the missing authorization id (issue #409).
+             */
+            if (Number(dev.devSnmpVers) === SNMP_V3 && !findAuthSet(this.config.authSets, dev.devAuthId)) {
+                this.log.warn(
+                    `device "${dev.devName}" (${dev.devIpAddr}) uses snmp v3 but its authorization id ${dev.devAuthId ? `"${dev.devAuthId}" is unknown` : 'is empty'} - the device is skipped. Please correct configuration.`,
                 );
-                ok = false;
+                dev.devAct = false;
+                continue;
             }
 
             if (!/^\d+$/.test(String(dev.devTimeout))) {
@@ -1269,12 +1277,7 @@ class Snmp extends utils.Adapter {
         }
 
         if (Number(dev.devSnmpVers) === SNMP_V3) {
-            let authSet: Partial<AuthConfig> = {};
-            for (let kk = 0; kk < this.config.authSets.length; kk++) {
-                if (this.config.authSets[kk].authId === dev.devAuthId) {
-                    authSet = this.config.authSets[kk];
-                }
-            }
+            const authSet: Partial<AuthConfig> = findAuthSet(this.config.authSets, dev.devAuthId) ?? {};
             CTX.authSecLvl = authSet.authSecLvl || 0;
             CTX.authUser = (authSet.authUser || '').trim();
             CTX.authAuthProto = authSet.authAuthProto || 0;

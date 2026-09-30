@@ -48,19 +48,27 @@ For details see the documentation referenced below.
 -->
 
 ### **WORK IN PROGRESS**
-- (copilot) Adapter requires node.js >= 22, js-controller >= 7.2.2 and admin >= 8.0.14 now.
-- (bluefox) State roles have been corrected.(#524)
+- (bluefox) The states use the roles of the ioBroker role list: a number is `value` resp. `level` when it is writeable, a boolean `indicator` resp. `switch`, a text `text`, and the type states no longer use the role `type.encoding`, which does not exist. The error flag of a device is `indicator.error` instead of `indicator.reachable` (#524)
 - (bluefox) New value format "hex dump": binary data of an OctetString, Opaque or Counter64 is stored as "76 01 04 00 27 10", the way a MIB browser shows it, and a writeable OID takes that notation back (#623)
 - (bluefox) New tab "MIB": MIB files can be uploaded and browsed, and a device can be read live - the browser fills the OID group of the selected device, one OID at a time or all shown at once
 - (bluefox) An incomplete configuration no longer disables the instance: a device without OIDs is skipped with a warning, so that a new device can be set up with the MIB browser while the adapter is running
-- (bluefox) The documentation has been brought up to date
+- (bluefox) The screenshots of the documentation have been renewed and show the current dialog, including the MIB tab
+- (bluefox) The options of the config dialog use the width of the dialog again - on a wide screen their labels were squeezed into a narrow column
+- (bluefox) The documentation has been brought up to date: the format of an OID and the state type it produces, the objects and states the adapter creates with their roles and quality codes, writing back to a device, the three options which were missing, and the MIB tab plus the setup wizard in the russian documentation
 - (bluefox) A folder of the MIB browser can be taken over as a whole: its plus button adds every value below it to the OID group, read in one walk
+- (bluefox) The MIB browser has one source now: it reads the device live, level by level, and names what comes back with the uploaded MIB files - the separate, offline tree of a MIB file is gone, the module list jumps to the beginning of a MIB instead
 - (bluefox) Fixed: with SNMP v1 the end of a subtree is reported as the error NoSuchName, which made every level of a v1 device fail
+- (bluefox) Fixed: the live view skipped every second row of a table - the rows carry their value at the oid of the row itself, so the jump behind a row has to start below it, not at the next row
+- (bluefox) An OID taken over from a MIB file now addresses a value: a scalar is stored as "<OID>.0" (the ".0" stays out of the object id), a column of a table is marked, because it needs the index of a row - which the live read of the device delivers
 - (bluefox) New setup wizard on the "Devices" tab: it asks for the device, lets you upload its MIB files and pick the values to read - including a live read of the device before it has ever been saved
+- (bluefox) The devices are configured first: the tab "Devices" comes before "OID sets", the device table is no longer hidden until an OID group exists, and an empty OID table no longer blocks the save button
 - (bluefox) New option "use MIB names": the OID field then also accepts symbolic names like IF-MIB::ifDescr.1 and the object ids are built from the MIB symbol. Attention: switching this option changes the object ids of existing OIDs
-- (bluefox) The adapter has been refactored to TypeScript
-- (bluefox) The adapter can no longer be installed directly from GitHub
-- (bluefox) dependencies have been updated
+- (bluefox) The adapter has been refactored to TypeScript, the sources now live in `src/` and are compiled to `build/`
+- (bluefox) The admin translations have been moved from `admin/i18n/<lang>/translations.json` to `admin/i18n/<lang>.json`, `admin/words.js` has been removed
+- (bluefox) The npm `install` script has been removed - the configuration migration runs at adapter startup as before
+- (bluefox) The adapter can no longer be installed directly from GitHub (`common.nogit`), please install it from npm
+- (copilot) Adapter requires node.js >= 22 now
+- (copilot) Adapter requires admin >= 7.7.22 now
 
 ### 3.4.0 (2026-02-16)
 - (mcm1957) Dependencies have been updated

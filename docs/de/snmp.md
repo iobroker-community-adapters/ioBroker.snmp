@@ -111,7 +111,11 @@ Diese Registerkarte enthält SNMP V3-Autorisierungsinformationen.
 | Verschlüsselung           | Auswahl | Verschlüsselungsverfahren          | des, aes, aes256b oder aes256r                  |
 | Verschlüsselungsschlüssel | Text    | Verschlüsselungsschlüssel          |                                                 |
 
-Beachten Sie, dass Name(id) eindeutig sein muss.
+Beachten Sie, dass Name(id) eindeutig sein muss. Die Auth-ID eines Geräts auf dem Tab *Geräte* muss
+zu einem dieser Namen passen - führende und angehängte Leerzeichen werden auf beiden Seiten
+ignoriert. Ein Gerät mit SNMP v3, dessen Auth-ID zu nichts passt, wird mit einer Warnung
+übersprungen: der Adapter würde sonst ohne Benutzernamen fragen und das Gerät mit "Unknown User
+Name" antworten, was über die eigentliche Ursache nichts aussagt.
 
 Bei Auswahl des snmp V3-Protokolls ist eine erweiterte Authentifizierung erforderlich. In der Liste der Geräte ab dem Tab Geräte 
 geben Sie in der Spalte Auth-Id den Namen eines Authentifizierungsblocks.
