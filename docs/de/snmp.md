@@ -49,14 +49,14 @@ die Verwendung der Protokollversionen snmp v2c oder snpm v3 erfordert.
 Das Format entscheidet, wie der gelesene Wert abgelegt wird, und damit über den Typ des
 ioBroker-States:
 
-| Format       | State-Typ | Wert                                                                                       |
-|--------------|-----------|--------------------------------------------------------------------------------------------|
-| Text         | string    | der Wert als Text                                                                            |
+| Format       | State-Typ | Wert                                                                                        |
+|--------------|-----------|---------------------------------------------------------------------------------------------|
+| Text         | string    | der Wert als Text                                                                           |
 | Zahl         | number    | der numerische Wert; nicht numerische Daten setzen die Qualität auf 0x01                    |
-| Boolesch     | boolean   | false bei 0 bzw. leerem Wert, sonst true                                                     |
-| JSON         | string    | `{"type":"<typ>","data":<wert>}`, damit Skripte den Wert samt Typ bekommen                   |
-| Hex-Dump     | string    | die Bytes des Wertes als `76 01 04 00 27 10`, so wie ein MIB-Browser Binärdaten zeigt         |
-| Automatisch  | mixed     | der Typ richtet sich nach dem SNMP-Typ des Wertes                                            |
+| Boolesch     | boolean   | false bei 0 bzw. leerem Wert, sonst true                                                    |
+| JSON         | string    | `{"type":"<typ>","data":<wert>}`, damit Skripte den Wert samt Typ bekommen                  |
+| Hex-Dump     | string    | die Bytes des Wertes als `76 01 04 00 27 10`, so wie ein MIB-Browser Binärdaten zeigt       |
+| Automatisch  | mixed     | der Typ richtet sich nach dem SNMP-Typ des Wertes                                           |
 
 **Hex-Dump** ist für die Binärdaten gedacht, die manche Geräte liefern - etwa die Wartungszähler
 eines Druckers. Ein solcher OctetString liest sich mit jedem anderen Format als `vy'swz'tx{'u`, als
@@ -181,19 +181,24 @@ Hier legen Sie einige allgemeine Optionen fest
 
 <p align=center><img src="img/snmp_tab_options.jpg" width="600" /></p>
 
-| Parameter             | Typ      | Beschreibung                                                                      | Kommentar                                                                                                                                   |
-|-----------------------|----------|-----------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
-| Paketgröße            | Ganzzahl | maximale Anzahl von OIDs, die innerhalb einer einzigen Anfrage gesendet werden    | reduzieren Sie diesen Wert bei TOOBIG-Fehlern                                                                                               |
-| Kompatibilitätsmodus  | boolesch | wenn diese Option aktiviert ist, basieren die Datenpunktnamen auf der IP-Adresse  | HINWEIS: veraltet - nicht mehr verwenden. Dieses Flag funktioniert nicht mit IPv6-Adressen. Kann in zukünftigen Versionen entfernt werden.  |
-| Sitzung offen halten  | boolesch | die Lese-Sitzung eines Geräts bei einem Fehler nicht schließen und neu öffnen     | einen Versuch wert, wenn ein Gerät nach einer einzelnen fehlgeschlagenen Anfrage nicht mehr antwortet                                       |
-| MIB-Namen verwenden   | boolean  | OID-Feld akzeptiert symbolische MIB-Namen, Objekt-IDs folgen der MIB              | siehe unten. ACHTUNG: Das Umschalten ändert die Objekt-IDs bestehender OIDs                                                                 |
-| Raw-States            | boolesch | je OID einen zusätzlichen State `<OID-Name>-raw` anlegen                          | das Varbind als JSON, für alles, was die Formate oben nicht abdecken                                                                       |
-| Typ-States            | boolesch | je OID einen zusätzlichen State `<OID-Name>-type` anlegen                         | der SNMP-Typ, mit dem das Gerät geantwortet hat, z. B. `OctetString`                                                                        |
+| Parameter                          | Typ       | Beschreibung                                                                       | Kommentar                                                                                                                                    |
+|------------------------------------|-----------|------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|
+| Paketgröße                         | Ganzzahl  | maximale Anzahl von OIDs, die innerhalb einer einzigen Anfrage gesendet werden     | reduzieren Sie diesen Wert bei TOOBIG-Fehlern                                                                                                |
+| Kompatibilitätsmodus               | boolesch  | wenn diese Option aktiviert ist, basieren die Datenpunktnamen auf der IP-Adresse   | HINWEIS: veraltet - nicht mehr verwenden. Dieses Flag funktioniert nicht mit IPv6-Adressen. Kann in zukünftigen Versionen entfernt werden.   |
+| Sitzung bei Fehler nicht schließen | boolesch  | die Lese-Sitzung eines Geräts bei einem Fehler nicht schließen und neu öffnen      | einen Versuch wert, wenn ein Gerät nach einer einzelnen fehlgeschlagenen Anfrage nicht mehr antwortet                                        |
+| MIB-Namen verwenden                | boolean   | OID-Feld akzeptiert symbolische MIB-Namen, Objekt-IDs folgen der MIB               | siehe unten. ACHTUNG: Das Umschalten ändert die Objekt-IDs bestehender OIDs                                                                  |
+| Rohzustände hinzufügen             | boolesch  | je OID einen zusätzlichen State `<OID-Name>-raw` anlegen                           | das Varbind als JSON, für alles, was die Formate oben nicht abdecken                                                                         |
+| Typzustände hinzufügen             | boolesch  | je OID einen zusätzlichen State `<OID-Name>-type` anlegen                          | der SNMP-Typ, mit dem das Gerät geantwortet hat, z. B. `OctetString`                                                                         |
 
 
 Die Option packetsize kann verwendet werden, um die Anzahl der abgefragten OIDs innerhalb einer Anfrage zu reduzieren. Je nach Zielgerät ist die Anzahl der
 IODs, die mit einer Anfrage abgefragt werden können, möglicherweise begrenzt. In einem solchen Fall antwortet das Gerät möglicherweise mit dem Fehler TOOBIG. Versuchen Sie es, in einem solchen Fall
 den Wert für die Option packetsize zu reduzieren.
+
+Die Option **Sitzung bei Fehler nicht schließen** lässt die Lese-Sitzung eines Geräts offen, wenn
+eine Anfrage fehlschlägt. Normalerweise schließt der Adapter die Sitzung bei einem Fehler und öffnet
+für den nächsten Versuch eine neue, was für die meisten Geräte richtig ist. Manche Geräte antworten
+nach einem solchen Neuaufbau aber nicht mehr - für die schalten Sie diese Option ein.
 
 Die Option **MIB-Namen verwenden** ändert zwei Dinge gleichzeitig. Die OID-Spalte der OID-Sets
 akzeptiert dann auch einen symbolischen Namen wie `IF-MIB::ifDescr.1` (oder `ifDescr.1` ohne Modul),
@@ -211,16 +216,16 @@ verwenden weiterhin ihren OID-Namen.
 Für jedes aktive Gerät legt der Adapter ein Geräteobjekt an, einen Ordner `info` mit dem Status
 dieses Geräts und je einen State pro aktiver OID der zugeordneten OID-Gruppe:
 
-| ID                              | Typ     | Rolle                | Bedeutung                                                            |
-|---------------------------------|---------|----------------------|----------------------------------------------------------------------|
-| `snmp.<Instanz>.info.connection` | boolean | indicator.connected  | true, solange mindestens ein Gerät antwortet                         |
-| `<Gerät>`                       | device  | -                    | `common.statusStates` zeigt auf die beiden States darunter           |
-| `<Gerät>.info.online`           | boolean | indicator.reachable  | true, solange das Gerät antwortet                                    |
-| `<Gerät>.info.error`            | boolean | indicator.error      | true nach einem Fehler, nach dem nächsten erfolgreichen Lesen wieder false |
-| `<Gerät>.info.error_text`       | string  | text                 | die Meldung des letzten Fehlers                                      |
-| `<Gerät>.<OID-Name>`            | siehe Format | siehe unten     | der gelesene Wert; Punkte im OID-Namen werden zu Ordnern             |
-| `<Gerät>.<OID-Name>-type`       | string  | text                 | SNMP-Typ des Wertes, nur mit der Option *Typ-States*                 |
-| `<Gerät>.<OID-Name>-raw`        | string  | json                 | das Varbind, wie es ankam, nur mit der Option *Raw-States*           |
+| ID                               | Typ          | Rolle               | Bedeutung                                                                  |
+|----------------------------------|--------------|---------------------|----------------------------------------------------------------------------|
+| `snmp.<Instanz>.info.connection` | boolean      | indicator.connected | true, solange mindestens ein Gerät antwortet                               |
+| `<Gerät>`                        | device       | -                   | `common.statusStates` zeigt auf die beiden States darunter                 |
+| `<Gerät>.info.online`            | boolean      | indicator.reachable | true, solange das Gerät antwortet                                          |
+| `<Gerät>.info.error`             | boolean      | indicator.error     | true nach einem Fehler, nach dem nächsten erfolgreichen Lesen wieder false |
+| `<Gerät>.info.error_text`        | string       | text                | die Meldung des letzten Fehlers                                            |
+| `<Gerät>.<OID-Name>`             | siehe Format | siehe unten         | der gelesene Wert; Punkte im OID-Namen werden zu Ordnern                   |
+| `<Gerät>.<OID-Name>-type`        | string       | text                | SNMP-Typ des Wertes, nur mit der Option *Typzustände hinzufügen*           |
+| `<Gerät>.<OID-Name>-raw`         | string       | json                | das Varbind, wie es ankam, nur mit der Option *Rohzustände hinzufügen*     |
 
 `<Gerät>` ist der Gerätename; im Kompatibilitätsmodus ist es die IP-Adresse mit `_` statt `.`.
 Auf diese IDs beziehen sich Skripte und Diagramme, deshalb ändern sie sich nicht - mit der einen
@@ -229,24 +234,24 @@ Ausnahme, die die Option *MIB-Namen verwenden* oben beschreibt.
 Die Rolle des Wert-States richtet sich nach seinem Typ, damit eine Visualisierung weiß, womit sie
 es zu tun hat:
 
-| State-Typ  | nur lesbar  | beschreibbar |
-|------------|-------------|--------------|
-| number     | `value`     | `level`      |
-| boolean    | `indicator` | `switch`     |
-| string     | `text`      | `text`       |
-| mixed (Format *Automatisch*) | `state` | `state` |
+| State-Typ                    | nur lesbar   | beschreibbar  |
+|------------------------------|--------------|---------------|
+| number                       | `value`      | `level`       |
+| boolean                      | `indicator`  | `switch`      |
+| string                       | `text`       | `text`        |
+| mixed (Format *Automatisch*) | `state`      | `state`       |
 
 ### Qualität
 
 Jeder Wert trägt den ioBroker-Qualitätscode, ein Skript kann also einen echten Wert von einem
 fehlenden unterscheiden:
 
-| Qualität | Bedeutung                                                                            |
-|----------|---------------------------------------------------------------------------------------|
-| 0x00     | in Ordnung                                                                             |
-| 0x01     | der Wert ließ sich nicht in das eingestellte Format umwandeln                          |
-| 0x02     | das Gerät hat nicht geantwortet (Timeout), der letzte Wert bleibt stehen               |
-| 0x44     | das Gerät meldet einen Fehler, der Wert wird auf null gesetzt                          |
+| Qualität | Bedeutung                                                                               |
+|----------|-----------------------------------------------------------------------------------------|
+| 0x00     | in Ordnung                                                                              |
+| 0x01     | der Wert ließ sich nicht in das eingestellte Format umwandeln                           |
+| 0x02     | das Gerät hat nicht geantwortet (Timeout), der letzte Wert bleibt stehen                |
+| 0x44     | das Gerät meldet einen Fehler, der Wert wird auf null gesetzt                           |
 | 0x84     | die OID gibt es auf diesem Gerät nicht (NoSuchInstance), der Wert wird auf null gesetzt |
 
 ### Schreiben

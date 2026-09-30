@@ -48,6 +48,8 @@ For details see the documentation referenced below.
 -->
 
 ### **WORK IN PROGRESS**
+- (bluefox) The option "do not close session on error" is documented, and the option table uses the labels of the dialog, so that every option can be found under the name it has there (#288)
+- (bluefox) A device using SNMP v3 whose authorization id is empty or refers to nothing is skipped with a warning instead of asking without a user name - such a request is answered with "Unknown User Name", which named neither the device nor the missing authorization set (#409). The ids of device and authorization set are compared without leading and trailing blanks now
 - (bluefox) The states use the roles of the ioBroker role list: a number is `value` resp. `level` when it is writeable, a boolean `indicator` resp. `switch`, a text `text`, and the type states no longer use the role `type.encoding`, which does not exist. The error flag of a device is `indicator.error` instead of `indicator.reachable` (#524)
 - (bluefox) New value format "hex dump": binary data of an OctetString, Opaque or Counter64 is stored as "76 01 04 00 27 10", the way a MIB browser shows it, and a writeable OID takes that notation back (#623)
 - (bluefox) New tab "MIB": MIB files can be uploaded and browsed, and a device can be read live - the browser fills the OID group of the selected device, one OID at a time or all shown at once

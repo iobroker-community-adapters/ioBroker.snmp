@@ -47,14 +47,14 @@ requires the use of snmp v2c or SNMPv3 protocol versions.
 
 The format decides how the value read is stored, and with it the type of the ioBroker state:
 
-| Format    | state type | value                                                                                        |
-|-----------|------------|----------------------------------------------------------------------------------------------|
-| String    | string     | the value as text                                                                              |
+| Format    | state type | value                                                                                         |
+|-----------|------------|-----------------------------------------------------------------------------------------------|
+| String    | string     | the value as text                                                                             |
 | Number    | number     | the numeric value; data that is not numeric sets the quality to 0x01                          |
-| Boolean   | boolean    | false for 0 resp. an empty value, true otherwise                                               |
-| JSON      | string     | `{"type":"<type>","data":<value>}`, so that scripts get the value together with its type       |
-| Hex dump  | string     | the bytes of the value as `76 01 04 00 27 10`, the way a MIB browser shows binary data         |
-| Automatic | mixed      | the type follows the SNMP type of the value                                                    |
+| Boolean   | boolean    | false for 0 resp. an empty value, true otherwise                                              |
+| JSON      | string     | `{"type":"<type>","data":<value>}`, so that scripts get the value together with its type      |
+| Hex dump  | string     | the bytes of the value as `76 01 04 00 27 10`, the way a MIB browser shows binary data        |
+| Automatic | mixed      | the type follows the SNMP type of the value                                                   |
 
 **Hex dump** is meant for the binary data some devices answer with - maintenance counters of a
 printer for example. Such an OctetString reads as `vy'swz'tx{'u` with any of the other formats,
@@ -105,15 +105,15 @@ This tab contains SNMP V3 authorization information.
 
 <p align=center><img src="img/snmp_tab_authorization.jpg" width="600" /></p>
 
-| Parameter         | Type        | Description                       | Comment                             |
-|-------------------|-------------|-----------------------------------|-------------------------------------|
-| Name (id)         | text        | id of authorization data          | must match Auth-Id at tab devices   |
-| Security Level    | selection   | desired security method           | see description                     |
-| Username          | text        | username to authenticate          |                                     |
-| Method            | selection   | password hashing method           | md5, sha, sha224, sha256, sha384 or sha512 |
-| Authorization Key | text        | password for authentication       |                                     |
-| Encryption        | selection   | encryption method                 | des, aes, aes256b or aes256r        |
-| Encryption Key    | text        | encryption key                    |                                     |
+| Parameter         | Type        | Description                 | Comment                                    |
+|-------------------|-------------|-----------------------------|--------------------------------------------|
+| Name (id)         | text        | id of authorization data    | must match Auth-Id at tab devices          |
+| Security Level    | selection   | desired security method     | see description                            |
+| Username          | text        | username to authenticate    |                                            |
+| Method            | selection   | password hashing method     | md5, sha, sha224, sha256, sha384 or sha512 |
+| Authorization Key | text        | password for authentication |                                            |
+| Encryption        | selection   | encryption method           | des, aes, aes256b or aes256r               |
+| Encryption Key    | text        | encryption key              |                                            |
 
 Note that Name(id) must be unique. The Auth-Id of a device on the *Devices* tab has to match one
 of these names - leading and trailing blanks are ignored on both sides. A device using SNMP v3 whose
@@ -176,19 +176,24 @@ Here you specify some general options
 
 <p align=center><img src="img/snmp_tab_options.jpg" width="600" /></p>
 
-| Parameter          | Type      | Description                                                            | Comment                                                                                                                     |
-|--------------------|-----------|------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
-| Packetsize         | integer   | maximum number of OIDs sent within a single request                    | reduce this value in case of TOOBIG errors                                                                                  |
-| Compatibility mode | boolean   | if this option is activated, datapoint names are based on ip address   | NOTE: outdated - do not use any longer. This flag will not work with IPv6 addresses. Might be removed in future releases.   |
-| Keep session       | boolean   | do not close and reopen the reader session of a device on an error     | try this if a device does not answer any more after a single failed request                                                 |
-| Use MIB names      | boolean   | OID field accepts symbolic MIB names and the object ids follow the MIB | see below. NOTE: switching this option changes the object ids of existing OIDs                                              |
-| Raw states         | boolean   | create an additional state `<OID-name>-raw` per OID                    | the varbind as json, for everything the formats above do not cover                                                          |
-| Type states        | boolean   | create an additional state `<OID-name>-type` per OID                   | the SNMP type the device answered with, e.g. `OctetString`                                                                  |
+| Parameter                     | Type    | Description                                                             | Comment                                                                                                                     |
+|-------------------------------|---------|-------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
+| Packetsize                    | integer | maximum number of OIDs sent within a single request                     | reduce this value in case of TOOBIG errors                                                                                  |
+| Compatibility mode            | boolean | if this option is activated, datapoint names are based on ip address    | NOTE: outdated - do not use any longer. This flag will not work with IPv6 addresses. Might be removed in future releases.   |
+| Do not close session on error | boolean | do not close and reopen the reader session of a device on an error      | try this if a device does not answer any more after a single failed request                                                 |
+| Use MIB names                 | boolean | OID field accepts symbolic MIB names and the object ids follow the MIB  | see below. NOTE: switching this option changes the object ids of existing OIDs                                              |
+| Add raw states                | boolean | create an additional state `<OID-name>-raw` per OID                     | the varbind as json, for everything the formats above do not cover                                                          |
+| Add type states               | boolean | create an additional state `<OID-name>-type` per OID                    | the SNMP type the device answered with, e.g. `OctetString`                                                                  |
 
 
 The option packet size can be used to reduce the number of OIDs queried within one request. Depending on the target device, the number of 
 IODs queried with one request might be limited. In such a case the device might respond with error TOOBIG. In such a case try to 
 reduce to value for option packet size.
+
+The option **do not close session on error** keeps the reader session of a device open when a
+request fails. Normally the adapter closes the session on an error and opens a new one for the next
+attempt, which is the right thing for most devices. Some devices, however, stop answering after such
+a reconnect - for those, switch this option on.
 
 The option **use MIB names** changes two things at once. The OID column of the OID sets then also
 accepts a symbolic name such as `IF-MIB::ifDescr.1` (or `ifDescr.1` without the module), which the
@@ -205,16 +210,16 @@ are no longer wanted. OIDs that no loaded MIB covers keep using their OID name.
 For every active device the adapter creates one device object, a folder `info` with the status of
 that device, and one state per active OID of the OID group assigned to it:
 
-| id                              | type    | role                 | meaning                                                              |
-|---------------------------------|---------|----------------------|----------------------------------------------------------------------|
-| `snmp.<instance>.info.connection` | boolean | indicator.connected  | true while at least one device answers                               |
-| `<device>`                      | device  | -                    | `common.statusStates` points to the two states below                 |
-| `<device>.info.online`          | boolean | indicator.reachable  | true while the device answers                                        |
-| `<device>.info.error`           | boolean | indicator.error      | true after an error, false again after the next successful read      |
-| `<device>.info.error_text`      | string  | text                 | the message of the last error                                        |
-| `<device>.<OID-name>`           | see format | see below         | the value read; dots in the OID name become folders                  |
-| `<device>.<OID-name>-type`      | string  | text                 | SNMP type of the value, only with the option *type states*           |
-| `<device>.<OID-name>-raw`       | string  | json                 | the varbind as it arrived, only with the option *raw states*         |
+| id                                | type       | role                  | meaning                                                               |
+|-----------------------------------|------------|-----------------------|-----------------------------------------------------------------------|
+| `snmp.<instance>.info.connection` | boolean    | indicator.connected   | true while at least one device answers                                |
+| `<device>`                        | device     | -                     | `common.statusStates` points to the two states below                  |
+| `<device>.info.online`            | boolean    | indicator.reachable   | true while the device answers                                         |
+| `<device>.info.error`             | boolean    | indicator.error       | true after an error, false again after the next successful read       |
+| `<device>.info.error_text`        | string     | text                  | the message of the last error                                         |
+| `<device>.<OID-name>`             | see format | see below             | the value read; dots in the OID name become folders                   |
+| `<device>.<OID-name>-type`        | string     | text                  | SNMP type of the value, only with the option *add type states*        |
+| `<device>.<OID-name>-raw`         | string     | json                  | the varbind as it arrived, only with the option *add raw states*      |
 
 `<device>` is the name of the device; with the compatibility mode it is the IP address with `_`
 instead of `.`. These ids are what scripts and charts refer to, so they do not change - with one
@@ -222,23 +227,23 @@ exception, which the option *use MIB names* documents above.
 
 The role of the value state follows its type, so that a visualization knows what it is:
 
-| state type | read only   | writeable |
-|------------|-------------|-----------|
-| number     | `value`     | `level`   |
-| boolean    | `indicator` | `switch`  |
-| string     | `text`      | `text`    |
-| mixed (format *automatic*) | `state` | `state` |
+| state type                 | read only    | writeable  |
+|----------------------------|--------------|------------|
+| number                     | `value`      | `level`    |
+| boolean                    | `indicator`  | `switch`   |
+| string                     | `text`       | `text`     |
+| mixed (format *automatic*) | `state`      | `state`    |
 
 ### Quality
 
 Every value carries the ioBroker quality code, so a script can tell a real value from a missing one:
 
-| quality | meaning                                                                             |
-|---------|--------------------------------------------------------------------------------------|
+| quality | meaning                                                                               |
+|---------|---------------------------------------------------------------------------------------|
 | 0x00    | ok                                                                                    |
-| 0x01    | the value could not be converted into the configured format                          |
-| 0x02    | the device did not answer (timeout), the last value stays                            |
-| 0x44    | the device reported an error, the value is set to null                               |
+| 0x01    | the value could not be converted into the configured format                           |
+| 0x02    | the device did not answer (timeout), the last value stays                             |
+| 0x44    | the device reported an error, the value is set to null                                |
 | 0x84    | the OID does not exist on this device (NoSuchInstance), the value is set to null      |
 
 ### Writing
