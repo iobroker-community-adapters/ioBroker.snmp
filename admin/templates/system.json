@@ -1,0 +1,16 @@
+{
+    "format": "snmp-template",
+    "version": 1,
+    "name": "System (SNMPv2-MIB)",
+    "deviceClass": "any snmp device",
+    "description": "The system group every snmp device has to answer - a good first test whether a device can be read at all.",
+    "mib": "SNMPv2-MIB",
+    "oids": [
+        { "oidName": "sysDescr", "oidOid": "1.3.6.1.2.1.1.1.0", "oidFormat": 0, "oidWriteable": false, "oidOptional": false },
+        { "oidName": "sysObjectID", "oidOid": "1.3.6.1.2.1.1.2.0", "oidFormat": 0, "oidWriteable": false, "oidOptional": false },
+        { "oidName": "sysUpTime", "oidOid": "1.3.6.1.2.1.1.3.0", "oidFormat": 1, "oidWriteable": false, "oidOptional": false },
+        { "oidName": "sysContact", "oidOid": "1.3.6.1.2.1.1.4.0", "oidFormat": 0, "oidWriteable": false, "oidOptional": true },
+        { "oidName": "sysName", "oidOid": "1.3.6.1.2.1.1.5.0", "oidFormat": 0, "oidWriteable": false, "oidOptional": false },
+        { "oidName": "sysLocation", "oidOid": "1.3.6.1.2.1.1.6.0", "oidFormat": 0, "oidWriteable": false, "oidOptional": true }
+    ]
+}

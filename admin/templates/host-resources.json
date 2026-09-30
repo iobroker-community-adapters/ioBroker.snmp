@@ -1,0 +1,15 @@
+{
+    "format": "snmp-template",
+    "version": 1,
+    "name": "Host (HOST-RESOURCES-MIB)",
+    "deviceClass": "server, pc, nas",
+    "description": "Uptime, memory and the load of the first processor of a computer which runs an snmp daemon.",
+    "mib": "HOST-RESOURCES-MIB",
+    "oids": [
+        { "oidName": "hrSystemUptime", "oidOid": "1.3.6.1.2.1.25.1.1.0", "oidFormat": 1, "oidWriteable": false, "oidOptional": false },
+        { "oidName": "hrSystemNumUsers", "oidOid": "1.3.6.1.2.1.25.1.5.0", "oidFormat": 1, "oidWriteable": false, "oidOptional": true },
+        { "oidName": "hrSystemProcesses", "oidOid": "1.3.6.1.2.1.25.1.6.0", "oidFormat": 1, "oidWriteable": false, "oidOptional": true },
+        { "oidName": "hrMemorySize", "oidOid": "1.3.6.1.2.1.25.2.2.0", "oidFormat": 1, "oidWriteable": false, "oidOptional": false },
+        { "oidName": "hrProcessorLoad", "oidOid": "1.3.6.1.2.1.25.3.3.1.2.1", "oidFormat": 1, "oidWriteable": false, "oidOptional": true }
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    "format": "snmp-template",
+    "version": 1,
+    "name": "UPS (UPS-MIB)",
+    "deviceClass": "uninterruptible power supply",
+    "description": "Battery state and remaining runtime of a UPS which answers the standard UPS-MIB of RFC 1628. Many manufacturers only deliver their own MIB - use the MIB browser in that case.",
+    "mib": "UPS-MIB",
+    "oids": [
+        { "oidName": "upsIdentManufacturer", "oidOid": "1.3.6.1.2.1.33.1.1.1.0", "oidFormat": 0, "oidWriteable": false, "oidOptional": true },
+        { "oidName": "upsIdentModel", "oidOid": "1.3.6.1.2.1.33.1.1.2.0", "oidFormat": 0, "oidWriteable": false, "oidOptional": true },
+        { "oidName": "upsBatteryStatus", "oidOid": "1.3.6.1.2.1.33.1.2.1.0", "oidFormat": 1, "oidWriteable": false, "oidOptional": false },
+        { "oidName": "upsSecondsOnBattery", "oidOid": "1.3.6.1.2.1.33.1.2.2.0", "oidFormat": 1, "oidWriteable": false, "oidOptional": false },
+        { "oidName": "upsEstimatedMinutesRemaining", "oidOid": "1.3.6.1.2.1.33.1.2.3.0", "oidFormat": 1, "oidWriteable": false, "oidOptional": false },
+        { "oidName": "upsEstimatedChargeRemaining", "oidOid": "1.3.6.1.2.1.33.1.2.4.0", "oidFormat": 1, "oidWriteable": false, "oidOptional": false },
+        { "oidName": "upsBatteryVoltage", "oidOid": "1.3.6.1.2.1.33.1.2.5.0", "oidFormat": 1, "oidWriteable": false, "oidOptional": true },
+        { "oidName": "upsOutputSource", "oidOid": "1.3.6.1.2.1.33.1.4.1.0", "oidFormat": 1, "oidWriteable": false, "oidOptional": false }
+    ]
+}

@@ -1,0 +1,3 @@
+{
+    "templates": ["system.json", "interfaces.json", "host-resources.json", "printer.json", "ups.json"]
+}

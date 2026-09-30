@@ -1,0 +1,21 @@
+{
+    "format": "snmp-template",
+    "version": 1,
+    "name": "Interface 1 (IF-MIB)",
+    "deviceClass": "switch, router, access point",
+    "description": "The counters and the state of the first interface. The last number of every OID is the interface index - copy the rows and change it to monitor further ports.",
+    "mib": "IF-MIB",
+    "oids": [
+        { "oidName": "ifNumber", "oidOid": "1.3.6.1.2.1.2.1.0", "oidFormat": 1, "oidWriteable": false, "oidOptional": false },
+        { "oidName": "if1.ifDescr", "oidOid": "1.3.6.1.2.1.2.2.1.2.1", "oidFormat": 0, "oidWriteable": false, "oidOptional": false },
+        { "oidName": "if1.ifType", "oidOid": "1.3.6.1.2.1.2.2.1.3.1", "oidFormat": 1, "oidWriteable": false, "oidOptional": true },
+        { "oidName": "if1.ifSpeed", "oidOid": "1.3.6.1.2.1.2.2.1.5.1", "oidFormat": 1, "oidWriteable": false, "oidOptional": false },
+        { "oidName": "if1.ifPhysAddress", "oidOid": "1.3.6.1.2.1.2.2.1.6.1", "oidFormat": 4, "oidWriteable": false, "oidOptional": true },
+        { "oidName": "if1.ifAdminStatus", "oidOid": "1.3.6.1.2.1.2.2.1.7.1", "oidFormat": 1, "oidWriteable": false, "oidOptional": false },
+        { "oidName": "if1.ifOperStatus", "oidOid": "1.3.6.1.2.1.2.2.1.8.1", "oidFormat": 1, "oidWriteable": false, "oidOptional": false },
+        { "oidName": "if1.ifInOctets", "oidOid": "1.3.6.1.2.1.2.2.1.10.1", "oidFormat": 1, "oidWriteable": false, "oidOptional": false },
+        { "oidName": "if1.ifInErrors", "oidOid": "1.3.6.1.2.1.2.2.1.14.1", "oidFormat": 1, "oidWriteable": false, "oidOptional": true },
+        { "oidName": "if1.ifOutOctets", "oidOid": "1.3.6.1.2.1.2.2.1.16.1", "oidFormat": 1, "oidWriteable": false, "oidOptional": false },
+        { "oidName": "if1.ifOutErrors", "oidOid": "1.3.6.1.2.1.2.2.1.20.1", "oidFormat": 1, "oidWriteable": false, "oidOptional": true }
+    ]
+}
