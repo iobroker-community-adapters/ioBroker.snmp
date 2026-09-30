@@ -74,5 +74,22 @@
     "ttOptTypeStates": "Créer des états contenant des données de type d'oids.",
     "ttOptUseIp": "Marquer pour utiliser l'adresse IP pour les identifiants d'état",
     "ttOptUseMibNames": "Autoriser les OID symboliques et nommer les objets selon la MIB",
-    "warnAuthUnused": "Remarque : La configuration de ce panneau ne sera pas utilisée actuellement car aucun appareil n'utilise le protocole SNMPv3."
+    "warnAuthUnused": "Remarque : La configuration de ce panneau ne sera pas utilisée actuellement car aucun appareil n'utilise le protocole SNMPv3.",
+    "lblTraps": "Traps",
+    "infoTraps": "Un trap est envoyé par l'appareil lui-même lorsqu'il se passe quelque chose - l'adaptateur se contente d'écouter. Un trap reçu est écrit dans les états « <appareil>.trap.* » et en plus dans « info.trap.* », qui contient le dernier trap de n'importe quel expéditeur.",
+    "lblTrapEnabled": "Recevoir les traps",
+    "hlpTrapEnabled": "Ouvrir un socket udp et attendre les traps et les informs. Sans cette option, l'adaptateur ne fait qu'interroger.",
+    "lblTrapPort": "Port",
+    "hlpTrapPort": "Les traps sont envoyés sur le port 162. Sous linux, un port inférieur à 1024 ne peut être ouvert que par root - utilisez un port plus élevé et configurez l'appareil, ou redirigez le port sur l'hôte.",
+    "lblTrapAddress": "Adresse d'écoute",
+    "hlpTrapAddress": "Adresse de cet hôte sur laquelle le socket écoute. Laisser vide pour écouter sur toutes les interfaces.",
+    "lblTrapIp6": "Utiliser IPv6",
+    "lblTrapCommunity": "Communauté",
+    "hlpTrapCommunity": "Communauté qu'un trap SNMP v1 ou v2c doit porter. Un trap avec une autre communauté est rejeté et journalisé.",
+    "lblTrapAuthId": "Id d'autorisation (SNMP v3)",
+    "hlpTrapAuthId": "Id d'un jeu d'autorisation de l'onglet « Autorisation » dont l'utilisateur peut envoyer des traps. Laisser vide si aucun trap SNMP v3 n'est attendu.",
+    "lblTrapAcceptAll": "Accepter chaque trap sans vérification",
+    "hlpTrapAcceptAll": "Ni la communauté ni l'utilisateur SNMP v3 ne sont vérifiés. Pratique pendant la mise en place, tant que l'on ignore ce que l'appareil envoie - n'importe qui atteignant le port peut alors écrire dans les états.",
+    "lblTrapUnknown": "Accepter aussi les traps d'appareils inconnus",
+    "hlpTrapUnknown": "Un trap est attribué à un appareil d'après l'adresse d'expédition. Sans cette option, un trap venant d'une adresse non configurée comme appareil est ignoré ; avec elle, il arrive au moins dans « info.trap.* »."
 }

@@ -225,6 +225,37 @@ Solange die OID-Gruppe eines Geräts keine aktive OID enthält, überspringt der
 mit einer Warnung und läuft weiter, damit der MIB-Browser die MIB-Dateien und das Gerät weiterhin
 lesen kann.
 
+### TAB Traps
+Ein Trap ist die andere Richtung: das Gerät schickt ihn von sich aus, wenn etwas passiert - ein Port
+geht weg, eine USV schaltet auf Batterie, einem Drucker geht das Papier aus - und der Adapter hört
+nur zu. Hier wird nichts abgefragt, ein Trap kommt also, wenn er kommt.
+
+<p align=center><img src="img/snmp_tab_traps.jpg" width="600" /></p>
+
+| Parameter | Typ | Beschreibung | Kommentar |
+|-----------|-----|--------------|-----------|
+| Traps empfangen | boolesch | einen UDP-Socket öffnen und auf Traps und Informs warten | ohne diese Option fragt der Adapter nur ab |
+| Port | Zahl | UDP-Port, auf dem gelauscht wird | Geräte senden an 162; unter Linux darf ein Port unter 1024 nur von root belegt werden |
+| Bind-Adresse | Text | Adresse dieses Hosts, auf der gelauscht wird | leer lauscht auf allen Schnittstellen |
+| IPv6 verwenden | boolesch | auf IPv6 statt auf IPv4 lauschen | ein IPv4-Absender wird trotzdem erkannt, das Präfix `::ffff:` wird entfernt |
+| Community | Text | Community, die ein Trap mit SNMP v1 oder v2c mitbringen muss | ein Trap mit einer anderen Community wird abgelehnt und protokolliert |
+| Autorisierungs-ID (SNMP v3) | Text | ID eines Autorisierungssatzes, dessen Benutzer Traps senden darf | leer, wenn keine SNMP-v3-Traps erwartet werden |
+| Jeden Trap ohne Prüfung annehmen | boolesch | weder Community noch SNMP-v3-Benutzer werden geprüft | zum Einrichten - jeder, der den Port erreicht, kann dann in die States schreiben |
+| Auch Traps unbekannter Geräte annehmen | boolesch | einen Trap verarbeiten, dessen Absender nicht als Gerät konfiguriert ist | ein solcher Trap landet nur in `info.trap.*` |
+
+Ein Trap nennt kein Gerät, er kommt einfach an - also entscheidet die Absenderadresse, zu welchem
+Gerät er gehört. Ein Trap von einer Adresse, die nicht als Gerät konfiguriert ist, wird verworfen,
+sofern die letzte Option nicht gesetzt ist. Ein SNMP-v1-Trap nennt zusätzlich die Adresse des
+Agenten, um den es geht; sie wird herangezogen, wenn der Absender selbst kein konfiguriertes Gerät
+ist - das ist es, was ein Relay funktionieren lässt.
+
+Ein Inform ist ein Trap, der bestätigt werden will; der Adapter beantwortet ihn, bevor er ihn
+verarbeitet, sodass der Absender ihn nicht wiederholt.
+
+Beachten Sie, dass der Port erreichbar sein muss: 162 ist unter Linux ein privilegierter Port, und
+ein Container oder eine Firewall muss UDP durchlassen. Lässt sich der Port nicht belegen, steht der
+Grund im Log.
+
 ### TAB-Optionen
 Hier legen Sie einige allgemeine Optionen fest
 
@@ -305,6 +336,51 @@ es zu tun hat:
 | boolean                      | `indicator`  | `switch`      |
 | string                       | `text`       | `text`        |
 | mixed (Format *Automatisch*) | `state`      | `state`       |
+
+Mit eingeschaltetem Trap-Empfang bekommt jedes Gerät vier weitere States, und derselbe Satz liegt
+einmal unter `info` und hält den letzten Trap beliebiger Absender:
+
+| ID | Typ | Rolle | Bedeutung |
+|----|-----|-------|-----------|
+| `<Gerät>.trap.oid` | string | text | numerische OID des letzten Traps |
+| `<Gerät>.trap.name` | string | text | das Symbol, das eine MIB dafür kennt, sonst die numerische OID |
+| `<Gerät>.trap.json` | string | json | der ganze Trap mit allen Varbinds, siehe unten |
+| `<Gerät>.trap.count` | number | value | Traps dieses Geräts seit dem Start der Instanz |
+| `info.trap.address` | string | text | Adresse, von der der letzte Trap kam |
+| `info.trap.oid` / `.name` / `.json` / `.count` | | | dasselbe für den letzten Trap beliebiger Absender |
+
+**Abonnieren Sie `count`**, um auf einen Trap zu reagieren: dieser State ändert sich mit jedem
+einzelnen Trap, während `oid` und `name` gleich bleiben, wenn ein Gerät sich wiederholt. Die
+anderen drei States sind bereits geschrieben, wenn `count` sich ändert.
+
+Im JSON steht alles, was der Trap gemeldet hat:
+
+```json
+{
+    "oid": "1.3.6.1.6.3.1.1.5.3",
+    "name": "IF-MIB::linkDown",
+    "version": 1,
+    "address": "192.168.1.2",
+    "sender": "public",
+    "inform": false,
+    "upTime": 4,
+    "enterprise": "1.3.6.1.4.1",
+    "agentAddr": "192.168.1.2",
+    "generic": 2,
+    "specific": 0,
+    "varbinds": [
+        { "oid": "1.3.6.1.2.1.2.2.1.1.3", "name": "IF-MIB::ifIndex.3", "type": "Integer32", "value": 3 }
+    ]
+}
+```
+
+`version` ist 1, 2 oder 3, `sender` ist die Community bzw. der Benutzername, mit dem der Trap
+gesendet wurde, und `inform` sagt, ob er bestätigt werden musste. `enterprise`, `agentAddr`,
+`generic` und `specific` erscheinen nur bei einem SNMP-v1-Trap - das sind die vier Felder, mit
+denen sich ein solcher Trap beschreibt, und `oid` ist das, was RFC 3584 daraus macht, sodass sich
+ein v1- und ein v2c-Trap vergleichen lassen. Die Varbinds stehen in der Reihenfolge, in der sie
+ankamen, einschließlich `sysUpTime.0` und `snmpTrapOID.0`, mit denen ein SNMP-v2c-Trap beginnt;
+ihre Werte werden so dekodiert, wie es das Format *Automatisch* tut.
 
 ### Qualität
 

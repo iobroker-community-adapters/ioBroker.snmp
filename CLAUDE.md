@@ -21,7 +21,8 @@ npm run check-tasks      # type check tasks.ts
 npm run lint             # eslint -c eslint.config.mjs
 npx eslint -c eslint.config.mjs --fix   # the ONLY formatter - never run prettier separately
 npm run test:package     # mocha test/packageFiles (downloads the schemas - fails without network)
-npm run test:unit        # mocha test/mibStore test/mibBrowser test/snmpSession test/templates test/utils test/varbind
+npm run test:unit        # mocha test/mibStore test/mibBrowser test/snmpSession test/templates
+                         #       test/trapReceiver test/utils test/varbind
 npm run test             # test:package + test:unit
 npm run test:integration # mocha test/integrationAdapter - fails if a js-controller is running
 npm run translate        # translate-adapter -b admin/i18n/en.json
@@ -48,11 +49,13 @@ src/lib/utils.ts          name2id, ip2ipStr, oidFormat2StateType, oidObjType2Tex
 src/lib/varbind.ts        varbindDecode / varbindEncode - snmp value <-> ioBroker state value
                           (F_HEX renders the bytes as "76 01 04", hex2buffer() reads them back)
 src/lib/snmpSession.ts    create / close a session, promisified get, getNext, set and subtree
-                          (`snmpTrace()` dumps request and answer when `optTrace` is set)
+                          (`snmpTrace()` dumps request and answer when `optTrace` is set,
+                          `snmpUserFor()` builds the v3 user of an authorization set)
+src/lib/trapReceiver.ts   the socket traps are received on plus the pure part of reading one
 src/lib/installUtils.ts   migration of pre-2.0.0 configurations, defaults for newer attributes
 src/lib/mib.ts            MibStore - parses the uploaded MIB files, resolves symbol <-> oid
 src/lib/mibTypes.ts       payload of the `mib*` sendTo commands (contract with the admin component)
-admin/jsonConfig.json     config dialog (5 tabs), labels are i18n keys like `lblOidGroup`
+admin/jsonConfig.json     config dialog (6 tabs), labels are i18n keys like `lblOidGroup`
 admin/i18n/<lang>.json    flat translation files, 11 languages, `en.json` is the reference
 admin/templates/*.json    the OID templates delivered with the adapter, listed in `index.json`
 src-admin/src/MibBrowser.tsx  the MIB browser, a jsonConfig `type: "custom"` component
@@ -98,6 +101,27 @@ others, which is how the former `type.encoding` of the `-type` states was found.
 State quality codes in use: `0x00` ok, `0x01` conversion error, `0x02` connection problem,
 `0x44` device reported an error, `0x84` sensor/varbind reported an error.
 
+
+### Traps
+
+The trap receiver is the one place where the adapter does not poll: `createTrapReceiver()` opens a
+single udp socket for the whole instance and `onTrap()` is called for every notification - and for
+every error of that socket, which is how a port that cannot be bound is reported.
+
+A notification names no device, so `deviceForTrapAddress()` decides by the address it came from;
+the `agentAddr` of an snmp v1 trap is looked at second, which is what makes a relay work. Without
+`trapUnknown` a trap of a sender which is no configured device is dropped.
+
+snmp v1 describes a trap with four pdu fields instead of the two varbinds v2c uses. `trapOid()`
+converts them the way RFC 3584 does (generic 0..5 become `1.3.6.1.6.3.1.1.5.<generic + 1>`,
+everything else `<enterprise>.0.<specific>`), so that a rule can compare a v1 and a v2c trap.
+
+The states are `<devId>.trap.oid`, `.name`, `.json` and `.count` plus the same set below `info` for
+the last trap of any sender. `count` is written last and is the only one which changes with every
+single trap - a device which repeats itself writes the same oid again, and a script reacting on
+changes would never hear about it. `cleanupStates()` removes the `trap` folders when the receiver
+is switched off, and only those with `type === 'folder'`, because an oid named `trap` would produce
+a state with the very same id.
 
 ### Setup wizard
 

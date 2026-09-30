@@ -74,5 +74,22 @@
     "ttOptTypeStates": "创建包含 oid 类型数据的状态。",
     "ttOptUseIp": "标记为使用 ip 地址作为状态 ID",
     "ttOptUseMibNames": "允许符号化 OID 并按 MIB 命名对象",
-    "warnAuthUnused": "注意：当前不会使用此面板上的配置，因为没有设备使用 SNMPv3 协议。"
+    "warnAuthUnused": "注意：当前不会使用此面板上的配置，因为没有设备使用 SNMPv3 协议。",
+    "lblTraps": "Trap 通知",
+    "infoTraps": "Trap 由设备在发生事件时主动发出，适配器只负责接收。收到的 trap 会写入状态 \"<设备>.trap.*\"，并同时写入 \"info.trap.*\"，后者保存来自任意发送方的最后一条 trap。",
+    "lblTrapEnabled": "接收 trap",
+    "hlpTrapEnabled": "打开一个 udp 套接字，等待 trap 和 inform。不启用时适配器只做轮询。",
+    "lblTrapPort": "端口",
+    "hlpTrapPort": "Trap 默认发往 162 端口。在 linux 上低于 1024 的端口只有 root 能绑定，可改用更高的端口并让设备发到那里，或在主机上做端口转发。",
+    "lblTrapAddress": "绑定地址",
+    "hlpTrapAddress": "套接字监听的本机地址。留空表示监听所有网卡。",
+    "lblTrapIp6": "使用 IPv6",
+    "lblTrapCommunity": "团体名 (community)",
+    "hlpTrapCommunity": "SNMP v1 或 v2c 的 trap 必须携带的团体名。团体名不符的 trap 会被拒绝并记入日志。",
+    "lblTrapAuthId": "授权 id (SNMP v3)",
+    "hlpTrapAuthId": "“授权”选项卡中某个授权集的 id，其用户可以发送 trap。若不接收 SNMP v3 的 trap，请留空。",
+    "lblTrapAcceptAll": "不校验，接受所有 trap",
+    "hlpTrapAcceptAll": "不检查团体名，也不检查 SNMP v3 用户。调试阶段尚不清楚设备会发什么时很方便，但任何能访问该端口的人都能写入状态。",
+    "lblTrapUnknown": "也接受未知设备的 trap",
+    "hlpTrapUnknown": "Trap 按来源地址归属到设备。不启用时，来自未配置为设备的地址的 trap 会被丢弃；启用后这类 trap 至少会写入 \"info.trap.*\"。"
 }

@@ -74,5 +74,22 @@
     "ttOptTypeStates": "Maak staten met typegegevens van oids.",
     "ttOptUseIp": "Markeer om IP-adres te gebruiken voor staat-ID's",
     "ttOptUseMibNames": "Symbolische OIDs toestaan en objecten naar de MIB benoemen",
-    "warnAuthUnused": "Opmerking: configuratie op dit paneel wordt momenteel niet gebruikt omdat geen enkel apparaat het SNMPv3-protocol gebruikt."
+    "warnAuthUnused": "Opmerking: configuratie op dit paneel wordt momenteel niet gebruikt omdat geen enkel apparaat het SNMPv3-protocol gebruikt.",
+    "lblTraps": "Traps",
+    "infoTraps": "Een trap wordt door het apparaat zelf verstuurd wanneer er iets gebeurt - de adapter luistert alleen. Een ontvangen trap komt in de states \"<apparaat>.trap.*\" en daarnaast in \"info.trap.*\", waar de laatste trap van elke afzender staat.",
+    "lblTrapEnabled": "Traps ontvangen",
+    "hlpTrapEnabled": "Een udp-socket openen en op traps en informs wachten. Zonder deze optie vraagt de adapter alleen op.",
+    "lblTrapPort": "Poort",
+    "hlpTrapPort": "Traps gaan naar poort 162. Onder linux mag een poort onder 1024 alleen door root worden gebruikt - kies een hogere poort en laat het apparaat daarheen sturen, of leid de poort om op de host.",
+    "lblTrapAddress": "Bind-adres",
+    "hlpTrapAddress": "Adres van deze host waarop de socket luistert. Leeg laten om op alle interfaces te luisteren.",
+    "lblTrapIp6": "IPv6 gebruiken",
+    "lblTrapCommunity": "Community",
+    "hlpTrapCommunity": "Community die een trap met SNMP v1 of v2c moet meebrengen. Een trap met een andere community wordt geweigerd en gelogd.",
+    "lblTrapAuthId": "Autorisatie-id (SNMP v3)",
+    "hlpTrapAuthId": "Id van een autorisatieset uit het tabblad \"Autorisatie\" waarvan de gebruiker traps mag sturen. Leeg laten als er geen SNMP v3-traps worden verwacht.",
+    "lblTrapAcceptAll": "Elke trap zonder controle accepteren",
+    "hlpTrapAcceptAll": "Noch de community noch de SNMP v3-gebruiker wordt gecontroleerd. Handig tijdens het instellen, zolang niet bekend is wat het apparaat stuurt - iedereen die de poort bereikt kan dan in de states schrijven.",
+    "lblTrapUnknown": "Ook traps van onbekende apparaten accepteren",
+    "hlpTrapUnknown": "Een trap wordt via het afzenderadres aan een apparaat toegewezen. Zonder deze optie wordt een trap van een adres dat niet als apparaat is geconfigureerd weggegooid; met deze optie komt hij wel in \"info.trap.*\"."
 }

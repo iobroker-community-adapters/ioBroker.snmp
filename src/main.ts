@@ -24,7 +24,7 @@ import * as utils from '@iobroker/adapter-core';
 import { isVarbindError, varbindError, type Varbind } from 'net-snmp';
 import { isIPv4, isIPv6 } from 'node:net';
 
-import { DEFAULT_SNMP_PORT, F_TEXT, SNMP_V3 } from './lib/constants';
+import { DEFAULT_SNMP_PORT, F_AUTO, F_TEXT, SNMP_V1, SNMP_V3 } from './lib/constants';
 import { InstallUtils } from './lib/installUtils';
 import { isNumericOid, MibStore } from './lib/mib';
 import type { MibModulesResponse, MibNodesResponse, MibTreeNode } from './lib/mibTypes';
@@ -36,6 +36,21 @@ import {
     snmpSessionSetAsync,
     snmpSessionSubtreeAsync,
 } from './lib/snmpSession';
+import {
+    closeTrapReceiver,
+    createTrapReceiver,
+    deviceForTrapAddress,
+    normalizeTrapAddress,
+    trapIsInform,
+    trapOid,
+    trapSender,
+    trapUpTime,
+    trapVersion,
+    type TrapInfo,
+    type TrapNotification,
+    type TrapReceiver,
+    type TrapVarbind,
+} from './lib/trapReceiver';
 import type { AuthConfig, DeviceConfig, DeviceContext, OidConfig, SessionContext, StateCacheEntry } from './lib/types';
 import { findAuthSet, ip2ipStr, name2id, oidFormat2StateType, oidObjType2Text, oidStateRole } from './lib/utils';
 import { varbindDecode, varbindEncode } from './lib/varbind';
@@ -64,6 +79,12 @@ const MIB_SUBTREE_LIMIT = 500;
 /** name of the meta object which holds the uploaded MIB files */
 const MIB_META_SUFFIX = 'mibs';
 
+/** default udp port the traps are received on */
+const DEFAULT_TRAP_PORT = 162;
+
+/** name of the folder the states of a received trap live in, below the device resp. below `info` */
+const TRAP_FOLDER = 'trap';
+
 /**
  * true if the adapter has been started with '--install' - the process then only migrates the
  * configuration of all instances and terminates again.
@@ -85,6 +106,10 @@ class Snmp extends utils.Adapter {
     private didInstall = false;
     /** the parsed MIB modules, used to resolve symbolic oids and to feed the admin MIB browser */
     private readonly mibStore: MibStore;
+    /** the socket traps are received on, null while the trap receiver is switched off */
+    private trapReceiver: TrapReceiver | null = null;
+    /** number of traps received since the instance has been started, per state id prefix */
+    private readonly trapCounts: Record<string, number> = {};
 
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({ ...options, name: 'snmp' });
@@ -153,6 +178,35 @@ class Snmp extends utils.Adapter {
         // delete -type states if no longer enabled
         if (!this.config.optTypeStates) {
             await this.delStates('*-type');
+        }
+
+        // delete the states of the trap receiver if it is no longer enabled
+        if (!this.config.trapEnabled) {
+            await this.delTrapStates();
+        }
+    }
+
+    /**
+     * delTrapStates - remove the states the trap receiver has created
+     *
+     *		Only the folders the receiver itself creates are removed: an oid named "trap" would
+     *		produce a state with the very same id, and that one belongs to the user.
+     */
+    private async delTrapStates(): Promise<void> {
+        this.log.debug('delTrapStates');
+
+        /*
+         * The objects of the instance are filtered here instead of asking for the pattern
+         * "<namespace>.*.trap" - a wildcard in the middle of a pattern is not reliable, and there
+         * are not many objects to look at.
+         */
+        const objs = (await this.getAdapterObjectsAsync()) ?? {};
+        for (const obj of Object.values(objs)) {
+            if (obj.type !== 'folder' || !obj._id.endsWith(`.${TRAP_FOLDER}`)) {
+                continue;
+            }
+            this.log.info(`removing states ${obj._id}.*...`);
+            await this.delForeignObjectAsync(obj._id, { recursive: true });
         }
     }
 
@@ -306,6 +360,110 @@ class Snmp extends utils.Adapter {
     }
 
     /**
+     * initTrapObjects - create the states a received trap is written into
+     *
+     *		Every device gets its own set, plus one set below `info` which holds the last trap of
+     *		whoever sent it - a script which wants to see all of them then needs one subscription
+     *		instead of one per device.
+     *
+     *		`count` is the state to react on: it changes with every trap, while `oid` and `name`
+     *		stay the same when a device repeats itself.
+     *
+     * @param pPrefix id of the device, or "info" for the instance wide set
+     */
+    private async initTrapObjects(pPrefix: string): Promise<void> {
+        this.log.debug(`initTrapObjects (${pPrefix})`);
+
+        const base = `${pPrefix}.${TRAP_FOLDER}`;
+
+        try {
+            await this.initObject({
+                _id: base,
+                type: 'folder',
+                common: {
+                    name: '',
+                    desc: 'folder containing the last trap received',
+                },
+                native: {},
+            });
+
+            if (pPrefix === 'info') {
+                await this.initObject({
+                    _id: `${base}.address`,
+                    type: 'state',
+                    common: {
+                        name: `${base}.address`,
+                        desc: 'address the last trap came from',
+                        write: false,
+                        read: true,
+                        type: 'string',
+                        role: 'text',
+                    },
+                    native: {},
+                });
+            }
+
+            await this.initObject({
+                _id: `${base}.oid`,
+                type: 'state',
+                common: {
+                    name: `${base}.oid`,
+                    desc: 'numeric oid of the last trap',
+                    write: false,
+                    read: true,
+                    type: 'string',
+                    role: 'text',
+                },
+                native: {},
+            });
+
+            await this.initObject({
+                _id: `${base}.name`,
+                type: 'state',
+                common: {
+                    name: `${base}.name`,
+                    desc: 'symbol of the last trap, the numeric oid if no MIB covers it',
+                    write: false,
+                    read: true,
+                    type: 'string',
+                    role: 'text',
+                },
+                native: {},
+            });
+
+            await this.initObject({
+                _id: `${base}.json`,
+                type: 'state',
+                common: {
+                    name: `${base}.json`,
+                    desc: 'the last trap with all its varbinds as json',
+                    write: false,
+                    read: true,
+                    type: 'string',
+                    role: 'json',
+                },
+                native: {},
+            });
+
+            await this.initObject({
+                _id: `${base}.count`,
+                type: 'state',
+                common: {
+                    name: `${base}.count`,
+                    desc: 'number of traps received since the instance has been started',
+                    write: false,
+                    read: true,
+                    type: 'number',
+                    role: 'value',
+                },
+                native: {},
+            });
+        } catch (e) {
+            this.log.error(`error creating trap objects for "${pPrefix}", ${(e as Error).message}`);
+        }
+    }
+
+    /**
      * initOidObjects - initializes objects for one OID
      *
      * ASSERTION: root device object is already created
@@ -399,8 +557,16 @@ class Snmp extends utils.Adapter {
     private async initAllObjects(): Promise<void> {
         this.log.debug('initAllObjects - initializing objects');
 
+        if (this.config.trapEnabled) {
+            await this.initTrapObjects('info');
+        }
+
         for (let ii = 0; ii < this.CTXs.length; ii++) {
             await this.initDeviceObjects(this.CTXs[ii].id, this.CTXs[ii].ipAddr);
+
+            if (this.config.trapEnabled) {
+                await this.initTrapObjects(this.CTXs[ii].id);
+            }
 
             for (let cc = 0; cc < this.CTXs[ii].chunks.length; cc++) {
                 for (let jj = 0; jj < this.CTXs[ii].chunks[cc].ids.length; jj++) {
@@ -791,6 +957,200 @@ class Snmp extends utils.Adapter {
         await this.setStateAsync('info.connection', this.isConnected, true);
     }
 
+    // #################### trap receiver ####################
+
+    /**
+     * trapSymbol - the symbol a MIB gives to an oid of a received trap
+     *
+     *		`describe()` reports the longest known prefix plus what is left of the oid, so the
+     *		instance is appended: without it `1.3.6.1.4.1.8072.2.3.0.1` would be reported as
+     *		"SNMPv2-SMI::enterprises", which is the prefix and not the trap.
+     *
+     * @param pOid numeric oid
+     * @returns "<symbol>[.<instance>]", empty if no MIB covers the oid
+     */
+    private trapSymbol(pOid: string): string {
+        const described = this.mibStore.describe(pOid);
+        if (!described?.symbol) {
+            return '';
+        }
+
+        return described.instance ? `${described.symbol}.${described.instance}` : described.symbol;
+    }
+
+    /**
+     * trapVarbind - one varbind of a received trap, named and decoded
+     *
+     *		The format is always "automatic": a trap carries whatever the device decided to send,
+     *		there is no configured oid behind it which could name a format.
+     *
+     * @param pVarbind varbind as it arrived
+     * @returns the varbind as it appears in the json state
+     */
+    private trapVarbind(pVarbind: Varbind): TrapVarbind {
+        const name = this.trapSymbol(pVarbind.oid);
+
+        if (isVarbindError(pVarbind)) {
+            return {
+                oid: pVarbind.oid,
+                name: name,
+                type: oidObjType2Text(pVarbind.type),
+                value: varbindError(pVarbind),
+            };
+        }
+
+        const decoded = varbindDecode(pVarbind, F_AUTO, '', pVarbind.oid, this.log);
+        return {
+            oid: pVarbind.oid,
+            name: name,
+            type: decoded.typeStr,
+            value: decoded.val,
+        };
+    }
+
+    /**
+     * trapInfo - everything a received trap reports, ready to be written as json
+     *
+     * @param pTrap the notification as the receiver handed it over
+     * @returns the trap with its varbinds named and decoded
+     */
+    private trapInfo(pTrap: TrapNotification): TrapInfo {
+        const pdu = pTrap.pdu;
+        const oid = trapOid(pdu);
+        const version = trapVersion(pdu);
+
+        const info: TrapInfo = {
+            oid: oid,
+            name: this.trapSymbol(oid) || oid,
+            version: version,
+            address: normalizeTrapAddress(pTrap.rinfo?.address ?? ''),
+            sender: trapSender(pdu),
+            inform: trapIsInform(pdu),
+            varbinds: (pdu.varbinds ?? []).map(varbind => this.trapVarbind(varbind)),
+        };
+
+        const upTime = trapUpTime(pdu);
+        if (typeof upTime === 'number') {
+            info.upTime = upTime;
+        }
+
+        // the four fields an snmp v1 trap describes itself with - trapOid() derives its oid from them
+        if (version === SNMP_V1) {
+            info.enterprise = (pdu.enterprise ?? '').replace(/^\./, '');
+            info.agentAddr = normalizeTrapAddress(pdu.agentAddr ?? '');
+            info.generic = Number(pdu.generic) || 0;
+            info.specific = Number(pdu.specific) || 0;
+        }
+
+        return info;
+    }
+
+    /**
+     * writeTrapStates - store a received trap below a device resp. below `info`
+     *
+     * @param pPrefix id of the device, or "info" for the instance wide set
+     * @param pInfo the trap to store
+     */
+    private async writeTrapStates(pPrefix: string, pInfo: TrapInfo): Promise<void> {
+        const base = `${pPrefix}.${TRAP_FOLDER}`;
+
+        try {
+            if (pPrefix === 'info') {
+                await this.setStateAsync(`${base}.address`, { val: pInfo.address, ack: true, q: 0x00 });
+            }
+            await this.setStateAsync(`${base}.json`, { val: JSON.stringify(pInfo), ack: true, q: 0x00 });
+            await this.setStateAsync(`${base}.oid`, { val: pInfo.oid, ack: true, q: 0x00 });
+            await this.setStateAsync(`${base}.name`, { val: pInfo.name, ack: true, q: 0x00 });
+
+            /*
+             * The counter is written last and is the only state which changes with every single
+             * trap: a device which repeats itself writes the same oid and the same name again, and
+             * a script which reacts on changes would never hear about the repetition.
+             */
+            this.trapCounts[base] = (this.trapCounts[base] ?? 0) + 1;
+            await this.setStateAsync(`${base}.count`, { val: this.trapCounts[base], ack: true, q: 0x00 });
+        } catch (e) {
+            this.log.error(`cannot write the trap states of "${pPrefix}", ${(e as Error).message}`);
+        }
+    }
+
+    /**
+     * onTrap - called for every received trap and for every error of the trap socket
+     *
+     * @param pError error reported by the receiver, null for a received trap
+     * @param pTrap the received trap
+     */
+    private async onTrap(pError: Error | null, pTrap?: TrapNotification): Promise<void> {
+        if (pError) {
+            // a rejected trap is reported the same way as a broken socket - both are worth knowing
+            this.log.warn(`trap receiver - ${pError.message}`);
+            return;
+        }
+        if (!pTrap?.pdu || this.shutdownInProgress) {
+            return;
+        }
+
+        const info = this.trapInfo(pTrap);
+        const CTX = deviceForTrapAddress(this.CTXs, info.address, pTrap.pdu.agentAddr ?? '');
+
+        if (!CTX && !this.config.trapUnknown) {
+            this.log.debug(`trap from ${info.address} ignored - no device is configured with that address`);
+            return;
+        }
+
+        this.log.debug(
+            `${info.inform ? 'inform' : 'trap'} "${info.name}" received from ${info.address}` +
+                `${CTX ? ` (device ${CTX.id})` : ' (unknown device)'}`,
+        );
+
+        await this.writeTrapStates('info', info);
+        if (CTX) {
+            await this.writeTrapStates(CTX.id, info);
+        }
+    }
+
+    /**
+     * startTrapReceiver - open the socket the traps are received on
+     *
+     *		Nothing happens if the option is switched off. A port which cannot be bound is not
+     *		reported here but as an error of the socket, see `onTrap()`.
+     */
+    private startTrapReceiver(): void {
+        if (!this.config.trapEnabled) {
+            return;
+        }
+
+        this.trapReceiver = createTrapReceiver(
+            {
+                port: this.config.trapPort,
+                address: this.config.trapAddress,
+                isIPv6: !!this.config.trapIp6,
+                community: this.config.trapCommunity,
+                auth: findAuthSet(this.config.authSets, this.config.trapAuthId),
+                acceptAll: !!this.config.trapAcceptAll,
+            },
+            (error, trap) => void this.onTrap(error, trap),
+            this.log,
+        );
+
+        if (this.trapReceiver) {
+            this.log.info(
+                `listening for snmp traps on ${this.config.trapAddress || '*'}:${this.config.trapPort} ` +
+                    `(${this.config.trapIp6 ? 'IPv6' : 'IPv4'})`,
+            );
+        }
+    }
+
+    /**
+     * stopTrapReceiver - give the trap socket back
+     */
+    private stopTrapReceiver(): void {
+        if (this.trapReceiver) {
+            closeTrapReceiver(this.trapReceiver, this.log);
+            this.trapReceiver = null;
+        }
+    }
+
     /**
      * validateConfig - scan and validate config data
      *
@@ -1146,6 +1506,8 @@ class Snmp extends utils.Adapter {
             }
         }
 
+        this.validateTrapConfig();
+
         if (!ok) {
             this.log.debug('validateConfig - validation aborted (checks failed)');
             return false;
@@ -1153,6 +1515,60 @@ class Snmp extends utils.Adapter {
 
         this.log.debug('validateConfig - validation completed (checks passed)');
         return true;
+    }
+
+    /**
+     * validateTrapConfig - verify and normalize the configuration of the trap receiver
+     *
+     *		The values are normalized in place, the same way the device values are, so that an
+     *		instance which has never opened the new tab starts with the defaults. A configuration
+     *		which cannot work switches the receiver off instead of disabling the whole instance -
+     *		the devices are polled either way.
+     */
+    private validateTrapConfig(): void {
+        this.log.debug('validateConfig - verifying trap receiver');
+
+        this.config.trapEnabled = !!this.config.trapEnabled;
+        this.config.trapIp6 = !!this.config.trapIp6;
+        this.config.trapAcceptAll = !!this.config.trapAcceptAll;
+        this.config.trapUnknown = !!this.config.trapUnknown;
+        this.config.trapAddress = (this.config.trapAddress || '').trim();
+        this.config.trapAuthId = (this.config.trapAuthId || '').trim();
+        this.config.trapCommunity = (
+            typeof this.config.trapCommunity === 'string' ? this.config.trapCommunity : 'public'
+        ).trim();
+
+        this.config.trapPort = parseInt(String(this.config.trapPort), 10) || DEFAULT_TRAP_PORT;
+        if (this.config.trapPort < 1 || this.config.trapPort > 65535) {
+            this.log.warn(`trap port (${this.config.trapPort}) is out of range, using ${DEFAULT_TRAP_PORT} instead.`);
+            this.config.trapPort = DEFAULT_TRAP_PORT;
+        }
+
+        if (!this.config.trapEnabled) {
+            return;
+        }
+
+        if (this.config.trapAddress && !isIPv4(this.config.trapAddress) && !isIPv6(this.config.trapAddress)) {
+            this.log.error(
+                `trap address "${this.config.trapAddress}" is not an ip address, traps are switched off. Please correct configuration.`,
+            );
+            this.config.trapEnabled = false;
+            return;
+        }
+
+        if (this.config.trapAuthId && !findAuthSet(this.config.authSets, this.config.trapAuthId)) {
+            this.log.error(
+                `trap authorization id "${this.config.trapAuthId}" refers to no authorization set, traps are switched off. Please correct configuration.`,
+            );
+            this.config.trapEnabled = false;
+            return;
+        }
+
+        if (!this.config.trapCommunity && !this.config.trapAuthId && !this.config.trapAcceptAll) {
+            this.log.warn(
+                'traps are enabled, but neither a community nor an authorization set is configured - no trap will be accepted.',
+            );
+        }
     }
 
     /**
@@ -1752,6 +2168,9 @@ class Snmp extends utils.Adapter {
             void this.createReaderSession(CTX);
         }
 
+        // start listening for traps
+        this.startTrapReceiver();
+
         // start connection info updater
         this.log.debug('startconnection info updater');
         this.connUpdateTimer = this.setInterval(() => void this.handleConnectionInfo(), 15000) ?? null;
@@ -1836,6 +2255,8 @@ class Snmp extends utils.Adapter {
         this.log.debug('onUnload triggered');
 
         this.shutdownInProgress = true;
+
+        this.stopTrapReceiver();
 
         for (let ii = 0; ii < this.CTXs.length; ii++) {
             const CTX = this.CTXs[ii];

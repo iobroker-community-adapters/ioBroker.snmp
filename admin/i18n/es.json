@@ -74,5 +74,22 @@
     "ttOptTypeStates": "Cree estados que contengan datos de tipo de oids.",
     "ttOptUseIp": "Marque para usar la dirección IP para las identificaciones de estado",
     "ttOptUseMibNames": "Permitir OID simbólicos y nombrar los objetos según la MIB",
-    "warnAuthUnused": "Nota: La configuración en este panel no se usará actualmente ya que ningún dispositivo usa el protocolo SNMPv3."
+    "warnAuthUnused": "Nota: La configuración en este panel no se usará actualmente ya que ningún dispositivo usa el protocolo SNMPv3.",
+    "lblTraps": "Traps",
+    "infoTraps": "Un trap lo envía el propio dispositivo cuando ocurre algo; el adaptador solo escucha. Un trap recibido se escribe en los estados \"<dispositivo>.trap.*\" y además en \"info.trap.*\", que guarda el último trap de cualquier remitente.",
+    "lblTrapEnabled": "Recibir traps",
+    "hlpTrapEnabled": "Abrir un socket udp y escuchar traps e informs. Sin esta opción el adaptador solo consulta.",
+    "lblTrapPort": "Puerto",
+    "hlpTrapPort": "Los traps se envían al puerto 162. En linux un puerto por debajo de 1024 solo lo puede abrir root: use un puerto más alto y configure el dispositivo, o redirija el puerto en el host.",
+    "lblTrapAddress": "Dirección de escucha",
+    "hlpTrapAddress": "Dirección de este host en la que escucha el socket. Déjelo vacío para escuchar en todas las interfaces.",
+    "lblTrapIp6": "Usar IPv6",
+    "lblTrapCommunity": "Comunidad",
+    "hlpTrapCommunity": "Comunidad que debe llevar un trap de SNMP v1 o v2c. Un trap con otra comunidad se rechaza y se registra.",
+    "lblTrapAuthId": "Id de autorización (SNMP v3)",
+    "hlpTrapAuthId": "Id de un conjunto de autorización de la pestaña \"Autorización\" cuyo usuario puede enviar traps. Déjelo vacío si no se esperan traps de SNMP v3.",
+    "lblTrapAcceptAll": "Aceptar cualquier trap sin comprobación",
+    "hlpTrapAcceptAll": "No se comprueba ni la comunidad ni el usuario de SNMP v3. Útil durante la puesta en marcha, mientras no se sabe qué envía el dispositivo: cualquiera que alcance el puerto podrá escribir en los estados.",
+    "lblTrapUnknown": "Aceptar también traps de dispositivos desconocidos",
+    "hlpTrapUnknown": "Un trap se asigna a un dispositivo por la dirección del remitente. Sin esta opción, un trap de una dirección que no está configurada como dispositivo se descarta; con ella llega al menos a \"info.trap.*\"."
 }

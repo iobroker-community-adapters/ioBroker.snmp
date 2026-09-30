@@ -74,5 +74,22 @@
     "ttOptTypeStates": "Create states containing type data of oids.",
     "ttOptUseIp": "Mark to use ip adress for state ids",
     "ttOptUseMibNames": "Allow symbolic OIDs and name the objects after the MIB",
-    "warnAuthUnused": "Note: Configuration at this panel will not be used currently as no device uses SNMPv3 protocol."
+    "warnAuthUnused": "Note: Configuration at this panel will not be used currently as no device uses SNMPv3 protocol.",
+    "lblTraps": "Traps",
+    "infoTraps": "A trap is sent by the device itself when something happens - the adapter only listens for it. A received trap is written into the states \"<device>.trap.*\", and additionally into \"info.trap.*\", which holds the last trap of any sender.",
+    "lblTrapEnabled": "Receive traps",
+    "hlpTrapEnabled": "Open a udp socket and listen for traps and informs. Without this option the adapter only polls.",
+    "lblTrapPort": "Port",
+    "hlpTrapPort": "Traps are sent to port 162. On linux a port below 1024 may only be bound by root - use a higher port and let the device send there, or redirect the port on the host.",
+    "lblTrapAddress": "Bind address",
+    "hlpTrapAddress": "Address of this host the socket listens on. Leave empty to listen on every interface.",
+    "lblTrapIp6": "Use IPv6",
+    "lblTrapCommunity": "Community",
+    "hlpTrapCommunity": "Community a trap of SNMP v1 or v2c has to carry. A trap with any other community is rejected and logged.",
+    "lblTrapAuthId": "Authorization id (SNMP v3)",
+    "hlpTrapAuthId": "Id of an authorization set from the tab \"Authorization\" whose user may send traps. Leave empty if no SNMP v3 traps are expected.",
+    "lblTrapAcceptAll": "Accept every trap without checking",
+    "hlpTrapAcceptAll": "Neither the community nor the SNMP v3 user is checked. Useful while setting up, when it is not yet known what the device sends - everybody who can reach the port can then write into the states.",
+    "lblTrapUnknown": "Also accept traps of unknown devices",
+    "hlpTrapUnknown": "A trap is assigned to a device by the address it came from. Without this option a trap from an address which is not configured as a device is discarded; with it, such a trap still reaches \"info.trap.*\"."
 }

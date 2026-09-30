@@ -74,5 +74,22 @@
     "ttOptTypeStates": "Crea stati contenenti dati di tipo di oids.",
     "ttOptUseIp": "Contrassegna per utilizzare l'indirizzo IP per gli ID di stato",
     "ttOptUseMibNames": "Consenti OID simbolici e denomina gli oggetti secondo il MIB",
-    "warnAuthUnused": "Nota: la configurazione in questo pannello non verrà attualmente utilizzata poiché nessun dispositivo utilizza il protocollo SNMPv3."
+    "warnAuthUnused": "Nota: la configurazione in questo pannello non verrà attualmente utilizzata poiché nessun dispositivo utilizza il protocollo SNMPv3.",
+    "lblTraps": "Trap",
+    "infoTraps": "Un trap viene inviato dal dispositivo stesso quando succede qualcosa: l'adapter si limita ad ascoltare. Un trap ricevuto viene scritto negli stati \"<dispositivo>.trap.*\" e inoltre in \"info.trap.*\", che contiene l'ultimo trap di qualsiasi mittente.",
+    "lblTrapEnabled": "Ricevere i trap",
+    "hlpTrapEnabled": "Aprire un socket udp e ascoltare trap e inform. Senza questa opzione l'adapter si limita al polling.",
+    "lblTrapPort": "Porta",
+    "hlpTrapPort": "I trap vengono inviati alla porta 162. Su linux una porta inferiore a 1024 può essere aperta solo da root: usare una porta più alta e configurare il dispositivo, oppure reindirizzare la porta sull'host.",
+    "lblTrapAddress": "Indirizzo di ascolto",
+    "hlpTrapAddress": "Indirizzo di questo host su cui il socket ascolta. Lasciare vuoto per ascoltare su tutte le interfacce.",
+    "lblTrapIp6": "Usare IPv6",
+    "lblTrapCommunity": "Community",
+    "hlpTrapCommunity": "Community che un trap SNMP v1 o v2c deve portare. Un trap con una community diversa viene rifiutato e registrato.",
+    "lblTrapAuthId": "Id di autorizzazione (SNMP v3)",
+    "hlpTrapAuthId": "Id di un set di autorizzazione della scheda \"Autorizzazione\" il cui utente può inviare trap. Lasciare vuoto se non si attendono trap SNMP v3.",
+    "lblTrapAcceptAll": "Accettare ogni trap senza verifica",
+    "hlpTrapAcceptAll": "Non vengono verificati né la community né l'utente SNMP v3. Utile durante la configurazione, finché non si sa cosa invia il dispositivo: chiunque raggiunga la porta può però scrivere negli stati.",
+    "lblTrapUnknown": "Accettare anche i trap di dispositivi sconosciuti",
+    "hlpTrapUnknown": "Un trap viene assegnato a un dispositivo in base all'indirizzo del mittente. Senza questa opzione un trap proveniente da un indirizzo non configurato come dispositivo viene scartato; con essa arriva almeno in \"info.trap.*\"."
 }

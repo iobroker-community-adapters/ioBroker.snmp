@@ -187,6 +187,8 @@ Here you upload the MIB files of your devices and browse their contents.
 The MIBs shipped with the adapter (SNMPv2-MIB, RFC1213-MIB, IF-MIB and the other SMI base modules)
 are always available and do not have to be uploaded.
 
+<p align="center"><img src="img/snmp_tab_mib.jpg" width="600" /></p>
+
 Below the upload the **MIB browser** shows the device itself. At the top you choose the **device**
 the OIDs are collected for - its OID group is filled in automatically, so you normally never have to
 type a group name.
@@ -218,6 +220,35 @@ tab, upload its MIB here if you have one, then select the device in the MIB brow
 values you want - or enter the OIDs by hand on the *OID groups* tab. Until the OID group of a device
 contains at least one active OID, the adapter skips that device with a warning and keeps running, so
 that the MIB browser can still read the MIB files and the device itself.
+
+### TAB Traps
+A trap is the other direction: the device sends it by itself when something happens - a port goes
+down, a UPS switches to battery, a printer runs out of paper - and the adapter only listens for it.
+Nothing is polled here, so a trap arrives when it arrives.
+
+<p align=center><img src="img/snmp_tab_traps.jpg" width="600" /></p>
+
+| Parameter                            | Type     | Description                                                | Comment                                                                                     |
+|--------------------------------------|----------|------------------------------------------------------------|---------------------------------------------------------------------------------------------|
+| Receive traps                        | boolean  | open a udp socket and listen for traps and informs          | without it the adapter only polls                                                           |
+| Port                                 | number   | udp port to listen on                                       | devices send to 162; on linux a port below 1024 may only be bound by root                   |
+| Bind address                         | text     | address of this host to listen on                           | empty listens on every interface                                                            |
+| Use IPv6                             | boolean  | listen on IPv6 instead of IPv4                              | an IPv4 sender is still recognized, the mapping `::ffff:` is removed                        |
+| Community                            | text     | community a trap of SNMP v1 or v2c has to carry             | a trap with another community is rejected and logged                                        |
+| Authorization id (SNMP v3)           | text     | id of an authorization set whose user may send traps        | empty if no SNMP v3 traps are expected                                                      |
+| Accept every trap without checking   | boolean  | neither the community nor the SNMP v3 user is checked       | for setting up - everybody who reaches the port can then write into the states              |
+| Also accept traps of unknown devices | boolean  | process a trap whose sender is not configured as a device   | such a trap only reaches `info.trap.*`                                                      |
+
+A trap names no device, it just arrives - so the address it came from decides which device it
+belongs to. A trap from an address which is not configured as a device is discarded, unless the
+last option is set. An SNMP v1 trap additionally reports the address of the agent it is about,
+which is used when the sender itself is not a configured device - that is what makes a relay work.
+
+An inform is a trap which wants to be acknowledged; the adapter answers it before it processes it,
+so the sender does not repeat it.
+
+Note that the port has to be reachable: 162 is a privileged port on linux, and a container or a
+firewall has to let udp through. If the port cannot be bound, the reason is written into the log.
 
 ### TAB Options
 Here you specify some general options
@@ -296,6 +327,50 @@ The role of the value state follows its type, so that a visualization knows what
 | boolean                    | `indicator`  | `switch`   |
 | string                     | `text`       | `text`     |
 | mixed (format *automatic*) | `state`      | `state`    |
+
+With the trap receiver enabled every device gets four more states, and the same set exists once
+below `info` holding the last trap of any sender:
+
+| id                       | type    | role  | meaning                                                                  |
+|--------------------------|---------|-------|---------------------------------------------------------------------------|
+| `<device>.trap.oid`      | string  | text  | numeric oid of the last trap                                             |
+| `<device>.trap.name`     | string  | text  | the symbol a MIB gives it, the numeric oid if no MIB covers it            |
+| `<device>.trap.json`     | string  | json  | the whole trap with all its varbinds, see below                          |
+| `<device>.trap.count`    | number  | value | traps received from this device since the instance has been started      |
+| `info.trap.address`      | string  | text  | address the last trap came from                                          |
+| `info.trap.oid` / `.name` / `.json` / `.count` | | | the same for the last trap of any sender                  |
+
+**Subscribe to `count`** to react on a trap: it changes with every single trap, while `oid` and
+`name` stay the same when a device repeats itself. The other three states are already written when
+`count` changes.
+
+The json holds everything the trap reported:
+
+```json
+{
+    "oid": "1.3.6.1.6.3.1.1.5.3",
+    "name": "IF-MIB::linkDown",
+    "version": 1,
+    "address": "192.168.1.2",
+    "sender": "public",
+    "inform": false,
+    "upTime": 4,
+    "enterprise": "1.3.6.1.4.1",
+    "agentAddr": "192.168.1.2",
+    "generic": 2,
+    "specific": 0,
+    "varbinds": [
+        { "oid": "1.3.6.1.2.1.2.2.1.1.3", "name": "IF-MIB::ifIndex.3", "type": "Integer32", "value": 3 }
+    ]
+}
+```
+
+`version` is 1, 2 or 3, `sender` is the community resp. the user name the trap was sent with, and
+`inform` says whether it had to be acknowledged. `enterprise`, `agentAddr`, `generic` and
+`specific` only appear for an SNMP v1 trap - those are the four fields such a trap describes itself
+with, and `oid` is what RFC 3584 makes out of them, so a v1 and a v2c trap can be compared. The
+varbinds are listed in the order they arrived, including the `sysUpTime.0` and `snmpTrapOID.0` an
+SNMP v2c trap starts with; their values are decoded like the format *automatic* does it.
 
 ### Quality
 

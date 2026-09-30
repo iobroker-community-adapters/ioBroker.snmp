@@ -74,5 +74,22 @@
     "ttOptTypeStates": "Erstellen Sie Zustände, die Typdaten von OIDs enthalten.",
     "ttOptUseIp": "Markieren, um die IP-Adresse für Zustand-IDs zu verwenden",
     "ttOptUseMibNames": "Symbolische OIDs erlauben und Objekte nach der MIB benennen",
-    "warnAuthUnused": "Hinweis: Die Konfiguration in diesem Bereich wird derzeit nicht verwendet, da kein Gerät das SNMPv3-Protokoll verwendet."
+    "warnAuthUnused": "Hinweis: Die Konfiguration in diesem Bereich wird derzeit nicht verwendet, da kein Gerät das SNMPv3-Protokoll verwendet.",
+    "lblTraps": "Traps",
+    "infoTraps": "Einen Trap schickt das Gerät von sich aus, wenn etwas passiert - der Adapter hört nur zu. Ein empfangener Trap landet in den States \"<Gerät>.trap.*\" und zusätzlich in \"info.trap.*\", wo der letzte Trap beliebiger Absender steht.",
+    "lblTrapEnabled": "Traps empfangen",
+    "hlpTrapEnabled": "Einen UDP-Socket öffnen und auf Traps und Informs warten. Ohne diese Option fragt der Adapter nur ab.",
+    "lblTrapPort": "Port",
+    "hlpTrapPort": "Traps gehen an Port 162. Unter Linux darf ein Port unter 1024 nur von root belegt werden - nutzen Sie einen höheren Port und lassen Sie das Gerät dorthin senden, oder leiten Sie den Port auf dem Host um.",
+    "lblTrapAddress": "Bind-Adresse",
+    "hlpTrapAddress": "Adresse dieses Hosts, auf der der Socket lauscht. Leer lassen, um auf allen Schnittstellen zu lauschen.",
+    "lblTrapIp6": "IPv6 verwenden",
+    "lblTrapCommunity": "Community",
+    "hlpTrapCommunity": "Community, die ein Trap mit SNMP v1 oder v2c mitbringen muss. Ein Trap mit einer anderen Community wird abgelehnt und protokolliert.",
+    "lblTrapAuthId": "Autorisierungs-ID (SNMP v3)",
+    "hlpTrapAuthId": "ID eines Autorisierungssatzes aus dem Tab \"Autorisierung\", dessen Benutzer Traps senden darf. Leer lassen, wenn keine SNMP-v3-Traps erwartet werden.",
+    "lblTrapAcceptAll": "Jeden Trap ohne Prüfung annehmen",
+    "hlpTrapAcceptAll": "Weder die Community noch der SNMP-v3-Benutzer werden geprüft. Nützlich beim Einrichten, solange nicht bekannt ist, was das Gerät sendet - jeder, der den Port erreicht, kann dann in die States schreiben.",
+    "lblTrapUnknown": "Auch Traps unbekannter Geräte annehmen",
+    "hlpTrapUnknown": "Ein Trap wird über die Absenderadresse einem Gerät zugeordnet. Ohne diese Option wird ein Trap von einer Adresse, die als Gerät nicht konfiguriert ist, verworfen; mit ihr landet er zumindest in \"info.trap.*\"."
 }

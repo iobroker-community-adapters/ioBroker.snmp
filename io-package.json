@@ -277,7 +277,15 @@
     "optTypeStates": false,
     "optTrace": false,
     "optTrace": false,
-    "optUseMibNames": false
+    "optUseMibNames": false,
+        "trapEnabled": false,
+        "trapPort": 162,
+        "trapAddress": "",
+        "trapIp6": false,
+        "trapCommunity": "public",
+        "trapAuthId": "",
+        "trapAcceptAll": false,
+        "trapUnknown": false
   },
   "objects": [],
   "instanceObjects": [

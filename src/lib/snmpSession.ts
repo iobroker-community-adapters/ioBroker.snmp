@@ -125,6 +125,93 @@ export async function snmpSessionSetAsync(
 }
 
 /**
+ * The authorization data an snmp v3 user is built from.
+ *
+ * A `DeviceContext` carries it (copied there from the authorization set of the device) and so does
+ * a row of `native.authSets`, so both can be turned into a user - the reader sessions do it for
+ * their device, the trap receiver for the user which is allowed to send traps.
+ */
+export interface SnmpV3Auth {
+    /** 1 = minimum, 2 = authentication, 3 = authentication + encryption */
+    authSecLvl?: number | string;
+    authUser?: string;
+    /** one of the MD5 / SHA* constants */
+    authAuthProto?: number | string;
+    authAuthKey?: string;
+    /** one of the DES / AES* constants */
+    authEncProto?: number | string;
+    authEncKey?: string;
+}
+
+/**
+ * snmpUserFor - the net-snmp user of an authorization set
+ *
+ *		NOTE: 0 is not a valid snmp security level resp. protocol code. It is kept as the initial
+ *		value - as in the JavaScript original - so that an invalid configuration reaches net-snmp
+ *		unchanged instead of being silently turned into something which happens to work.
+ *
+ * @param pAuth authorization data, from a device context or from an authorization set
+ * @returns the user as net-snmp expects it
+ */
+export function snmpUserFor(pAuth: SnmpV3Auth): User {
+    let snmpSecurityLevel = 0 as SecurityLevel;
+    const authSecLvl = Number(pAuth.authSecLvl);
+    if (authSecLvl === 1) {
+        snmpSecurityLevel = snmp.SecurityLevel.noAuthNoPriv; // no message authentication or encryption
+    } else if (authSecLvl === 2) {
+        snmpSecurityLevel = snmp.SecurityLevel.authNoPriv; // message authentication and no encryption
+    } else if (authSecLvl === 3) {
+        snmpSecurityLevel = snmp.SecurityLevel.authPriv; //for message authentication and encryption
+    }
+
+    let snmpAuthProtocol = 0 as AuthProtocols;
+    switch (Number(pAuth.authAuthProto) /* ensure numeric type */) {
+        default:
+            snmpAuthProtocol = 0 as AuthProtocols;
+            break;
+        case MD5:
+            snmpAuthProtocol = snmp.AuthProtocols.md5;
+            break;
+        case SHA:
+            snmpAuthProtocol = snmp.AuthProtocols.sha;
+            break;
+        case SHA224:
+            snmpAuthProtocol = snmp.AuthProtocols.sha224;
+            break;
+        case SHA256:
+            snmpAuthProtocol = snmp.AuthProtocols.sha256;
+            break;
+        case SHA384:
+            snmpAuthProtocol = snmp.AuthProtocols.sha384;
+            break;
+        case SHA512:
+            snmpAuthProtocol = snmp.AuthProtocols.sha512;
+            break;
+    }
+
+    let snmpPrivProtocol = 0 as PrivProtocols;
+    const authEncProto = Number(pAuth.authEncProto);
+    if (authEncProto === DES) {
+        snmpPrivProtocol = snmp.PrivProtocols.des; // DES encryption
+    } else if (authEncProto === AES) {
+        snmpPrivProtocol = snmp.PrivProtocols.aes; // AES encryption
+    } else if (authEncProto === AES256B) {
+        snmpPrivProtocol = snmp.PrivProtocols.aes256b; // AES encryption
+    } else if (authEncProto === AES256R) {
+        snmpPrivProtocol = snmp.PrivProtocols.aes256r; // AES encryption
+    }
+
+    return {
+        name: pAuth.authUser ?? '',
+        level: snmpSecurityLevel,
+        authProtocol: snmpAuthProtocol,
+        authKey: pAuth.authAuthKey,
+        privProtocol: snmpPrivProtocol,
+        privKey: pAuth.authEncKey,
+    };
+}
+
+/**
  * snmpCreateSession - initializes a snmp session
  *
  * @param pCTX CTX object
@@ -171,68 +258,11 @@ export function snmpCreateSession(pCTX: DeviceContext, pLog: ioBroker.Logger): S
             idBitsSize: 32,
         });
     } else if (snmpVers === SNMP_V3) {
-        // NOTE: 0 is not a valid snmp security level. It is kept as the initial value - as in the
-        // JavaScript original - so that an invalid configuration reaches net-snmp unchanged.
-        let snmpSecurityLevel = 0 as SecurityLevel;
-        const authSecLvl = Number(pCTX.authSecLvl);
-        if (authSecLvl === 1) {
-            snmpSecurityLevel = snmp.SecurityLevel.noAuthNoPriv; // no message authentication or encryption
-        } else if (authSecLvl === 2) {
-            snmpSecurityLevel = snmp.SecurityLevel.authNoPriv; // message authentication and no encryption
-        } else if (authSecLvl === 3) {
-            snmpSecurityLevel = snmp.SecurityLevel.authPriv; //for message authentication and encryption
-        }
-
-        let snmpAuthProtocol = 0 as AuthProtocols;
-        switch (Number(pCTX.authAuthProto) /* ensure numeric type */) {
-            default:
-                // see the note on snmpSecurityLevel - 0 is not a valid protocol code
-                snmpAuthProtocol = 0 as AuthProtocols;
-                break;
-            case MD5:
-                snmpAuthProtocol = snmp.AuthProtocols.md5;
-                break;
-            case SHA:
-                snmpAuthProtocol = snmp.AuthProtocols.sha;
-                break;
-            case SHA224:
-                snmpAuthProtocol = snmp.AuthProtocols.sha224;
-                break;
-            case SHA256:
-                snmpAuthProtocol = snmp.AuthProtocols.sha256;
-                break;
-            case SHA384:
-                snmpAuthProtocol = snmp.AuthProtocols.sha384;
-                break;
-            case SHA512:
-                snmpAuthProtocol = snmp.AuthProtocols.sha512;
-                break;
-        }
-
-        let snmpPrivProtocol = 0 as PrivProtocols;
-        const authEncProto = Number(pCTX.authEncProto);
-        if (authEncProto === DES) {
-            snmpPrivProtocol = snmp.PrivProtocols.des; // DES encryption
-        } else if (authEncProto === AES) {
-            snmpPrivProtocol = snmp.PrivProtocols.aes; // AES encryption
-        } else if (authEncProto === AES256B) {
-            snmpPrivProtocol = snmp.PrivProtocols.aes256b; // AES encryption
-        } else if (authEncProto === AES256R) {
-            snmpPrivProtocol = snmp.PrivProtocols.aes256r; // AES encryption
-        }
-
-        const snmpUser: User = {
-            name: pCTX.authUser ?? '',
-            level: snmpSecurityLevel,
-            authProtocol: snmpAuthProtocol,
-            authKey: pCTX.authAuthKey,
-            privProtocol: snmpPrivProtocol,
-            privKey: pCTX.authEncKey,
-        };
+        const snmpUser = snmpUserFor(pCTX);
 
         // the keys never belong into the log, the user name is what a failed authorization is about
         pLog.debug(
-            `snmpCreateSession - device ${pCTX.name} asks as snmp v3 user "${snmpUser.name}", security level ${snmpSecurityLevel}`,
+            `snmpCreateSession - device ${pCTX.name} asks as snmp v3 user "${snmpUser.name}", security level ${snmpUser.level}`,
         );
 
         const snmpTransport = pCTX.isIPv6 ? 'udp6' : 'udp4';

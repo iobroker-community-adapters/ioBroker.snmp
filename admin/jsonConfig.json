@@ -156,7 +156,7 @@
                 }
             }
         },
-        
+
         "oidSets": {
             "type": "panel",
             "label": "lblOidSets",
@@ -312,7 +312,7 @@
                             "filter": false,
                             "sort": false,
                             "options": [
-                                { "label": "lblString", "value": 0}, 
+                                { "label": "lblString", "value": 0},
                                 { "label": "lblNumber", "value": 1},
                                 { "label": "lblBoolean", "value": 2},
                                 { "label": "lblJson", "value": 3},
@@ -343,7 +343,7 @@
 				}
 			}
 		},
-        
+
         "authorization": {
             "type": "panel",
             "label": "lblAuth",
@@ -401,7 +401,7 @@
                             "filter": false,
                             "sort": false,
                             "options": [
-                                { "label": "lblAuthSecLvlOpt1", "value": 1}, 
+                                { "label": "lblAuthSecLvlOpt1", "value": 1},
                                 { "label": "lblAuthSecLvlOpt2", "value": 2},
                                 { "label": "lblAuthSecLvlOpt3", "value": 3}
                             ],
@@ -425,7 +425,7 @@
                             "filter": false,
                             "sort": false,
                             "options": [
-                                { "label": "md5",    "value": 1}, 
+                                { "label": "md5",    "value": 1},
                                 { "label": "sha",    "value": 2},
                                 { "label": "sha224", "value": 3},
                                 { "label": "sha256", "value": 4},
@@ -454,9 +454,9 @@
                             "filter": false,
                             "sort": false,
                             "options": [
-                                { "label": "des", "value": 1}, 
+                                { "label": "des", "value": 1},
                                 { "label": "aes", "value": 2},
-                                { "label": "aes256b", "value": 3}, 
+                                { "label": "aes256b", "value": 3},
                                 { "label": "aes256r", "value": 4}
                             ],
                             "default": "1"
@@ -476,7 +476,7 @@
 				}
 			}
 		},
-        
+
         "mibs": {
             "type": "panel",
             "label": "lblMib",
@@ -531,6 +531,126 @@
             }
 		},
 
+        "traps": {
+            "type": "panel",
+            "label": "lblTraps",
+            "items": {
+                "_trapsInfo": {
+                    "type": "staticText",
+                    "text": "infoTraps",
+                    "style": {
+                        "fontSize": 16
+                    },
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "trapEnabled": {
+                    "type": "checkbox",
+                    "label": "lblTrapEnabled",
+                    "newLine": true,
+                    "default": false,
+                    "help": "hlpTrapEnabled",
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 6,
+                    "xl": 6
+                },
+                "trapPort": {
+                    "type": "number",
+                    "label": "lblTrapPort",
+                    "newLine": true,
+                    "min": 1,
+                    "max": 65535,
+                    "default": 162,
+                    "help": "hlpTrapPort",
+                    "hidden": "!data.trapEnabled",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "trapAddress": {
+                    "type": "ip",
+                    "label": "lblTrapAddress",
+                    "default": "0.0.0.0",
+                    "help": "hlpTrapAddress",
+                    "hidden": "!data.trapEnabled",
+                    "listenOnAllPorts": true,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "trapIp6": {
+                    "type": "checkbox",
+                    "label": "lblTrapIp6",
+                    "default": false,
+                    "hidden": "!data.trapEnabled",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "trapCommunity": {
+                    "type": "text",
+                    "label": "lblTrapCommunity",
+                    "newLine": true,
+                    "default": "public",
+                    "help": "hlpTrapCommunity",
+                    "hidden": "!data.trapEnabled",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "trapAuthId": {
+                    "type": "text",
+                    "label": "lblTrapAuthId",
+                    "default": "",
+                    "help": "hlpTrapAuthId",
+                    "hidden": "!data.trapEnabled",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "trapAcceptAll": {
+                    "type": "checkbox",
+                    "label": "lblTrapAcceptAll",
+                    "newLine": true,
+                    "default": false,
+                    "help": "hlpTrapAcceptAll",
+                    "hidden": "!data.trapEnabled",
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 6,
+                    "xl": 6
+                },
+                "trapUnknown": {
+                    "type": "checkbox",
+                    "label": "lblTrapUnknown",
+                    "newLine": true,
+                    "default": false,
+                    "help": "hlpTrapUnknown",
+                    "hidden": "!data.trapEnabled",
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 6,
+                    "xl": 6
+                }
+            }
+        },
         "options": {
             "type": "panel",
             "label": "lblOptions",
@@ -628,6 +748,6 @@
                     "xl": 6
                 }
             }
-		}        
+		}
 	}
 }

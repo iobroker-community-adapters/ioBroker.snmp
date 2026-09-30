@@ -74,5 +74,22 @@
     "ttOptTypeStates": "Crie estados contendo dados de tipo de oids.",
     "ttOptUseIp": "Marque para usar o endereço IP para ids de estado",
     "ttOptUseMibNames": "Permitir OIDs simbólicos e nomear os objetos segundo a MIB",
-    "warnAuthUnused": "Nota: A configuração neste painel não será usada atualmente, pois nenhum dispositivo usa o protocolo SNMPv3."
+    "warnAuthUnused": "Nota: A configuração neste painel não será usada atualmente, pois nenhum dispositivo usa o protocolo SNMPv3.",
+    "lblTraps": "Traps",
+    "infoTraps": "Um trap é enviado pelo próprio dispositivo quando algo acontece - o adaptador apenas escuta. Um trap recebido é escrito nos estados \"<dispositivo>.trap.*\" e ainda em \"info.trap.*\", que guarda o último trap de qualquer remetente.",
+    "lblTrapEnabled": "Receber traps",
+    "hlpTrapEnabled": "Abrir um socket udp e escutar traps e informs. Sem esta opção o adaptador apenas consulta.",
+    "lblTrapPort": "Porta",
+    "hlpTrapPort": "Os traps são enviados para a porta 162. No linux uma porta abaixo de 1024 só pode ser aberta pelo root - use uma porta mais alta e configure o dispositivo, ou redirecione a porta no host.",
+    "lblTrapAddress": "Endereço de ligação",
+    "hlpTrapAddress": "Endereço deste anfitrião em que o socket escuta. Deixe vazio para escutar em todas as interfaces.",
+    "lblTrapIp6": "Usar IPv6",
+    "lblTrapCommunity": "Community",
+    "hlpTrapCommunity": "Community que um trap de SNMP v1 ou v2c tem de trazer. Um trap com outra community é rejeitado e registado.",
+    "lblTrapAuthId": "Id de autorização (SNMP v3)",
+    "hlpTrapAuthId": "Id de um conjunto de autorização do separador \"Autorização\" cujo utilizador pode enviar traps. Deixe vazio se não forem esperados traps de SNMP v3.",
+    "lblTrapAcceptAll": "Aceitar qualquer trap sem verificação",
+    "hlpTrapAcceptAll": "Não se verifica nem a community nem o utilizador de SNMP v3. Útil durante a configuração, enquanto não se sabe o que o dispositivo envia - qualquer um que alcance a porta pode então escrever nos estados.",
+    "lblTrapUnknown": "Aceitar também traps de dispositivos desconhecidos",
+    "hlpTrapUnknown": "Um trap é atribuído a um dispositivo pelo endereço de origem. Sem esta opção um trap de um endereço que não está configurado como dispositivo é descartado; com ela chega pelo menos a \"info.trap.*\"."
 }

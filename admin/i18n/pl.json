@@ -74,5 +74,22 @@
     "ttOptTypeStates": "Twórz stany zawierające dane typu oidów.",
     "ttOptUseIp": "Zaznacz, aby używać adresu IP dla identyfikatorów stanu",
     "ttOptUseMibNames": "Zezwalaj na symboliczne OID i nazywaj obiekty według MIB",
-    "warnAuthUnused": "Uwaga: Konfiguracja w tym panelu nie będzie obecnie używana, ponieważ żadne urządzenie nie korzysta z protokołu SNMPv3."
+    "warnAuthUnused": "Uwaga: Konfiguracja w tym panelu nie będzie obecnie używana, ponieważ żadne urządzenie nie korzysta z protokołu SNMPv3.",
+    "lblTraps": "Pułapki (traps)",
+    "infoTraps": "Pułapkę wysyła samo urządzenie, gdy coś się wydarzy - adapter tylko nasłuchuje. Odebrana pułapka trafia do stanów \"<urządzenie>.trap.*\" oraz dodatkowo do \"info.trap.*\", gdzie znajduje się ostatnia pułapka dowolnego nadawcy.",
+    "lblTrapEnabled": "Odbieraj pułapki",
+    "hlpTrapEnabled": "Otwórz gniazdo udp i nasłuchuj pułapek oraz informów. Bez tej opcji adapter tylko odpytuje.",
+    "lblTrapPort": "Port",
+    "hlpTrapPort": "Pułapki trafiają na port 162. W linuksie port poniżej 1024 może otworzyć tylko root - użyj wyższego portu i skonfiguruj urządzenie albo przekieruj port na hoście.",
+    "lblTrapAddress": "Adres nasłuchu",
+    "hlpTrapAddress": "Adres tego hosta, na którym nasłuchuje gniazdo. Pozostaw puste, aby nasłuchiwać na wszystkich interfejsach.",
+    "lblTrapIp6": "Użyj IPv6",
+    "lblTrapCommunity": "Community",
+    "hlpTrapCommunity": "Community, które musi zawierać pułapka SNMP v1 lub v2c. Pułapka z innym community jest odrzucana i zapisywana w dzienniku.",
+    "lblTrapAuthId": "Id autoryzacji (SNMP v3)",
+    "hlpTrapAuthId": "Id zestawu autoryzacji z zakładki \"Autoryzacja\", którego użytkownik może wysyłać pułapki. Pozostaw puste, jeśli pułapki SNMP v3 nie są oczekiwane.",
+    "lblTrapAcceptAll": "Przyjmuj każdą pułapkę bez sprawdzania",
+    "hlpTrapAcceptAll": "Nie jest sprawdzane ani community, ani użytkownik SNMP v3. Przydatne przy konfiguracji, dopóki nie wiadomo, co wysyła urządzenie - wtedy jednak każdy, kto osiągnie port, może pisać do stanów.",
+    "lblTrapUnknown": "Przyjmuj też pułapki nieznanych urządzeń",
+    "hlpTrapUnknown": "Pułapka jest przypisywana do urządzenia na podstawie adresu nadawcy. Bez tej opcji pułapka z adresu, który nie jest skonfigurowany jako urządzenie, jest odrzucana; z nią trafia przynajmniej do \"info.trap.*\"."
 }
