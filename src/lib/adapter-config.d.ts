@@ -29,6 +29,16 @@ declare global {
              * state ids from the MIB symbol instead of from `oidName`
              */
             optUseMibNames: boolean;
+            /**
+             * dump every snmp request and every answer as json into the log - for a support case,
+             * see `snmpTrace()` in `lib/snmpSession.ts`
+             */
+            optTrace: boolean;
+            /**
+             * dump every snmp request and every answer as json into the log - for a support case,
+             * see `snmpTrace()` in `lib/snmpSession.ts`
+             */
+            optTrace: boolean;
 
             /**
              * Version of the stored configuration - written by `InstallUtils`, not part of the

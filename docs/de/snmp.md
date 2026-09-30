@@ -189,6 +189,7 @@ Hier legen Sie einige allgemeine Optionen fest
 | MIB-Namen verwenden                | boolean   | OID-Feld akzeptiert symbolische MIB-Namen, Objekt-IDs folgen der MIB               | siehe unten. ACHTUNG: Das Umschalten ändert die Objekt-IDs bestehender OIDs                                                                  |
 | Rohzustände hinzufügen             | boolesch  | je OID einen zusätzlichen State `<OID-Name>-raw` anlegen                           | das Varbind als JSON, für alles, was die Formate oben nicht abdecken                                                                         |
 | Typzustände hinzufügen             | boolesch  | je OID einen zusätzlichen State `<OID-Name>-type` anlegen                          | der SNMP-Typ, mit dem das Gerät geantwortet hat, z. B. `OctetString`                                                                         |
+| Alle SNMP-Anfragen und Antworten mitschneiden | boolesch | jede Anfrage und jede Antwort als JSON ins Log schreiben | für Supportfälle - das Log wächst mit jeder Abfrage, danach wieder ausschalten |
 
 
 Die Option packetsize kann verwendet werden, um die Anzahl der abgefragten OIDs innerhalb einer Anfrage zu reduzieren. Je nach Zielgerät ist die Anzahl der
@@ -199,6 +200,21 @@ Die Option **Sitzung bei Fehler nicht schließen** lässt die Lese-Sitzung eines
 eine Anfrage fehlschlägt. Normalerweise schließt der Adapter die Sitzung bei einem Fehler und öffnet
 für den nächsten Versuch eine neue, was für die meisten Geräte richtig ist. Manche Geräte antworten
 nach einem solchen Neuaufbau aber nicht mehr - für die schalten Sie diese Option ein.
+
+Die Option **Alle SNMP-Anfragen und Antworten mitschneiden** schreibt jede Anfrage, die der Adapter
+stellt, und jede Antwort, die er bekommt, als JSON ins Log - gekennzeichnet mit `[trace]` und dem
+Gerät, zu dem sie gehört:
+
+```
+[trace] [printer] get request ["1.3.6.1.2.1.43.11.1.1.9.1.1"]
+[trace] [printer] get answer {"err":null,"varbinds":[{"oid":"1.3.6.1.2.1.43.11.1.1.9.1.1","type":2,"value":1200}]}
+```
+
+Erfasst sind die Abfragen der Geräte, das Schreiben einer beschreibbaren OID und die Anfragen des
+MIB-Browsers. Binärdaten erscheinen als `{"type":"Buffer","data":[…]}`, es geht also nichts
+verloren. Geschrieben wird auf Info-Ebene, der Mitschnitt lässt sich also einsammeln, ohne die ganze
+Instanz auf Debug zu stellen - er wächst aber mit jeder Abfrage, schalten Sie die Option nach der
+Analyse also wieder aus.
 
 Die Option **MIB-Namen verwenden** ändert zwei Dinge gleichzeitig. Die OID-Spalte der OID-Sets
 akzeptiert dann auch einen symbolischen Namen wie `IF-MIB::ifDescr.1` (oder `ifDescr.1` ohne Modul),

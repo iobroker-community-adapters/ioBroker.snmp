@@ -26,17 +26,40 @@ import {
 import type { DeviceContext, SessionContext, SnmpResult } from './types';
 
 /**
+ * snmpTrace - one line of the request/answer trace
+ *
+ *		The trace is switched on per instance with the option `optTrace` and is meant for a support
+ *		case: it writes what really goes over the wire, which no other log line shows. The caller
+ *		passes the device it is talking to, `undefined` switches the trace off.
+ *
+ * @param pLog logger
+ * @param pDevice id of the device, undefined if the trace is switched off
+ * @param pWhat what is being dumped, e.g. "get request"
+ * @param pData the request resp. the answer
+ */
+function snmpTrace(pLog: ioBroker.Logger, pDevice: string | undefined, pWhat: string, pData: unknown): void {
+    if (!pDevice) {
+        return;
+    }
+
+    // a varbind carries Buffer values - JSON.stringify writes them as {"type":"Buffer","data":[…]}
+    pLog.info(`[trace] [${pDevice}] ${pWhat} ${JSON.stringify(pData)}`);
+}
+
+/**
  * snmpSessionGetAsync - async version of snmp.session.get
  *
  * @param pSession snmp session reference
  * @param pOids snmp oids array
  * @param pLog logger
+ * @param pTraceDevice device id to write the trace for, undefined if the trace is off
  * @returns object containing { err, varbinds } as returned by snmp.session.get
  */
 export async function snmpSessionGetAsync(
     pSession: Session | null,
     pOids: string[],
     pLog: ioBroker.Logger,
+    pTraceDevice?: string,
 ): Promise<SnmpResult> {
     return new Promise<SnmpResult>(resolve => {
         const ret: SnmpResult = {
@@ -44,14 +67,18 @@ export async function snmpSessionGetAsync(
             varbinds: [],
         };
 
+        snmpTrace(pLog, pTraceDevice, 'get request', pOids);
+
         if (!pSession) {
             pLog.debug('session vanished, skipping get oparation');
             ret.err = 'no active session';
+            snmpTrace(pLog, pTraceDevice, 'get answer', ret);
             resolve(ret);
         } else {
             pSession.get(pOids, function (error, varbinds) {
                 ret.err = error;
                 ret.varbinds = varbinds ?? [];
+                snmpTrace(pLog, pTraceDevice, 'get answer', { err: error?.toString(), varbinds: ret.varbinds });
                 resolve(ret);
             });
         }
@@ -64,12 +91,14 @@ export async function snmpSessionGetAsync(
  * @param pSession snmp session reference
  * @param pVarbinds snmp varbinds array
  * @param pLog logger
+ * @param pTraceDevice device id to write the trace for, undefined if the trace is off
  * @returns object containing { err, varbinds } as returned by snmp.session.set
  */
 export async function snmpSessionSetAsync(
     pSession: Session | null,
     pVarbinds: Varbind[],
     pLog: ioBroker.Logger,
+    pTraceDevice?: string,
 ): Promise<SnmpResult> {
     return new Promise<SnmpResult>(resolve => {
         const ret: SnmpResult = {
@@ -77,14 +106,18 @@ export async function snmpSessionSetAsync(
             varbinds: [],
         };
 
+        snmpTrace(pLog, pTraceDevice, 'set request', pVarbinds);
+
         if (!pSession) {
             pLog.debug('session vanished, skipping set operation');
             ret.err = 'no active session';
+            snmpTrace(pLog, pTraceDevice, 'set answer', ret);
             resolve(ret);
         } else {
             pSession.set(pVarbinds, function (error, varbinds) {
                 ret.err = error;
                 ret.varbinds = varbinds ?? [];
+                snmpTrace(pLog, pTraceDevice, 'set answer', { err: error?.toString(), varbinds: ret.varbinds });
                 resolve(ret);
             });
         }
@@ -256,6 +289,7 @@ export function snmpCloseSession(pSessCtx: SessionContext, pLog: ioBroker.Logger
  * @param pOid oid to walk
  * @param pMaxCount maximum number of varbinds to collect
  * @param pLog logger
+ * @param pTraceDevice device id to write the trace for, undefined if the trace is off
  * @returns object containing { err, varbinds } and whether the walk has been cut off
  */
 export async function snmpSessionSubtreeAsync(
@@ -263,6 +297,7 @@ export async function snmpSessionSubtreeAsync(
     pOid: string,
     pMaxCount: number,
     pLog: ioBroker.Logger,
+    pTraceDevice?: string,
 ): Promise<SnmpResult & { truncated: boolean }> {
     return new Promise<SnmpResult & { truncated: boolean }>(resolve => {
         const ret: SnmpResult & { truncated: boolean } = {
@@ -271,9 +306,12 @@ export async function snmpSessionSubtreeAsync(
             truncated: false,
         };
 
+        snmpTrace(pLog, pTraceDevice, 'subtree request', { oid: pOid, maxCount: pMaxCount });
+
         if (!pSession) {
             pLog.debug('session vanished, skipping subtree operation');
             ret.err = 'no active session';
+            snmpTrace(pLog, pTraceDevice, 'subtree answer', ret);
             resolve(ret);
             return;
         }
@@ -291,6 +329,11 @@ export async function snmpSessionSubtreeAsync(
             },
             (error: Error | null): void => {
                 ret.err = error;
+                snmpTrace(pLog, pTraceDevice, 'subtree answer', {
+                    err: error?.toString(),
+                    truncated: ret.truncated,
+                    varbinds: ret.varbinds,
+                });
                 resolve(ret);
             },
         );
@@ -306,12 +349,14 @@ export async function snmpSessionSubtreeAsync(
  * @param pSession snmp session reference
  * @param pOids snmp oids array
  * @param pLog logger
+ * @param pTraceDevice device id to write the trace for, undefined if the trace is off
  * @returns object containing { err, varbinds } as returned by snmp.session.getNext
  */
 export async function snmpSessionGetNextAsync(
     pSession: Session | null,
     pOids: string[],
     pLog: ioBroker.Logger,
+    pTraceDevice?: string,
 ): Promise<SnmpResult> {
     return new Promise<SnmpResult>(resolve => {
         const ret: SnmpResult = {
@@ -319,14 +364,18 @@ export async function snmpSessionGetNextAsync(
             varbinds: [],
         };
 
+        snmpTrace(pLog, pTraceDevice, 'getNext request', pOids);
+
         if (!pSession) {
             pLog.debug('session vanished, skipping getNext operation');
             ret.err = 'no active session';
+            snmpTrace(pLog, pTraceDevice, 'getNext answer', ret);
             resolve(ret);
         } else {
             pSession.getNext(pOids, function (error, varbinds) {
                 ret.err = error;
                 ret.varbinds = varbinds ?? [];
+                snmpTrace(pLog, pTraceDevice, 'getNext answer', { err: error?.toString(), varbinds: ret.varbinds });
                 resolve(ret);
             });
         }

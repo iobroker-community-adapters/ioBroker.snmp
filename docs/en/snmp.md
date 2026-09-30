@@ -184,6 +184,7 @@ Here you specify some general options
 | Use MIB names                 | boolean | OID field accepts symbolic MIB names and the object ids follow the MIB  | see below. NOTE: switching this option changes the object ids of existing OIDs                                              |
 | Add raw states                | boolean | create an additional state `<OID-name>-raw` per OID                     | the varbind as json, for everything the formats above do not cover                                                          |
 | Add type states               | boolean | create an additional state `<OID-name>-type` per OID                    | the SNMP type the device answered with, e.g. `OctetString`                                                                  |
+| Trace all snmp requests and answers | boolean | write every request and every answer into the log as json | for a support case - the log grows with every poll, switch it off afterwards |
 
 
 The option packet size can be used to reduce the number of OIDs queried within one request. Depending on the target device, the number of 
@@ -194,6 +195,20 @@ The option **do not close session on error** keeps the reader session of a devic
 request fails. Normally the adapter closes the session on an error and opens a new one for the next
 attempt, which is the right thing for most devices. Some devices, however, stop answering after such
 a reconnect - for those, switch this option on.
+
+The option **trace all snmp requests and answers** writes every request the adapter sends and every
+answer it receives into the log as json, marked with `[trace]` and the device it belongs to:
+
+```
+[trace] [printer] get request ["1.3.6.1.2.1.43.11.1.1.9.1.1"]
+[trace] [printer] get answer {"err":null,"varbinds":[{"oid":"1.3.6.1.2.1.43.11.1.1.9.1.1","type":2,"value":1200}]}
+```
+
+It covers the polls of the devices, the write of a writeable OID and the requests of the MIB
+browser. Binary data appears as `{"type":"Buffer","data":[…]}`, so nothing is lost on the way into
+the log. The lines are written at info level, so the trace can be collected without switching the
+whole instance to debug - but it grows with every poll, so switch the option off when the analysis
+is done.
 
 The option **use MIB names** changes two things at once. The OID column of the OID sets then also
 accepts a symbolic name such as `IF-MIB::ifDescr.1` (or `ifDescr.1` without the module), which the

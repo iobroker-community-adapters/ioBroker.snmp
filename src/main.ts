@@ -130,6 +130,16 @@ class Snmp extends utils.Adapter {
     }
 
     /**
+     * traceDevice - the device id for the request/answer trace, undefined while the trace is off
+     *
+     * @param pDevId id of the device a request belongs to
+     * @returns the device id if the option `optTrace` is set, otherwise undefined
+     */
+    private traceDevice(pDevId: string): string | undefined {
+        return this.config.optTrace ? pDevId : undefined;
+    }
+
+    /**
      * cleanupStates - cleanup unused states
      */
     private async cleanupStates(): Promise<void> {
@@ -694,7 +704,7 @@ class Snmp extends utils.Adapter {
             return;
         }
 
-        const result = await snmpSessionGetAsync(pCTX.sessCtx.session, oids, this.log);
+        const result = await snmpSessionGetAsync(pCTX.sessCtx.session, oids, this.log, this.traceDevice(pCTX.id));
         this.log.debug(`[${devId}] session.get completed for chunk index ${pIdx}`);
         if (result.err) {
             // error
@@ -1397,7 +1407,12 @@ class Snmp extends utils.Adapter {
             let cursor = pOid;
 
             while (nodes.length < MIB_CHILDREN_LIMIT) {
-                const result = await snmpSessionGetNextAsync(sessCtx.session, [cursor], this.log);
+                const result = await snmpSessionGetNextAsync(
+                    sessCtx.session,
+                    [cursor],
+                    this.log,
+                    this.traceDevice(pCTX.id),
+                );
                 if (result.err) {
                     /*
                      * snmp v1 does not know an "end of mib view": it answers a getNext behind the
@@ -1424,7 +1439,12 @@ class Snmp extends utils.Adapter {
                 let more = false;
                 if (single) {
                     // an error of the probe means the same as an answer outside the child: no more
-                    const probe = await snmpSessionGetNextAsync(sessCtx.session, [varbind.oid], this.log);
+                    const probe = await snmpSessionGetNextAsync(
+                        sessCtx.session,
+                        [varbind.oid],
+                        this.log,
+                        this.traceDevice(pCTX.id),
+                    );
                     const next = probe.varbinds[0];
                     more = !!next && !isVarbindError(next) && next.oid.startsWith(`${childOid}.`);
                 }
@@ -1497,7 +1517,13 @@ class Snmp extends utils.Adapter {
         }
 
         try {
-            const result = await snmpSessionSubtreeAsync(sessCtx.session, resolved.oid, MIB_SUBTREE_LIMIT, this.log);
+            const result = await snmpSessionSubtreeAsync(
+                sessCtx.session,
+                resolved.oid,
+                MIB_SUBTREE_LIMIT,
+                this.log,
+                this.traceDevice(CTX.id),
+            );
 
             // snmp v1 ends the walk with NoSuchName - whatever was collected until then is valid
             if (result.err && !result.err.toString().includes('NoSuchName')) {
@@ -1768,7 +1794,7 @@ class Snmp extends utils.Adapter {
         let sessCtx: SessionContext | null = snmpCreateSession(CTX, this.log);
 
         if (varbind.value !== null) {
-            const resultSet = await snmpSessionSetAsync(sessCtx.session, [varbind], this.log);
+            const resultSet = await snmpSessionSetAsync(sessCtx.session, [varbind], this.log, this.traceDevice(devId));
             if (resultSet.err) {
                 this.log.error(`[${devId}] session.set: ${resultSet.err.toString()}`);
             } else {
@@ -1779,7 +1805,7 @@ class Snmp extends utils.Adapter {
         }
 
         // reread data of device
-        const resultGet = await snmpSessionGetAsync(sessCtx.session, [varbind.oid], this.log);
+        const resultGet = await snmpSessionGetAsync(sessCtx.session, [varbind.oid], this.log, this.traceDevice(devId));
         if (resultGet.varbinds.length === 1) {
             /* should be always one */
             if (isVarbindError(resultGet.varbinds[0])) {

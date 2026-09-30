@@ -275,6 +275,8 @@
     "optNoCloseOnError": false,
     "optRawStates": false,
     "optTypeStates": false,
+    "optTrace": false,
+    "optTrace": false,
     "optUseMibNames": false
   },
   "objects": [],

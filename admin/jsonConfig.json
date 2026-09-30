@@ -587,6 +587,19 @@
                     "lg": 6,
                     "xl": 6
                 },
+                "optTrace": {
+                    "type": "checkbox",
+                    "label": "lblOptTrace",
+                    "default": false,
+                    "tooltip": "ttOptTrace",
+                    "help": "hlpOptTrace",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 6,
+                    "xl": 6
+                },
 				"optTypeStates": 	{
                     "type": "checkbox",
                     "label": "lblOptTypeStates",
