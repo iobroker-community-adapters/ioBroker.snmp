@@ -71,6 +71,11 @@ export interface TrapReceiver {
         addUser: (pUser: User) => void;
     };
     close: (pCallback?: () => void) => void;
+    /**
+     * net-snmp's internal listener with one dgram socket per transport - not part of its documented
+     * api, read only to learn when the socket is bound, see `createTrapReceiver()`
+     */
+    listener?: { sockets?: Record<string, { once: (pEvent: 'listening', pListener: () => void) => void }> };
 }
 
 /** Everything the receiver needs in order to open its socket */
@@ -267,12 +272,14 @@ export function trapIsInform(pPdu: TrapPdu): boolean {
  * @param pOptions what to listen on and what to accept
  * @param pCallback called for every notification and for every error of the socket
  * @param pLog logger
+ * @param pOnListening called once the socket is bound - not at all if binding fails
  * @returns the receiver, or null if it could not even be created
  */
 export function createTrapReceiver(
     pOptions: TrapReceiverOptions,
     pCallback: (pError: Error | null, pTrap?: TrapNotification) => void,
     pLog: ioBroker.Logger,
+    pOnListening?: () => void,
 ): TrapReceiver | null {
     const transport = pOptions.isIPv6 ? 'udp6' : 'udp4';
 
@@ -297,6 +304,22 @@ export function createTrapReceiver(
     } catch (e) {
         pLog.error(`cannot listen for traps on port ${pOptions.port}, ${(e as Error).message}`);
         return null;
+    }
+
+    /*
+     * net-snmp binds its socket without telling anybody when that has worked. The socket is
+     * reachable through the receiver's listener, and as `bind()` completes asynchronously, a
+     * listener attached here is in time for the event.
+     */
+    if (pOnListening) {
+        const sockets = Object.values(receiver.listener?.sockets ?? {});
+        if (sockets.length) {
+            for (const socket of sockets) {
+                socket.once('listening', pOnListening);
+            }
+        } else {
+            pLog.debug('createTrapReceiver - the socket of net-snmp is not accessible, cannot tell when it is bound');
+        }
     }
 
     const authorizer = receiver.getAuthorizer();

@@ -123,6 +123,13 @@ changes would never hear about it. `cleanupStates()` removes the `trap` folders 
 is switched off, and only those with `type === 'folder'`, because an oid named `trap` would produce
 a state with the very same id.
 
+The trap port is reported to the registry of exclusive resources of js-controller 8
+(`common.declareUsedResources: true`, the controller cannot derive it - there is no `native.port`):
+`checkUsedResource('udpPort')` warns before the socket is opened, `registerUsedResource('udpPort')`
+runs once it is bound. net-snmp does not report that moment, so `createTrapReceiver()` listens for
+`listening` on the sockets of its internal `listener` - `test/trapReceiver.js` notices if that object
+changes. Older controllers have no registry, `resourceRegistry()` probes for it at runtime.
+
 ### Setup wizard
 
 `SetupWizard` is the second custom component, placed above the device table. It collects a device,
