@@ -20,7 +20,7 @@
         "@mui/icons-material": "^9.2.0",
         "@mui/material": "^9.2.0",
         "@originjs/vite-plugin-federation": "^1.4.1",
-        "@types/node": "^22.20.4",
+        "@types/node": "^22.20.5",
         "@types/react": "^19.2.17",
         "@types/react-dom": "^19.2.3",
         "@vitejs/plugin-react": "^6.0.4",
