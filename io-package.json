@@ -131,7 +131,7 @@
     "keywords": [
       "SNMP-OID"
     ],
-    "readme": "https://github.com/mcm1957/ioBroker.snmp/blob/master/README.md",
+    "readme": "https://github.com/iobroker-community-adapters/ioBroker.snmp/blob/master/README.md",
     "loglevel": "info",
     "tier": 2,
     "mode": "daemon",
@@ -147,6 +147,7 @@
     "authors": [
       "Marcolotti <info@ct-j.de>",
       "mcm1957 <mcm57@gmx.at>",
+      "bluefox <bluefox@ccu.io>",
       "iobroker-community-adapters <iobroker-community-adapters@gmx.de>"
     ],
     "adminUI": {
