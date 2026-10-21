@@ -67,6 +67,16 @@ interface StateValues {
     json: string;
 }
 
+/**
+ * The part of js-controller 8's registry of exclusive resources this adapter uses. Neither the
+ * installed types nor older controllers know it, so it is probed at runtime.
+ */
+type UdpPortResource = { port: number; bind?: string; family?: 4 | 6 };
+interface ResourceRegistry {
+    registerUsedResource(pType: 'udpPort', pData: UdpPortResource): Promise<void>;
+    checkUsedResource?(pType: 'udpPort', pData?: Partial<UdpPortResource>): Promise<{ instance: string }[]>;
+}
+
 /** maximum number of varbinds a single MIB browser walk returns */
 /** largest sub identifier of an oid - used to skip a whole subtree with one getNext */
 const MAX_SUB_ID = 4294967295;
@@ -1113,10 +1123,17 @@ class Snmp extends utils.Adapter {
      * startTrapReceiver - open the socket the traps are received on
      *
      *		Nothing happens if the option is switched off. A port which cannot be bound is not
-     *		reported here but as an error of the socket, see `onTrap()`.
+     *		reported here but as an error of the socket, see `onTrap()`. Once the socket is bound,
+     *		its port is reported to js-controller (>= 8) as occupied by this instance.
      */
-    private startTrapReceiver(): void {
+    private async startTrapReceiver(): Promise<void> {
         if (!this.config.trapEnabled) {
+            return;
+        }
+
+        // ask first, so that a port which cannot be bound afterwards is known to belong to someone
+        await this.warnAboutUsedTrapPort();
+        if (this.shutdownInProgress) {
             return;
         }
 
@@ -1131,6 +1148,7 @@ class Snmp extends utils.Adapter {
             },
             (error, trap) => void this.onTrap(error, trap),
             this.log,
+            () => void this.registerTrapPort(),
         );
 
         if (this.trapReceiver) {
@@ -1138,6 +1156,73 @@ class Snmp extends utils.Adapter {
                 `listening for snmp traps on ${this.config.trapAddress || '*'}:${this.config.trapPort} ` +
                     `(${this.config.trapIp6 ? 'IPv6' : 'IPv4'})`,
             );
+        }
+    }
+
+    /**
+     * resourceRegistry - the registry of exclusive resources of js-controller 8
+     *
+     * @returns the registry, or null if the controller does not have it
+     */
+    private resourceRegistry(): ResourceRegistry | null {
+        const registry = this as unknown as ResourceRegistry;
+        return typeof registry.registerUsedResource === 'function' ? registry : null;
+    }
+
+    /**
+     * trapPortResource - the trap socket as an entry of the resource registry
+     *
+     *		An empty bind address is the registry's default for "every interface" anyway.
+     *
+     * @returns the payload of the `udpPort` entry
+     */
+    private trapPortResource(): UdpPortResource {
+        return {
+            port: this.config.trapPort,
+            ...(this.config.trapAddress ? { bind: this.config.trapAddress } : {}),
+            family: this.config.trapIp6 ? 6 : 4,
+        };
+    }
+
+    /**
+     * warnAboutUsedTrapPort - warn if another instance has registered the trap port already
+     *
+     *		The answer is a hint only: the registry knows what the adapters declare, not what the
+     *		operating system has handed out.
+     */
+    private async warnAboutUsedTrapPort(): Promise<void> {
+        const registry = this.resourceRegistry();
+        if (!registry?.checkUsedResource) {
+            return;
+        }
+        try {
+            const holders = await registry.checkUsedResource('udpPort', this.trapPortResource());
+            if (holders.length) {
+                this.log.warn(
+                    `udp port ${this.config.trapPort} is already used by ${holders.map(h => h.instance).join(', ')}, ` +
+                        'the trap receiver will probably not start.',
+                );
+            }
+        } catch (e) {
+            this.log.debug(`cannot check if udp port ${this.config.trapPort} is free, ${(e as Error).message}`);
+        }
+    }
+
+    /**
+     * registerTrapPort - report the bound trap socket to js-controller (>= 8)
+     *
+     *		Nothing has to be freed again: the controller drops the entries of an instance when it
+     *		starts and marks them as no longer held when it stops.
+     */
+    private async registerTrapPort(): Promise<void> {
+        const registry = this.resourceRegistry();
+        if (!registry) {
+            return;
+        }
+        try {
+            await registry.registerUsedResource('udpPort', this.trapPortResource());
+        } catch (e) {
+            this.log.warn(`cannot register udp port ${this.config.trapPort} as used, ${(e as Error).message}`);
         }
     }
 
@@ -2169,7 +2254,7 @@ class Snmp extends utils.Adapter {
         }
 
         // start listening for traps
-        this.startTrapReceiver();
+        void this.startTrapReceiver();
 
         // start connection info updater
         this.log.debug('startconnection info updater');

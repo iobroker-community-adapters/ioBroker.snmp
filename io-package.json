@@ -141,6 +141,7 @@
     "compact": true,
     "nogit": true,
     "messagebox": true,
+    "declareUsedResources": true,
     "supportedMessages": {
       "custom": true
     },

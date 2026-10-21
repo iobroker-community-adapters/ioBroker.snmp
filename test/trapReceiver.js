@@ -3,15 +3,19 @@
 /*
  * Unit tests for the pure part of the trap handling (src/lib/trapReceiver.ts).
  *
- * The socket itself is not tested here - what has to be right is the way a notification is read:
- * an snmp v1 trap describes itself with four pdu fields, an snmp v2c trap with two varbinds, and
- * both have to end up as the same oid so that a script can compare them.
+ * Mostly the way a notification is read: an snmp v1 trap describes itself with four pdu fields,
+ * an snmp v2c trap with two varbinds, and both have to end up as the same oid so that a script can
+ * compare them. Of the socket only the moment it is bound is tested - the port is reported to
+ * js-controller then, and net-snmp tells about it through an internal object only.
  */
 
 const assert = require('node:assert');
+const dgram = require('node:dgram');
 const snmp = require('net-snmp');
 
 const {
+    closeTrapReceiver,
+    createTrapReceiver,
     deviceForTrapAddress,
     normalizeTrapAddress,
     trapIsInform,
@@ -152,5 +156,47 @@ describe('normalizeTrapAddress', () => {
         assert.strictEqual(normalizeTrapAddress(' 192.168.1.5 '), '192.168.1.5');
         assert.strictEqual(normalizeTrapAddress('fe80::1'), 'fe80::1');
         assert.strictEqual(normalizeTrapAddress(''), '');
+    });
+});
+
+describe('createTrapReceiver', () => {
+    const log = { debug: () => {}, info: () => {}, warn: () => {}, error: () => {} };
+    const options = { port: 1162, address: '127.0.0.1', isIPv6: false, community: 'public', acceptAll: false };
+
+    it('tells when the socket is bound', done => {
+        // net-snmp turns port 0 into 162 (`options.port || 162`), which a CI runner may not bind
+        const probe = dgram.createSocket('udp4');
+        probe.bind(0, '127.0.0.1', () => {
+            const port = probe.address().port;
+            probe.close(() => {
+                let receiver = null;
+                receiver = createTrapReceiver({ ...options, port }, error => done(error), log, () => {
+                    closeTrapReceiver(receiver, log);
+                    done();
+                });
+                assert.ok(receiver);
+            });
+        });
+    });
+
+    it('does not tell if the port cannot be bound', done => {
+        const blocker = dgram.createSocket('udp4');
+        blocker.bind(0, '127.0.0.1', () => {
+            const port = blocker.address().port;
+            let listening = false;
+            const receiver = createTrapReceiver(
+                { ...options, port },
+                error => {
+                    assert.ok(error);
+                    // the error event comes in place of the listening event, never after it
+                    assert.strictEqual(listening, false);
+                    blocker.close();
+                    done();
+                },
+                log,
+                () => (listening = true),
+            );
+            assert.ok(receiver);
+        });
     });
 });

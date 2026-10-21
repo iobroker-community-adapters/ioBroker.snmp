@@ -46,11 +46,14 @@ For details see the documentation referenced below.
 <!--
    ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+- (@GermanBluefox) The UDP port of the trap receiver is reported to js-controller 8 as occupied (`registerUsedResource`), and a warning is logged before the start if another instance has registered it already
+
 ### 4.0.0 (2026-09-30)
 - (bluefox) New tab "Traps": the adapter can listen for snmp traps and informs of v1, v2c and v3. A received trap is written into "<device>.trap.oid", ".name", ".json" and ".count" - the counter is the state to subscribe to - and into "info.trap.*" for the last trap of any sender. The sender address decides which device a trap belongs to, and the oid of a v1 trap is derived from its pdu the way RFC 3584 describes it, so v1 and v2c traps can be compared (#22)
-- (bluefox) OID groups can be exchanged as templates: a group is written into a json file with "save as template" and a file like that is imported into a group again, adding to it or replacing it. Delivered are templates for the system group, the first port of a switch, a computer, a printer and a UPS (#202)
+- (bluefox) OID groups can be exchanged as templates: a group is written into a JSON file with "save as template" and a file like that is imported into a group again, adding to it or replacing it. Delivered are templates for the system group, the first port of a switch, a computer, a printer and a UPS (#202)
 - (bluefox) Fixed: rows which the setup wizard, the MIB browser or a template added stayed invisible in the table until the dialog was opened again
-- (bluefox) New option "trace all snmp requests and answers": every request and every answer is written into the log as json, marked with "[trace]" and the device it belongs to - for a support case, and it covers the polls, the writes and the requests of the MIB browser (#241)
+- (bluefox) New option "trace all snmp requests and answers": every request and every answer is written into the log as JSON, marked with "[trace]" and the device it belongs to - for a support case, and it covers the polls, the writes and the requests of the MIB browser (#241)
 - (bluefox) The option "do not close session on error" is documented, and the option table uses the labels of the dialog, so that every option can be found under the name it has there (#288)
 - (bluefox) A device using SNMP v3 whose authorization id is empty or refers to nothing is skipped with a warning instead of asking without a user name - such a request is answered with "Unknown User Name", which named neither the device nor the missing authorization set (#409). The ids of device and authorization set are compared without leading and trailing blanks now
 - (bluefox) The states use the roles of the ioBroker role list: a number is `value` resp. `level` when it is writeable, a boolean `indicator` resp. `switch`, a text `text`, and the type states no longer use the role `type.encoding`, which does not exist. The error flag of a device is `indicator.error` instead of `indicator.reachable` (#524)
@@ -60,7 +63,7 @@ For details see the documentation referenced below.
 - (bluefox) The screenshots of the documentation have been renewed and show the current dialog, including the MIB tab
 - (bluefox) The options of the config dialog use the width of the dialog again - on a wide screen their labels were squeezed into a narrow column
 - (bluefox) The documentation has been brought up to date: the format of an OID and the state type it produces, the objects and states the adapter creates with their roles and quality codes, writing back to a device, the three options which were missing, and the MIB tab plus the setup wizard in the russian documentation
-- (bluefox) A folder of the MIB browser can be taken over as a whole: its plus button adds every value below it to the OID group, read in one walk
+- (bluefox) A folder of the MIB browser can be taken over as a whole: It's plus button adds every value below it to the OID group, read in one walk
 - (bluefox) The MIB browser has one source now: it reads the device live, level by level, and names what comes back with the uploaded MIB files - the separate, offline tree of a MIB file is gone, the module list jumps to the beginning of a MIB instead
 - (bluefox) Fixed: with SNMP v1 the end of a subtree is reported as the error NoSuchName, which made every level of a v1 device fail
 - (bluefox) Fixed: the live view skipped every second row of a table - the rows carry their value at the oid of the row itself, so the jump behind a row has to start below it, not at the next row
