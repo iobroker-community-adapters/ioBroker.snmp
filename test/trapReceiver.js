@@ -161,15 +161,22 @@ describe('normalizeTrapAddress', () => {
 
 describe('createTrapReceiver', () => {
     const log = { debug: () => {}, info: () => {}, warn: () => {}, error: () => {} };
-    const options = { port: 0, address: '127.0.0.1', isIPv6: false, community: 'public', acceptAll: false };
+    const options = { port: 1162, address: '127.0.0.1', isIPv6: false, community: 'public', acceptAll: false };
 
     it('tells when the socket is bound', done => {
-        let receiver = null;
-        receiver = createTrapReceiver(options, error => done(error), log, () => {
-            closeTrapReceiver(receiver, log);
-            done();
+        // net-snmp turns port 0 into 162 (`options.port || 162`), which a CI runner may not bind
+        const probe = dgram.createSocket('udp4');
+        probe.bind(0, '127.0.0.1', () => {
+            const port = probe.address().port;
+            probe.close(() => {
+                let receiver = null;
+                receiver = createTrapReceiver({ ...options, port }, error => done(error), log, () => {
+                    closeTrapReceiver(receiver, log);
+                    done();
+                });
+                assert.ok(receiver);
+            });
         });
-        assert.ok(receiver);
     });
 
     it('does not tell if the port cannot be bound', done => {
