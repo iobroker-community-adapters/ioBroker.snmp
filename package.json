@@ -63,7 +63,7 @@
     "test": "npm run test:package && npm run test:unit",
     "release": "release-script",
     "translate": "translate-adapter -b admin/i18n/en.json",
-    "update-packages": "npx npm-check-updates --upgrade",
+    "update-packages": "npx npm-check-updates --upgrade && cd src-admin && npx npm-check-updates --upgrade",
     "0-clean": "tsx tasks.ts --0-clean",
     "1-npm": "tsx tasks.ts --1-npm",
     "2-build": "tsx tasks.ts --2-build",
