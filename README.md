@@ -46,7 +46,7 @@ For details see the documentation referenced below.
 <!--
    ### **WORK IN PROGRESS**
 -->
-### **WORK IN PROGRESS**
+### 4.0.1 (2026-10-22)
 - (@GermanBluefox) The UDP port of the trap receiver is reported to js-controller 8 as occupied (`registerUsedResource`), and a warning is logged before the start if another instance has registered it already
 
 ### 4.0.0 (2026-09-30)
@@ -88,10 +88,6 @@ For details see the documentation referenced below.
 ### 3.2.0 (2024-03-29)
 * (mcm1957) Adapter requires node.js 18 and js-controller >= 5 now
 * (mcm1957) Dependencies have been updated
-
-### 3.1.0 (2023-10-13)
-* (mcm1957) Requirements have been updated. Adapter requires node.js 18 or newer now
-* (mcm1957) Packages have been updated to clean up open dependabot PRs
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 

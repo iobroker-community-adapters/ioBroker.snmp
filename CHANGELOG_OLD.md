@@ -1,4 +1,8 @@
 # Older Changelogs
+## 3.1.0 (2023-10-13)
+* (mcm1957) Requirements have been updated. Adapter requires node.js 18 or newer now
+* (mcm1957) Packages have been updated to clean up open dependabot PRs
+
 ## 3.0.0 (2023-10-12)
 * (bluefox) updated packages. Minimal node.js version is 16
 
