@@ -20,29 +20,29 @@
                     "lg": 12,
                     "xl": 12
                 },
-				"_errDevices_1": {
-					"type": "staticText",
-					"text": "lblDevsInfo",
-					"newLine": true,
-					"hidden": "data.oids&&data.oids.length",
-					"style": {
-						"fontSize": 16,
-						"textAlign": "center"
-					},
+                "_errDevices_1": {
+                    "type": "staticText",
+                    "text": "lblDevsInfo",
+                    "newLine": true,
+                    "hidden": "data.oids&&data.oids.length",
+                    "style": {
+                        "fontSize": 16,
+                        "textAlign": "center"
+                    },
                     "xs": 12,
                     "sm": 12,
                     "md": 12,
                     "lg": 12,
                     "xl": 12
-				},
-				"divider":{
-					"type": "divider"
-				},
+                },
+                "divider": {
+                    "type": "divider"
+                },
                 "devs": {
                     "type": "table",
-					"newLine": true,
+                    "newLine": true,
                     "label": "lblDevsDevices",
-                    "showSecondAddAt":5,
+                    "showSecondAddAt": 5,
                     "xs": 12,
                     "sm": 12,
                     "md": 12,
@@ -106,13 +106,23 @@
                             "width": "10% ",
                             "title": "lblDevSnmpVers",
                             "options": [
-                                { "label": "SNMP v1", "value": 1},
-                                { "label": "SNMP v2c", "value": 2},
-                                { "label": "SNMP v3", "value": 3}
+                                {
+                                    "label": "SNMP v1",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "SNMP v2c",
+                                    "value": 2
+                                },
+                                {
+                                    "label": "SNMP v3",
+                                    "value": 3
+                                }
                             ],
                             "filter": false,
                             "sort": false,
-                            "default": 1                        },
+                            "default": 1
+                        },
                         {
                             "type": "text",
                             "attr": "devAuthId",
@@ -156,83 +166,82 @@
                 }
             }
         },
-
         "oidSets": {
             "type": "panel",
             "label": "lblOidSets",
             "items": {
-				"_oidsInfo_1":{
-					"type": "staticText",
-					"text": "infoOidSets",
-					"style": {
-						"fontSize": 16
-					},
+                "_oidsInfo_1": {
+                    "type": "staticText",
+                    "text": "infoOidSets",
+                    "style": {
+                        "fontSize": 16
+                    },
                     "xs": 12,
                     "sm": 12,
                     "md": 12,
                     "lg": 12,
                     "xl": 12
-				},
-				"_oidsMibInfo":{
-					"type": "staticText",
-					"text": "infoOidMibNames",
-					"newLine": true,
-					"hidden": "!data.optUseMibNames",
-					"style": {
-						"fontSize": 16
-					},
+                },
+                "_oidsMibInfo": {
+                    "type": "staticText",
+                    "text": "infoOidMibNames",
+                    "newLine": true,
+                    "hidden": "!data.optUseMibNames",
+                    "style": {
+                        "fontSize": 16
+                    },
                     "xs": 12,
                     "sm": 12,
                     "md": 12,
                     "lg": 12,
                     "xl": 12
-				},
-				"_oidsErr_1":{
-					"type": "staticText",
-					"text": "errOidGrpMissing",
-					"newLine": true,
-					"hidden": "data.oids&&data.oids.length",
-					"style": {
-						"fontSize": 16,
-						"color": "red"
-					},
+                },
+                "_oidsErr_1": {
+                    "type": "staticText",
+                    "text": "errOidGrpMissing",
+                    "newLine": true,
+                    "hidden": "data.oids&&data.oids.length",
+                    "style": {
+                        "fontSize": 16,
+                        "color": "red"
+                    },
                     "xs": 12,
                     "sm": 12,
                     "md": 12,
                     "lg": 12,
                     "xl": 12
-				},
-				"_oidsErr_2":{
-					"type": "staticText",
-					"text": "errOidGrpEmpty",
-					"newLine": true,
-					"hidden": "if (!data.oids) return 0; for(let ii=0; ii<(data.oids.length); ii++) {if (data.oids[ii].oidGroup != ''){return 1;}}; return 0;",
-					"style": {
-						"fontSize": 16,
-						"color": "red"
-					},
+                },
+                "_oidsErr_2": {
+                    "type": "staticText",
+                    "text": "errOidGrpEmpty",
+                    "newLine": true,
+                    "hidden": "if (!data.oids) return 0; for(let ii=0; ii<(data.oids.length); ii++) {if (data.oids[ii].oidGroup != ''){return 1;}}; return 0;",
+                    "style": {
+                        "fontSize": 16,
+                        "color": "red"
+                    },
                     "xs": 12,
                     "sm": 12,
                     "md": 12,
                     "lg": 12,
                     "xl": 12
-				},
-				"_oidsErr_3":{
-					"type": "staticText",
-					"text": "errOidEmpty",
-					"newLine": true,
-					"hidden": "if (!data.oids) return 0; for(let ii=0; ii<(data.oids.length); ii++) {if (data.oids[ii].oidOid != ''){return 1;}}; return 0;",
-					"style": {
-						"fontSize": 16,
-						"color": "red"
-					},
+                },
+                "_oidsErr_3": {
+                    "type": "staticText",
+                    "text": "errOidEmpty",
+                    "newLine": true,
+                    "hidden": "if (!data.oids) return 0; for(let ii=0; ii<(data.oids.length); ii++) {if (data.oids[ii].oidOid != ''){return 1;}}; return 0;",
+                    "style": {
+                        "fontSize": 16,
+                        "color": "red"
+                    },
                     "xs": 12,
                     "sm": 12,
                     "md": 12,
                     "lg": 12,
                     "xl": 12
-				},
-				"_templates": {
+                },
+                "_templates": {
                     "type": "custom",
                     "i18n": true,
                     "url": "custom/customComponents.js",
@@ -246,13 +255,13 @@
                     "lg": 12,
                     "xl": 12
                 },
-				"divider":{
-					"type": "divider"
-				},
+                "divider": {
+                    "type": "divider"
+                },
                 "oids": {
                     "type": "table",
                     "label": "lblOidGroups",
-                    "showSecondAddAt":5,
+                    "showSecondAddAt": 5,
                     "xs": 12,
                     "sm": 12,
                     "md": 12,
@@ -275,9 +284,9 @@
                             "title": "lblOidGroup",
                             "filter": false,
                             "sort": true,
-							"validator": "data.oidGroup&&data.oidGroup!=''",
-							"validatorErrorText": "errOidGrpEmpty",
-							"validatorNoSaveOnError": true,
+                            "validator": "data.oidGroup&&data.oidGroup!=''",
+                            "validatorErrorText": "errOidGrpEmpty",
+                            "validatorNoSaveOnError": true,
                             "default": "default"
                         },
                         {
@@ -287,9 +296,9 @@
                             "title": "lblOidName",
                             "filter": false,
                             "sort": true,
-							"validator": "data.oidName&&data.oidName!=''",
-							"validatorErrorText": "errOidNameEmpty",
-							"validatorNoSaveOnError": true,
+                            "validator": "data.oidName&&data.oidName!=''",
+                            "validatorErrorText": "errOidNameEmpty",
+                            "validatorNoSaveOnError": true,
                             "default": ""
                         },
                         {
@@ -299,9 +308,9 @@
                             "title": "lblOidOid",
                             "filter": false,
                             "sort": true,
-							"validator": "data.oidOid&&data.oidOid!=''",
-							"validatorErrorText": "errOidEmpty",
-							"validatorNoSaveOnError": true,
+                            "validator": "data.oidOid&&data.oidOid!=''",
+                            "validatorErrorText": "errOidEmpty",
+                            "validatorNoSaveOnError": true,
                             "default": ""
                         },
                         {
@@ -312,12 +321,30 @@
                             "filter": false,
                             "sort": false,
                             "options": [
-                                { "label": "lblString", "value": 0},
-                                { "label": "lblNumber", "value": 1},
-                                { "label": "lblBoolean", "value": 2},
-                                { "label": "lblJson", "value": 3},
-                                { "label": "lblHexdump", "value": 4},
-                                { "label": "lblAutomatic", "value": 99}
+                                {
+                                    "label": "lblString",
+                                    "value": 0
+                                },
+                                {
+                                    "label": "lblNumber",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "lblBoolean",
+                                    "value": 2
+                                },
+                                {
+                                    "label": "lblJson",
+                                    "value": 3
+                                },
+                                {
+                                    "label": "lblHexdump",
+                                    "value": 4
+                                },
+                                {
+                                    "label": "lblAutomatic",
+                                    "value": 99
+                                }
                             ],
                             "default": 99
                         },
@@ -340,44 +367,43 @@
                             "default": false
                         }
                     ]
-				}
-			}
-		},
-
+                }
+            }
+        },
         "authorization": {
             "type": "panel",
             "label": "lblAuth",
             "items": {
- 				"_oidsInfo_1":{
-					"type": "staticText",
-					"text": "infoAuth",
-					"style": {
-						"fontSize": 16
-					},
+                "_oidsInfo_1": {
+                    "type": "staticText",
+                    "text": "infoAuth",
+                    "style": {
+                        "fontSize": 16
+                    },
                     "xs": 12,
                     "sm": 12,
                     "md": 12,
                     "lg": 12,
                     "xl": 12
-				},
-               "oidsInfo_2":{
-					"type": "staticText",
-					"text": "warnAuthUnused",
-					"hidden": "for(let ii=0; ii<data.devs.length; ii++) {if (data.devs[ii].devSnmpVers == 3){return 1;}}; return 0;",
-					"style": {
-						"fontSize": 16
-					},
+                },
+                "oidsInfo_2": {
+                    "type": "staticText",
+                    "text": "warnAuthUnused",
+                    "hidden": "for(let ii=0; ii<data.devs.length; ii++) {if (data.devs[ii].devSnmpVers == 3){return 1;}}; return 0;",
+                    "style": {
+                        "fontSize": 16
+                    },
                     "xs": 12,
                     "sm": 12,
                     "md": 12,
                     "lg": 12,
                     "xl": 12
-				},
+                },
                 "authSets": {
                     "type": "table",
-					"newLine": true,
+                    "newLine": true,
                     "label": "lblAuthCfg",
-                    "showSecondAddAt":5,
+                    "showSecondAddAt": 5,
                     "xs": 12,
                     "sm": 12,
                     "md": 12,
@@ -401,9 +427,18 @@
                             "filter": false,
                             "sort": false,
                             "options": [
-                                { "label": "lblAuthSecLvlOpt1", "value": 1},
-                                { "label": "lblAuthSecLvlOpt2", "value": 2},
-                                { "label": "lblAuthSecLvlOpt3", "value": 3}
+                                {
+                                    "label": "lblAuthSecLvlOpt1",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "lblAuthSecLvlOpt2",
+                                    "value": 2
+                                },
+                                {
+                                    "label": "lblAuthSecLvlOpt3",
+                                    "value": 3
+                                }
                             ],
                             "default": "1"
                         },
@@ -421,17 +456,35 @@
                             "attr": "authAuthProto",
                             "width": "15% ",
                             "title": "lblAuthAuthProto",
-							"hidden": "data.authSecLvl<2",
+                            "hidden": "data.authSecLvl<2",
                             "filter": false,
                             "sort": false,
                             "options": [
-                                { "label": "md5",    "value": 1},
-                                { "label": "sha",    "value": 2},
-                                { "label": "sha224", "value": 3},
-                                { "label": "sha256", "value": 4},
-                                { "label": "sha384", "value": 5},
-                                { "label": "sha512", "value": 6}
-                                ],
+                                {
+                                    "label": "md5",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "sha",
+                                    "value": 2
+                                },
+                                {
+                                    "label": "sha224",
+                                    "value": 3
+                                },
+                                {
+                                    "label": "sha256",
+                                    "value": 4
+                                },
+                                {
+                                    "label": "sha384",
+                                    "value": 5
+                                },
+                                {
+                                    "label": "sha512",
+                                    "value": 6
+                                }
+                            ],
                             "default": 1
                         },
                         {
@@ -439,7 +492,7 @@
                             "attr": "authAuthKey",
                             "width": "15% ",
                             "title": "lblAuthAuthKey",
-							"hidden": "data.authSecLvl<2",
+                            "hidden": "data.authSecLvl<2",
                             "visible": true,
                             "filter": false,
                             "sort": false,
@@ -450,14 +503,26 @@
                             "attr": "authEncProto",
                             "width": "15% ",
                             "title": "lblAuthEncProto",
-							"hidden": "data.authSecLvl<3",
+                            "hidden": "data.authSecLvl<3",
                             "filter": false,
                             "sort": false,
                             "options": [
-                                { "label": "des", "value": 1},
-                                { "label": "aes", "value": 2},
-                                { "label": "aes256b", "value": 3},
-                                { "label": "aes256r", "value": 4}
+                                {
+                                    "label": "des",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "aes",
+                                    "value": 2
+                                },
+                                {
+                                    "label": "aes256b",
+                                    "value": 3
+                                },
+                                {
+                                    "label": "aes256r",
+                                    "value": 4
+                                }
                             ],
                             "default": "1"
                         },
@@ -466,33 +531,32 @@
                             "attr": "authEncKey",
                             "width": "15% ",
                             "title": "lblAuthEncKey",
-  							"hidden": "data.authSecLvl<3",
+                            "hidden": "data.authSecLvl<3",
                             "visible": true,
                             "filter": false,
                             "sort": false,
                             "default": ""
                         }
-					]
-				}
-			}
-		},
-
+                    ]
+                }
+            }
+        },
         "mibs": {
             "type": "panel",
             "label": "lblMib",
             "items": {
-				"_mibInfo":{
-					"type": "staticText",
-					"text": "infoMib",
-					"style": {
-						"fontSize": 16
-					},
+                "_mibInfo": {
+                    "type": "staticText",
+                    "text": "infoMib",
+                    "style": {
+                        "fontSize": 16
+                    },
                     "xs": 12,
                     "sm": 12,
                     "md": 12,
                     "lg": 12,
                     "xl": 12
-				},
+                },
                 "_mibUpload": {
                     "type": "fileSelector",
                     "label": "lblMibUpload",
@@ -504,16 +568,16 @@
                     "noNone": true,
                     "doNotSave": true,
                     "help": "hlpMibUpload",
-					"newLine": true,
+                    "newLine": true,
                     "xs": 12,
                     "sm": 12,
                     "md": 8,
                     "lg": 6,
                     "xl": 4
                 },
-				"divider":{
-					"type": "divider"
-				},
+                "divider": {
+                    "type": "divider"
+                },
                 "_mibBrowser": {
                     "type": "custom",
                     "i18n": true,
@@ -521,7 +585,7 @@
                     "name": "SnmpComponentSet/Components/MibBrowser",
                     "guiApi": 2,
                     "doNotSave": true,
-					"newLine": true,
+                    "newLine": true,
                     "xs": 12,
                     "sm": 12,
                     "md": 12,
@@ -529,8 +593,7 @@
                     "xl": 12
                 }
             }
-		},
-
+        },
         "traps": {
             "type": "panel",
             "label": "lblTraps",
@@ -655,7 +718,7 @@
             "type": "panel",
             "label": "lblOptions",
             "items": {
-				"optChunkSize": 	{
+                "optChunkSize": {
                     "type": "number",
                     "label": "lblOptChunkSize",
                     "min": 1,
@@ -669,10 +732,10 @@
                     "lg": 3,
                     "xl": 3
                 },
-				"optUseName": 	{
+                "optUseName": {
                     "type": "checkbox",
                     "label": "lblOptUseIp",
-					"newLine": true,
+                    "newLine": true,
                     "default": false,
                     "tooltip": "ttOptUseIp",
                     "help": "hlpOptUseIp",
@@ -682,10 +745,10 @@
                     "lg": 6,
                     "xl": 6
                 },
-				"optNoCloseOnError": 	{
+                "optNoCloseOnError": {
                     "type": "checkbox",
                     "label": "lblOptNoCloseOnError",
-					"newLine": true,
+                    "newLine": true,
                     "default": false,
                     "tooltip": "ttOptNoCloseOnError",
                     "help": "hlpOptNoCloseOnError",
@@ -695,10 +758,10 @@
                     "lg": 6,
                     "xl": 6
                 },
-				"optUseMibNames": 	{
+                "optUseMibNames": {
                     "type": "checkbox",
                     "label": "lblOptUseMibNames",
-					"newLine": true,
+                    "newLine": true,
                     "default": false,
                     "tooltip": "ttOptUseMibNames",
                     "help": "hlpOptUseMibNames",
@@ -708,10 +771,10 @@
                     "lg": 6,
                     "xl": 6
                 },
-				"optRawStates": 	{
+                "optRawStates": {
                     "type": "checkbox",
                     "label": "lblOptRawStates",
-					"newLine": true,
+                    "newLine": true,
                     "default": false,
                     "tooltip": "ttOptRawStates",
                     "help": "hlpOptRawStates",
@@ -734,10 +797,10 @@
                     "lg": 6,
                     "xl": 6
                 },
-				"optTypeStates": 	{
+                "optTypeStates": {
                     "type": "checkbox",
                     "label": "lblOptTypeStates",
-					"newLine": true,
+                    "newLine": true,
                     "default": false,
                     "tooltip": "ttOptTypeStates",
                     "help": "hlpOptTypeStates",
@@ -748,6 +811,6 @@
                     "xl": 6
                 }
             }
-		}
-	}
+        }
+    }
 }
