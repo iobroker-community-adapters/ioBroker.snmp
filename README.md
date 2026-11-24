@@ -46,6 +46,9 @@ For details see the documentation referenced below.
 <!--
    ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+- (@GermanBluefox) Fixed untranslated entries and copyright information reported by repository checker (#764)
+
 ### 4.0.1 (2026-10-22)
 - (@GermanBluefox) The UDP port of the trap receiver is reported to js-controller 8 as occupied (`registerUsedResource`), and a warning is logged before the start if another instance has registered it already
 
